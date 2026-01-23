@@ -1,0 +1,10 @@
+.leftnav-div {
+    display: "flex";
+}
+
+.leftnav-main {
+    margin-left: 415px;
+    padding: 20px;
+    width: fit-content;
+    flex:1
+}

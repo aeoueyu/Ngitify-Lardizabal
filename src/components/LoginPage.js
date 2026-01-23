@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/LoginPage.css';
 import logo from '../assets/logo.svg';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
     const [email,setEmail] = useState("");
@@ -11,9 +12,12 @@ export default function LoginPage() {
     const sampleEmail = "aeiou@email.com";
     const samplePassword = "aeiounicole";
 
+    const navigate = useNavigate();
+
     const handleLogin = ()=>{
         if (email === sampleEmail && password === samplePassword) {
             setErrorMessage("");
+            navigate("/overview", {replace:true});
             // alert("Login Successful");
         }
         else {
