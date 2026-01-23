@@ -69,7 +69,7 @@
     color: #cfcfcf;
 }
 
-.login-button {
+.signup-button {
     background-color: #3dacbd;
     width: 40%;
     height: 40px;
@@ -86,29 +86,29 @@
     transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
-.input, .login-button {
+.input, .signup-button {
     box-sizing: border-box;
     width: 50%;
 }
 
-.login-button:hover {
+.signup-button:hover {
     background-color: #9ed6de;
     transform: scale(1.05);
 }
 
-.login-button:active {
+.signup-button:active {
     transform: scale(0.95);
 }
 
-.signup-container {
+.login-container {
     margin-top: 5px;
 }
 
-.signup-label {
+.login-label {
     font-size: 12px;
 }
 
-.signup-link {
+.login-link {
     font-size: 12px;
     font-weight: bold;
 }

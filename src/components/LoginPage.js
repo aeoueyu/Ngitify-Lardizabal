@@ -1,8 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../styles/LoginPage.css';
 import logo from '../assets/logo.svg';
 
 export default function LoginPage() {
+    const [email,setEmail] = useState("");
+    const [password,setPassword] = useState("");
+
+    const [errorMessage,setErrorMessage] = useState("");
+
+    const sampleEmail = "aeiou@email.com";
+    const samplePassword = "aeiounicole";
+
+    const handleLogin = ()=>{
+        if (email === sampleEmail && password === samplePassword) {
+            setErrorMessage("");
+            // alert("Login Successful");
+        }
+        else {
+            setErrorMessage("Email and password do not match. Try again.");
+        }
+    }
+
     return (
         <div className="main-container">
         <div className="card">
@@ -13,7 +31,9 @@ export default function LoginPage() {
             <input 
                 type="email" 
                 placeholder="Enter your email" 
-                className="input" 
+                className="input"
+                value={email}
+                onChange={(e)=>setEmail(e.target.value)}
             />
             <div className="label-container">
                 <p className="label">Password</p>
@@ -22,8 +42,13 @@ export default function LoginPage() {
                 type="password" 
                 placeholder="Enter your password" 
                 className="input" 
+                value={password}
+                onChange={(e)=>setPassword(e.target.value)}
             />
-            <button className="login-button">
+            <div className="error">
+                {errorMessage}
+            </div>
+            <button className="login-button" onClick={handleLogin}>
                 LOGIN
             </button>
             <div className="signup-container">
