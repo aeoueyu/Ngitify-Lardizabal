@@ -1,10 +1,9 @@
 import React from "react";
-import "../styles/OverviewPage.css";
 
-export default function OverviewPage() {
+export default function PatientProfilePage() {
     return (
         <div>
-            <h1>Overview Page Content</h1>
+            <h1>Patient Profile Page</h1>
             <p>Dito nakalagay ang mga charts o stats mo.</p>
         </div>
     );

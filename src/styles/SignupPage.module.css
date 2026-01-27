@@ -1,0 +1,256 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.main-container * {
+    box-sizing: border-box;
+    font-family: 'Lexend Deca', sans-serif;
+}
+
+.main-container {
+    display: flex;
+    height: 100vh;
+    justify-content: flex-end   ;
+    align-items: center;
+    background-color: white;
+    background-image: url('../assets/login-bg.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    position: relative;
+    overflow: hidden;
+}
+
+.logo {
+    position: absolute;
+    width: 375px;
+    height: 50px;
+    top: 25px;
+    left: 60px;
+}
+
+.bg-element {
+    position: absolute;
+    width: 500px;
+    height: auto;
+    bottom: 0px;
+    left: 0px;
+    margin-bottom: 0px;
+}
+
+.container {
+    padding: 0 20px 20px 20px;
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-title {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    font-size: 20px;
+}
+
+.ngitify-title {
+    font-weight: bold;
+    color: #1a6575;
+}
+
+.row-field {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    width: 70%;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: flex-start;
+}
+
+.label-container {
+    width: 100%;
+    margin-left: 20px;
+}
+
+.label {
+    font-size: 10px;
+    font-weight: bold;
+    text-align: left;
+}
+
+.input-field {
+    height: 30px;
+    width: 100%;
+    border: 1px solid grey;
+    border-radius: 50px;
+    padding: 0 15px;
+    outline: none;
+    margin-bottom: 5px;
+}
+
+.input::placeholder {
+    color: #cfcfcf;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.addresslabel-container {
+    width: 60%;
+    margin-left: 40px;
+}
+
+.addresslabel {
+    font-size: 10px;
+    font-weight: bold;
+    text-align: left;
+}
+
+.addressinput-field {
+    height: 40px;
+    width: 60%;
+    border: 1px solid grey;
+    border-radius: 50px;
+    padding: 0 15px;
+    outline: none;
+}
+
+.row-field, .addressinput-field, .signup-button, .googlesignup-button{
+    box-sizing: border-box;
+    width: 60%;
+}
+
+.contact-input-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border: 1px solid grey;
+    border-radius: 50px;
+    padding: 0 15px;
+    height: 30px;
+    background: white;
+}
+
+.prefix {
+    font-weight: bold;
+    color: #555;
+    margin-right: 5px;
+    border-right: 1px solid #ccc;
+    padding-right: 8px;
+}
+
+.contact-input {
+    border: none;
+    outline: none;
+    width: 100%;
+}
+
+.strength {
+    font-size: 10px;
+    font-weight: bold;
+    width: 60%;
+    margin-left: 40px;
+}
+
+.weak { color: #ff4d4d; }
+.moderate { color: #ffa500; }
+.strong { color: #2eb82e; }
+
+.error {
+    color: red;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.signup-button {
+    background-color: #005466;
+    width: 60%;
+    height: 40px;
+    border-radius: 50px;
+    margin-top: 15px;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.signup-button:hover {
+    background-color: #337685;
+    transform: scale(1.05);
+}
+
+.signup-button:active {
+    transform: scale(0.95);
+}
+
+.signup-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.googlesignup-button {
+    background-color: white;
+    border: 1px solid #005466;
+    border-radius: 50px;
+    width: 60%;
+    height: 40px;
+    margin-top: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.googlesignup-button:hover {
+    transform: scale(1.05);
+    border: 1px solid #337685;
+}
+
+.googlesignup-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+}
+
+.google-logo {
+    width: 25px;
+    height: 25px;
+    display: block;
+}
+
+.googlesignup-label {
+    font-weight: bold;
+    display: block;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.login-container {
+    margin-top: 5px;
+}
+
+.login-label {
+    font-size: 12px;
+}
+
+.login-link {
+    font-size: 12px;
+    font-weight: bold;
+}

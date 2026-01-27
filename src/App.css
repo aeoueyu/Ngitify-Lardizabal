@@ -1,9 +1,9 @@
 .leftnav-div {
-    display: "flex";
+    display: flex;
 }
 
 .leftnav-main {
-    margin-left: 415px;
+    margin-left: 100px;
     padding: 20px;
     width: fit-content;
     flex:1

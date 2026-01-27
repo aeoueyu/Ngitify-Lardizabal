@@ -1,5 +1,4 @@
 import React from "react";
-import "../styles/OverviewPage.css";
 
 export default function OverviewPage() {
     return (
