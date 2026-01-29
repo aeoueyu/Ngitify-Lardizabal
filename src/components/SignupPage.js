@@ -1,4 +1,4 @@
-import React , { use, useEffect, useState }from "react";
+import React , { useEffect, useState }from "react";
 import styles from '../styles/SignupPage.module.css';
 import logo from '../assets/logo-greenpink.svg';
 import googlelogo from '../assets/google-logo.png';
@@ -6,11 +6,13 @@ import bgElement from '../assets/bg-element.svg';
 import { useNavigate } from "react-router-dom";
 
 export default function SignupPage() {
+    const navigate = useNavigate();
+    
     const [ fullname , setFullname ] = useState('');
     const [ email , setEmail ] = useState('');
     const [ birthday , setBirthday ] = useState('');
     const [ contactNumber , setContactNumber ] = useState('');
-    const [ currentAddress , setCurrentAddress ] = useState({
+    const [ address , setAddress ] = useState({
         houseNum: '',
         street: '',
         region: '',
@@ -24,7 +26,7 @@ export default function SignupPage() {
 
     useEffect(()=>{
         if (password || confirmPassword) {
-            if (password != confirmPassword) {
+            if (password !== confirmPassword) {
                 setErrorMessage('Passwords do not match.');
             }
             else {
@@ -44,9 +46,7 @@ export default function SignupPage() {
                 setPassStrength('MODERATE');
             }
         }
-    })
-
-    const isSignupDisabled = passStrength === 'WEAK' || passStrength === '' || password != confirmPassword;
+    }, [password,confirmPassword]);
 
     const handleNameChange = (e)=>{
         const val = e.target.value;
@@ -54,9 +54,72 @@ export default function SignupPage() {
         setFullname(cleanValue);
     }
 
-    const emailFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    const isOldEnough = ()=>{
+        if (!birthday) return false;
+        const today = new Date();
+        const birthDate = new Date(birthday);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age >= 21;
+    }
+
+    const getMaxBirthday = () => {
+        const today = new Date();
+        const maxDate = new Date(
+            today.getFullYear() - 21,
+            today.getMonth(),
+            today.getDate()
+        );
+        return maxDate.toISOString().split("T")[0];
+    };
+
+    const isAddressComplete = Object.values(address).every(value => value.trim() !== '');
+
+    const isSignupDisabled =
+        !fullname ||
+        !isEmailValid ||
+        contactNumber.length !==10 ||
+        !isOldEnough() ||
+        !isAddressComplete ||
+        passStrength === 'WEAK' ||
+        passStrength === '' ||
+        password !== confirmPassword;
 
     const [ errorMessage , setErrorMessage ] = useState("");
+
+    const handleSignup = async (e)=>{
+        const userData = {
+            fullname,
+            email,
+            contactNumber: `+63${contactNumber}`,
+            address,
+            password
+        };
+
+        try {
+            const response = await fetch('http://localhost:5000/api/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                navigate('/email-verification');
+            }
+            else {
+                setErrorMessage(data.message);
+            }
+        }
+        catch (err) {
+            setErrorMessage('Cannot connect to server.');
+        }
+    };
 
     return (
         <div className={styles['main-container']}>
@@ -115,42 +178,39 @@ export default function SignupPage() {
                         </div>
                         <input
                             type='date'
-                            placeholder='Enter your birthday'
-                            className={styles['input-field']}
+                            className={`${styles['input-field']} ${birthday ? styles['has-value'] : ''}`}
                             value={birthday}
+                            onChange={(e)=>setBirthday(e.target.value)}
+                            max={getMaxBirthday()}
                         />
                     </div>
                 </div>
                 <div className={styles['addresslabel-container']}>
                     <p className={styles['addresslabel']}>ADDRESS</p>
                 </div>
-                <div className={styles['row-field']}>
-                    <div className={styles['field']}>
-                        <input
-                            type='text'
-                            placeholder='House No.'
-                            className={styles['input-field']}
-                        />
-                    </div>
-                    <div className={styles['field']}>
-                        <input
-                            type='text'
-                            placeholder='Street Name'
-                            className={styles['input-field']}
-                        />
-                    </div>
-                </div>
                 <div className={styles['row-field']}> 
                     <div className={styles['field']}>
-                        <select className={styles['input-field']}>
-                            <option value=''>Select Region</option>
+                        <select
+                            className={styles['input-field']}
+                            required
+                            value={address.region}
+                            onChange={(e)=>setAddress({...address,region:e.target.value})}
+                            style={{color: address.region === '' ? '#CFCFCF' : 'black'}}
+                        >
+                            <option value='' disabled hidden>Select Region</option>
                             <option value='NCR'>NCR</option>
-                            <option value='NCR'>Region I</option>
+                            <option value='Region I'>Region I</option>
                         </select>
                     </div>
                     <div className={styles['field']}>
-                        <select className={styles['input-field']}>
-                            <option value=''>Select Province</option>
+                        <select
+                            className={styles['input-field']}
+                            required
+                            value={address.province}
+                            onChange={(e)=>setAddress({...address,province:e.target.value})}
+                            style={{color: address.province === '' ? '#CFCFCF' : 'black'}}
+                        >
+                            <option value='' disabled hidden>Select Province</option>
                             <option value='Metro Manila'>Metro Manila</option>
                             <option value='Cavite'>Cavite</option>
                         </select>
@@ -158,18 +218,52 @@ export default function SignupPage() {
                 </div>
                 <div className={styles['row-field']}> 
                     <div className={styles['field']}>
-                        <select className={styles['input-field']}>
-                            <option value=''>Select City</option>
+                        <select
+                            className={styles['input-field']}
+                            required
+                            value={address.city}
+                            onChange={(e)=>setAddress({...address,city:e.target.value})}
+                            style={{color: address.city === '' ? '#CFCFCF' : 'black'}}
+                        >
+                            <option value='' disabled hidden>Select City</option>
                             <option value='Pasay City'>Pasay City</option>
                             <option value='Imus'>Imus</option>
                         </select>
                     </div>
                     <div className={styles['field']}>
-                        <select className={styles['input-field']}>
-                            <option value=''>Select Barangay</option>
+                        <select
+                            className={styles['input-field']}
+                            required
+                            value={address.brgy}
+                            onChange={(e)=>setAddress({...address,brgy:e.target.value})}
+                            style={{color: address.brgy === '' ? '#CFCFCF' : 'black'}}
+                        >
+                            <option value='' disabled hidden>Select Barangay</option>
                             <option value='Barangay 1'>Barangay 1</option>
                             <option value='Barangay 2'>Barangay 2</option>
                         </select>
+                    </div>
+                </div>
+                <div className={styles['row-field']}>
+                    <div className={styles['field']}>
+                        <input
+                            type='text'
+                            placeholder='House No.'
+                            className={styles['input-field']}
+                            required
+                            value={address.houseNum}
+                            onChange={(e)=>setAddress({...address,houseNum:e.target.value})}
+                        />
+                    </div>
+                    <div className={styles['field']}>
+                        <input
+                            type='text'
+                            placeholder='Street Name'
+                            className={styles['input-field']}
+                            required
+                            value={address.street}
+                            onChange={(e)=>setAddress({...address,street:e.target.value})}
+                        />
                     </div>
                 </div>
                 <div className={styles['row-field']}>
@@ -193,6 +287,7 @@ export default function SignupPage() {
                             type='password'
                             placeholder='Enter your password'
                             className={styles['input-field']}
+                            value={confirmPassword}
                             onChange={(e)=>setConfirmPassword(e.target.value)}
                         />
                     </div>
@@ -205,7 +300,7 @@ export default function SignupPage() {
                 <div className={styles.error}>
                     {errorMessage}
                 </div>
-                <button className={styles['signup-button']} disabled={isSignupDisabled}>
+                <button className={styles['signup-button']} disabled={isSignupDisabled} onClick={handleSignup}>
                     SIGN UP
                 </button>
                 <button className={styles['googlesignup-button']}>

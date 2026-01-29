@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.main-container * {
+    font-family: 'Lexend Deca', sans-serif;
+}
+
+.main-container {
+    display: flex;
+    height: 100vh;
+    justify-content: flex-end   ;
+    align-items: center;
+    background-color: white;
+    background-image: url('../assets/login-bg.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    position: relative;
+    overflow: hidden;
+}
+
+.logo {
+    position: absolute;
+    width: 375px;
+    height: 50px;
+    top: 25px;
+    left: 60px;
+}
+
+.bg-element {
+    position: absolute;
+    width: 500px;
+    height: auto;
+    bottom: 0px;
+    left: 0px;
+}
+
+.container {
+    margin-top: 0px;
+    padding: 20px;
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-title {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    font-size: 30px;
+}
+
+.page-title p {
+    margin: 0;
+    margin-bottom: 5px;
+}
+
+.otp-title {
+    font-weight: bold;
+    color: #1a6575;
+}
+
+.page-header {
+    font-size: 15px;
+}
+
+.page-header p {
+    margin: 0;
+}
+
+.otp-field {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.otp-input {
+    height: 60px;
+    width: 50px;
+    text-align: center;
+    font-size: 30px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.otp-input:focus {
+    border-color: #1a6575;
+    box-shadow: 0 0 5px rgba(26, 101, 117, 0.3);
+}
+
+.otp-input::-webkit-outer-spin-button,
+.otp-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.message {
+    margin-top: 20px;
+}
+
+.error {
+    color: red;
+    font-size: 10px;
+}
+
+.success {
+    font-size: 10px;
+}
+
+.enter-button {
+    background-color: #005466;
+    width: 45%;
+    height: 40px;
+    border-radius: 50px;
+    margin-top: 20px;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.enter-button:hover {
+    background-color: #337685;
+    transform: scale(1.05);
+}
+
+.enter-button:active {
+    transform: scale(0.95);
+}
+
+.resend-container {
+    margin-top: 20px;
+}
+
+.resend-label {
+    font-size: 15px;
+}
+
+.click-resend {
+    font-weight: bold;
+    cursor: pointer;
+}

@@ -11,20 +11,31 @@ export default function LoginPage() {
 
     const [errorMessage,setErrorMessage] = useState("");
 
-    const sampleEmail = "aeiou@email.com";
-    const samplePassword = "aeiounicole";
-
     const navigate = useNavigate();
 
-    const handleLogin = ()=>{
-        if (email === sampleEmail && password === samplePassword) {
-            setErrorMessage("");
-            navigate("/overview", {replace:true});
+    const handleLogin = async ()=>{
+        try {
+            const response = await fetch('http://localhost:5000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setErrorMessage('');
+                navigate('/otp', { state: { email: email } });
+            }
+            else {
+                setErrorMessage(data.message);
+            }
         }
-        else {
-            setErrorMessage("Email and password do not match. Try again.");
+        catch (err) {
+            setErrorMessage('Cannot connect to server.');
         }
-    }
+    };
+
 
     return (
         <div className={styles['main-container']}>

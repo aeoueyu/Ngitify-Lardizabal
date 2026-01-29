@@ -89,19 +89,21 @@
     width: 100%;
     border: 1px solid grey;
     border-radius: 50px;
-    padding: 0 15px;
+    padding: 0 25px 0 15px;
     outline: none;
     margin-bottom: 5px;
+    appearance: none;
+    color: black;
 }
 
-.input::placeholder {
-    color: #cfcfcf;
+.input-field::placeholder {
+    color: #CFCFCF;
 }
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .addresslabel-container {
@@ -113,15 +115,6 @@ input::-webkit-inner-spin-button {
     font-size: 10px;
     font-weight: bold;
     text-align: left;
-}
-
-.addressinput-field {
-    height: 40px;
-    width: 60%;
-    border: 1px solid grey;
-    border-radius: 50px;
-    padding: 0 15px;
-    outline: none;
 }
 
 .row-field, .addressinput-field, .signup-button, .googlesignup-button{
@@ -138,9 +131,15 @@ input::-webkit-inner-spin-button {
     padding: 0 15px;
     height: 30px;
     background: white;
+    box-sizing: border-box;
+}
+
+.field .contact-input-wrapper {
+    margin-bottom: 5px;
 }
 
 .prefix {
+    font-size: 12px;
     font-weight: bold;
     color: #555;
     margin-right: 5px;
@@ -152,6 +151,33 @@ input::-webkit-inner-spin-button {
     border: none;
     outline: none;
     width: 100%;
+}
+
+.contact-input::placeholder {
+    color: #CFCFCF;
+}
+
+.input-field:invalid,
+.input-field option[value=""] {
+    color: #CFCFCF;
+}
+
+.input-field option {
+    color: black;
+}
+
+.input-field::-webkit-datetime-edit-text,
+.input-field::-webkit-datetime-edit-month-field,
+.input-field::-webkit-datetime-edit-day-field,
+.input-field::-webkit-datetime-edit-year-field {
+    color: #CFCFCF;
+}
+
+.input-field.has-value::-webkit-datetime-edit-text,
+.input-field.has-value::-webkit-datetime-edit-month-field,
+.input-field.has-value::-webkit-datetime-edit-day-field,
+.input-field.has-value::-webkit-datetime-edit-year-field {
+    color: black;
 }
 
 .strength {
