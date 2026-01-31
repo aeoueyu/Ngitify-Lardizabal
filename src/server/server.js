@@ -103,19 +103,6 @@ app.post('/api/add-dentist', async (req, res) => {
 // ... (sa ilalim ng app.post('/api/add-dentist' ...)
 
 // GET ALL DENTISTS
-app.get('/api/dentists', async (req, res) => {
-    try {
-        // Hanapin lahat ng user na 'dentist' ang role
-        // Select lang natin yung mga kailangan na fields para mabilis
-        const dentists = await User.find({ role: 'dentist' })
-            .select('name licenseNumber email contactNumber isVerified profileImage');
-
-        res.status(200).json(dentists);
-    } catch (error) {
-        console.error("Error fetching dentists:", error);
-        res.status(500).json({ message: "Server error fetching dentists." });
-    }
-});
 
 // ... (Sa ilalim ng app.get('/api/dentists' ...)
 
@@ -141,19 +128,28 @@ app.delete('/api/dentist/:id', async (req, res) => {
 // ... (sa ilalim ng app.delete...)
 
 // GET SINGLE DENTIST (For Editing)
+app.get('/api/dentists', async (req, res) => {
+    try {
+        const dentists = await User.find({ role: 'dentist' }).select('name licenseNumber email contactNumber isVerified profileImage');
+        res.status(200).json(dentists);
+    } catch (error) {
+        console.error("Error fetching dentists:", error);
+        res.status(500).json({ message: "Server error fetching dentists." });
+    }
+});
+
+// 3. GET SINGLE DENTIST (FOR EDITING/VIEWING)
 app.get('/api/dentist/:id', async (req, res) => {
     try {
-        // Safety Check: Kung hindi valid ID ang pumasok
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(400).json({ message: "Invalid User ID format" });
         }
-
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ message: "User not found" });
         res.json(user);
     } catch (error) {
         console.error("Error fetching dentist:", error);
-        res.status(500).json({ message: "Server error fetching dentist data." });
+        res.status(500).json({ message: "Server error" });
     }
 });
 

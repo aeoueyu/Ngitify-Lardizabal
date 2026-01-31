@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styles from '../../styles/edit-user/EditDentistPage.module.css';
+import styles from '../../styles/add-user/AddDentistPage.module.css'; // Reuse Add Page styles
 import { useNavigate, useParams } from 'react-router-dom';
 import { regions, provinces, cities, barangays } from '../../utils/addressData';
 import successIcon from '../../assets/alert-icons/success.svg';
@@ -10,10 +10,10 @@ export default function EditDentistPage() {
     const fileInputRef = useRef(null);
     
     // --- STATE MANAGEMENT ---
+    const [isLoading, setIsLoading] = useState(true);
     const [isSameAddress, setIsSameAddress] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
 
     const initialAddressState = {
         country: 'Philippines',
@@ -28,10 +28,11 @@ export default function EditDentistPage() {
         permanentAddress: { ...initialAddressState }
     });
 
-    // --- 1. FETCH DATA ON MOUNT ---
+    // --- FETCH DATA ---
     useEffect(() => {
         const fetchDentist = async () => {
             try {
+                // Tatawag sa backend gamit ang ID
                 const response = await fetch(`http://localhost:5000/api/dentist/${id}`);
                 const data = await response.json();
                 
@@ -40,7 +41,7 @@ export default function EditDentistPage() {
                         firstName: data.name?.first || '',
                         middleName: data.name?.middle || '',
                         lastName: data.name?.last || '',
-                        birthdate: data.birthdate ? data.birthdate.split('T')[0] : '',
+                        birthdate: data.birthdate ? new Date(data.birthdate).toISOString().split('T')[0] : '',
                         email: data.email || '',
                         phone: data.contactNumber ? data.contactNumber.replace('+63', '') : '',
                         licenseNumber: data.licenseNumber || '',
@@ -50,11 +51,12 @@ export default function EditDentistPage() {
                     });
                     setProfileImage(data.profileImage);
                 } else {
-                    alert("Failed to fetch dentist data");
+                    alert("Failed to fetch dentist data. " + (data.message || ""));
                     navigate('/owner/manage-dentists');
                 }
             } catch (error) {
                 console.error("Error:", error);
+                alert("Server error. Check if backend is running.");
             } finally {
                 setIsLoading(false);
             }
@@ -62,7 +64,7 @@ export default function EditDentistPage() {
         fetchDentist();
     }, [id, navigate]);
 
-    // --- FORM HANDLERS ---
+    // --- HANDLERS ---
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -111,7 +113,7 @@ export default function EditDentistPage() {
         }
     };
 
-    // --- SUBMIT HANDLER (UPDATE) ---
+    // --- SUBMIT (UPDATE) ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -221,9 +223,7 @@ export default function EditDentistPage() {
                             {profileImage ? (
                                 <img src={profileImage} alt="Profile" className={styles.previewImage} />
                             ) : (
-                                <div className={styles.uploadPlaceholder}>
-                                    <span>No Image</span>
-                                </div>
+                                <div className={styles.uploadPlaceholder}><span>No Image</span></div>
                             )}
                         </div>
                         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} style={{ display: 'none' }} />

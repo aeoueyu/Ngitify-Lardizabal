@@ -86,7 +86,7 @@ export default function ManageDentists() {
     const handleEdit = (id) => {
         navigate(`/owner/edit-dentist/${id}`);
     };
-
+    
     const handleView = (id) => {
         navigate(`/owner/view-dentist/${id}`);
     };
@@ -155,14 +155,8 @@ export default function ManageDentists() {
                                         </span>
                                     </td>
                                     <td className={styles.actionCell}>
-                                        {/* Update this button */}
-                                        <button 
-                                            className={styles.viewBtn} 
-                                            onClick={() => handleView(dentist.id)}
-                                        >
-                                            VIEW
-                                        </button>
-                                        
+                                        {/* AAYUSIN NATIN ITO: Dapat may () => arrow function */}
+                                        <button className={styles.viewBtn} onClick={() => handleView(dentist.id)}>VIEW</button>
                                         <button className={styles.editBtn} onClick={() => handleEdit(dentist.id)}>EDIT</button>
                                         <button className={styles.deleteBtn} onClick={() => initiateDelete(dentist.id)}>DELETE</button>
                                     </td>
