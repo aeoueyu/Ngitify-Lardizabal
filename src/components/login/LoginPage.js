@@ -23,12 +23,37 @@ export default function LoginPage() {
     }, [userRole, navigate]);
 
     const handleLogin = async () => {
-        // Simple validation
+        // 1. Basic Validation
         if(!email || !password) {
             setErrorMessage("Please fill in all fields.");
             return;
         }
 
+        // --- HARDCODED ADMIN LOGIC (Start) ---
+        // Dito natin sasaluhin si Admin bago pa tumawag sa backend/database
+        if (email === 'admin@gmail.com') {
+            if (password === 'AdminUser_123') {
+                // Check kung nasa tamang Role siya
+                if (userRole === 'Owner') {
+                    // SUCCESS: Admin is logging in as Owner
+                    navigate('/owner/dashboard');
+                    return; // Stop execution here
+                } else {
+                    // FAIL: Admin trying to login as Dentist/Staff/Patient
+                    // Magpapakita ng generic error para hindi nila alam na admin account ito
+                    setErrorMessage("Invalid email or password.");
+                    return; 
+                }
+            } else {
+                // Wrong password for admin
+                setErrorMessage("Invalid email or password.");
+                return;
+            }
+        }
+        // --- HARDCODED ADMIN LOGIC (End) ---
+
+
+        // 2. REGULAR LOGIN (Para sa ibang users: Dentist, Staff, Patient)
         try {
             const response = await fetch('http://localhost:5000/api/login', {
                 method: 'POST',
@@ -45,12 +70,9 @@ export default function LoginPage() {
             if (response.ok) {
                 setErrorMessage('');
                 
-                // --- DITO ANG PAGBABAGO ---
-                // Wala nang OTP redirect. Diretso na sa Dashboard base sa role.
-                // Siguraduhin na meron kang routes para sa mga paths na ito sa App.js
-                
+                // NO MORE OTP: Diretso na sa Dashboard base sa role
                 switch(userRole) {
-                    case 'Owner':
+                    case 'Owner': // Kung may iba pang owner sa DB
                         navigate('/owner/dashboard'); 
                         break;
                     case 'Dentist':
@@ -63,25 +85,21 @@ export default function LoginPage() {
                         navigate('/patient/dashboard');
                         break;
                     default:
-                        navigate('/'); // Fallback
+                        navigate('/'); 
                 }
-
             } else {
-                // Kung sakaling "Account not activated" ang error mula sa backend,
-                // pwede tayong maglagay ng logic dito para papuntahin sila sa Activation Page.
-                setErrorMessage(data.message || 'Invalid credentials');
+                setErrorMessage(data.message || 'Invalid email or password.');
             }
         } catch (err) {
             setErrorMessage('Cannot connect to server.');
         }
     };
 
-    // GRAMMAR FIX: 'an' Owner vs 'a' Dentist/Staff/Patient
+    // Grammar fix for "a" vs "an"
     const article = userRole === 'Owner' ? 'an' : 'a';
 
     return (
         <div className={styles['main-container']}>
-            
             <div className={styles['container']}>
                 <img src={logo} alt='Lardizabal Dental Clinic' className={styles['logo']} />
                 
@@ -109,7 +127,7 @@ export default function LoginPage() {
                         value={password}
                         onChange={(e)=>setPassword(e.target.value)}
                     />
-                    {/* Ito na lang ang gagamit ng OTP/Email verification */}
+                    {/* Disable muna forgot pass para kay Admin, pero active sa iba kung may backend logic ka na */}
                     <a href='/forgot-password' className={styles['forgotpass-link']}>Forgot Password?</a>
                 </div>
 

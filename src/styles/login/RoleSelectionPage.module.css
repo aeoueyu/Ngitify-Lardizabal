@@ -1,21 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
 
-/* --- KEYFRAME ANIMATIONS --- */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes fadeUpScale {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUpScale { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 .main-container {
     width: 100%;
@@ -28,20 +15,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     overflow: hidden;
-}
-
-.bg-element {
-    position: absolute;
-    bottom: -50px;
-    left: -50px;
-    width: 500px;
-    opacity: 0.5;
-    z-index: 0;
-    animation: fadeIn 1.5s ease-out;
 }
 
 .logo {
@@ -54,27 +28,17 @@
 .container {
     z-index: 1;
     text-align: center;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     padding: 40px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    animation: fadeIn 1s ease-out; /* Buong card magfe-fade in */
-}
-
-.header-text {
-    /* backwards fill para nakatago bago magsimula animation */
-    animation: fadeUpScale 0.8s ease-out 0.2s backwards; 
-}
-
-.header-text p {
-    color: #444;
-    font-size: 1.2rem;
-    margin: 0;
+    animation: fadeIn 1s ease-out;
 }
 
 .header-text h2 {
     font-size: 2rem;
     margin: 10px 0 30px 0;
+    color: #444;
 }
 
 .pink-text {
@@ -88,41 +52,59 @@
     margin-bottom: 30px;
 }
 
+/* Updated Button Styles for Icon + Text */
 .role-btn {
     width: 180px;
-    height: 120px;
+    height: 140px; /* Tinaasan ko ng konti para comfy ang icon */
     background-color: white;
     border: 2px solid #005466;
     color: #005466;
     border-radius: 15px;
+    
+    /* Flex layout para sa Icon at Text */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px; /* Space sa pagitan ng icon at text */
+    
     font-family: 'Lexend Deca', sans-serif;
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    /* Initial state para sa animation */
+    
+    /* Animation start state */
     opacity: 0; 
     transform: translateY(20px) scale(0.95);
 }
 
-/* --- STAGGERED ANIMATION FOR BUTTONS --- */
+/* Icon Sizing */
+.role-icon {
+    height: 50px; /* Pwede mong i-adjust kung masyadong malaki/maliit */
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+/* Hover Effects */
+.role-btn:hover {
+    background-color: #005466;
+    color: white;
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 15px rgba(0, 84, 102, 0.3);
+}
+
+/* Optional: I-scale ang icon pag hover para mas interactive */
+.role-btn:hover .role-icon {
+    transform: scale(1.1);
+}
+
+/* Staggered Animations */
 .role-grid .role-btn:nth-child(1) { animation: fadeUpScale 0.6s ease-out 0.3s forwards; }
 .role-grid .role-btn:nth-child(2) { animation: fadeUpScale 0.6s ease-out 0.4s forwards; }
 .role-grid .role-btn:nth-child(3) { animation: fadeUpScale 0.6s ease-out 0.5s forwards; }
 .role-grid .role-btn:nth-child(4) { animation: fadeUpScale 0.6s ease-out 0.6s forwards; }
-
-
-.role-btn:hover {
-    background-color: #005466;
-    color: white;
-    transform: translateY(-5px) scale(1.02); /* Adjusted scale for smoother hover */
-    box-shadow: 0 8px 15px rgba(0, 84, 102, 0.3);
-}
-
-.back-link {
-    animation: fadeIn 0.8s ease-out 0.8s backwards;
-}
 
 .back-link p {
     color: #888;
@@ -142,6 +124,12 @@
     }
     .role-btn {
         width: 100%;
-        height: 80px;
+        height: 100px;
+        flex-direction: row; /* Sa mobile, pwedeng magkatabi icon at text para tipid sa height */
+        justify-content: flex-start;
+        padding-left: 30px;
+    }
+    .role-icon {
+        height: 35px; /* Liitan konti sa mobile */
     }
 }

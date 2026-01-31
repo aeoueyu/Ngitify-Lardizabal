@@ -8,7 +8,7 @@ import PatientProfilePage from './components/PatientProfilePage';
 import SettingsPage from './components/SettingsPage'
 import OTP from './components/OTP';
 import EmailVerificationPage from './components/EmailVerificationPage';
-import Sidebar from './components/Sidebar';
+import Sidebar from './components/sidebar/Sidebar';
 import ForgotPassPage from './components/ForgotPassPage';
 import VerificationCodePage from './components/VerificationCodePage';
 import NewPasswordPage from './components/NewPasswordPage';
