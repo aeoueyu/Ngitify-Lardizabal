@@ -5,11 +5,17 @@
     width: 100%;
 }
 
+/* HEADER */
 .headerContainer {
     display: flex;
-    justify-content: space-between; /* Ito ang maglalagay sa button sa dulo (right) */
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
+}
+
+.titleSection {
+    display: flex;
+    flex-direction: column;
 }
 
 .pageTitle {
@@ -20,7 +26,13 @@
 }
 
 .highlight {
-    color: #ea8b89; /* Pink highlight */
+    color: #ea8b89;
+}
+
+.subTitle {
+    color: #888;
+    font-size: 14px;
+    margin: 5px 0 0 0;
 }
 
 .addButton {
@@ -34,7 +46,7 @@
     border-radius: 50px;
     font-family: 'Lexend Deca', sans-serif;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 10px rgba(0, 84, 102, 0.2);
@@ -46,16 +58,194 @@
 }
 
 .addIcon {
-    width: 16px;
-    height: 16px;
-    filter: brightness(0) invert(1); /* Gawing puti ang icon */
+    width: 14px;
+    height: 14px;
+    filter: brightness(0) invert(1);
 }
 
-.contentPlaceholder {
+/* SEARCH BAR */
+.controlsContainer {
+    margin-bottom: 20px;
+}
+
+.searchBar {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px 20px;
+    border: 1.5px solid #ddd;
+    border-radius: 50px;
+    outline: none;
+    font-family: 'Lexend Deca', sans-serif;
+    font-size: 14px;
+    transition: all 0.3s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+}
+
+.searchBar:focus {
+    border-color: #005466;
+    box-shadow: 0 0 0 4px rgba(0, 84, 102, 0.05);
+}
+
+/* TABLE STYLING */
+.tableContainer {
     background: white;
-    padding: 40px;
     border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    overflow: hidden; 
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px; 
+}
+
+.table thead {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #edf2f4;
+}
+
+.table th {
+    text-align: left;
+    padding: 18px 25px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #005466;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+}
+
+.table tbody tr:hover {
+    background-color: #fcfcfc;
+}
+
+.table td {
+    padding: 20px 25px;
+    font-size: 14px;
+    color: #555;
+    vertical-align: middle;
+}
+
+/* SPECIFIC CELLS */
+.nameCell {
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatarPlaceholder {
+    width: 35px;
+    height: 35px;
+    background-color: #e0f7fa;
+    color: #005466;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* ... EXISTING STYLES ... */
+
+/* Idagdag mo ito sa ilalim ng .avatarPlaceholder */
+.avatarImage {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #ddd;
+}
+
+.contactCell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.phoneText {
+    font-size: 12px;
     color: #888;
+}
+
+/* STATUS BADGES */
+.statusBadge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.active {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.inactive {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* ACTIONS */
+.actionHeader {
+    text-align: right !important; 
+}
+
+.actionCell {
+    text-align: right;
+    white-space: nowrap; /* Para hindi mag-wrap ang buttons */
+}
+
+/* Base style for buttons */
+.editBtn, .viewBtn, .deleteBtn {
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: all 0.2s;
+}
+
+/* VIEW BUTTON (Gray) */
+.viewBtn {
+    background-color: #f3f3f3;
+    color: #555;
+}
+.viewBtn:hover {
+    background-color: #e0e0e0;
+}
+
+/* EDIT BUTTON (Blue) */
+.editBtn {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+.editBtn:hover {
+    background-color: #bbdefb;
+}
+
+/* DELETE BUTTON (Red) */
+.deleteBtn {
+    background-color: #ffebee;
+    color: #c62828;
+}
+.deleteBtn:hover {
+    background-color: #ffcdd2;
+}
+
+.noData {
+    text-align: center;
+    padding: 40px;
+    color: #999;
 }

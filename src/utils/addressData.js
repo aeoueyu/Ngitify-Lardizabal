@@ -1,12 +1,12 @@
 // Import raw JSON data
-import rawRegions from './json/regions.json';
-import rawProvinces from './json/provinces.json';
-import rawCities from './json/cities.json';
-import rawBarangays from './json/barangays.json';
+// FIX: Updated filenames to match your actual files (singular names)
+import rawRegions from './json/region.json';
+import rawProvinces from './json/province.json';
+import rawCities from './json/city.json';
+import rawBarangays from './json/barangay.json';
 
 // --- 1. REGIONS ---
 // Format: [{ code: '01', name: 'Region I' }, ...]
-// Inaayos natin ang keys para magmatch sa AddDentistPage
 export const regions = rawRegions.map(region => ({
     code: region.region_code,
     name: region.region_name
