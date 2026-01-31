@@ -143,32 +143,38 @@ app.delete('/api/dentist/:id', async (req, res) => {
 // GET SINGLE DENTIST (For Editing)
 app.get('/api/dentist/:id', async (req, res) => {
     try {
+        // Safety Check: Kung hindi valid ID ang pumasok
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Invalid User ID format" });
+        }
+
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ message: "User not found" });
         res.json(user);
     } catch (error) {
         console.error("Error fetching dentist:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json({ message: "Server error fetching dentist data." });
     }
 });
 
-// UPDATE DENTIST
+// 2. UPDATE DENTIST (Para sa Save Changes)
+// UPDATE DENTIST (No Password Update)
 app.put('/api/dentist/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        // Kunin ang mga bagong data mula sa request body
+        // Tinanggal ko na ang password sa destructuring
         const { 
             firstName, middleName, lastName, 
             email, phone, birthdate, 
             licenseNumber, specialization, 
             currentAddress, permanentAddress,
-            password, profileImage 
+            profileImage 
         } = req.body;
 
         const user = await User.findById(id);
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        // Update fields individually
+        // Update fields
         user.name = {
             first: firstName,
             middle: middleName,
@@ -183,16 +189,12 @@ app.put('/api/dentist/:id', async (req, res) => {
         user.currentAddress = currentAddress;
         user.permanentAddress = permanentAddress;
 
-        // Update Image only if provided (hindi null)
         if (profileImage) {
             user.profileImage = profileImage;
         }
 
-        // Update Password only if provided (hindi blanko)
-        if (password && password.trim() !== "") {
-            const salt = await bcrypt.genSalt(10);
-            user.password = await bcrypt.hash(password, salt);
-        }
+        // REMOVED: Password update block here. 
+        // Password can only be changed via "Forgot Password" or separate "Change Password" settings.
 
         await user.save();
         res.json({ message: "Dentist updated successfully" });

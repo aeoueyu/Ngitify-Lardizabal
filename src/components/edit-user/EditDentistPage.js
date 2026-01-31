@@ -1,17 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-// Re-use natin ang styles ng Add Page para consistent
-import styles from '../../styles/edit-user/EditDentistPage.module.css';
+import styles from '../../styles/add-user/AddDentistPage.module.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { regions, provinces, cities, barangays } from '../../utils/addressData';
 import successIcon from '../../assets/alert-icons/success.svg';
 
 export default function EditDentistPage() {
     const navigate = useNavigate();
-    const { id } = useParams(); // Get ID from URL
+    const { id } = useParams();
     const fileInputRef = useRef(null);
     
-    // --- STATE ---
-    const [isLoading, setIsLoading] = useState(true); // Loading State
+    // --- STATE MANAGEMENT ---
+    const [isLoading, setIsLoading] = useState(true);
     const [isSameAddress, setIsSameAddress] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -25,51 +24,29 @@ export default function EditDentistPage() {
     const [formData, setFormData] = useState({
         firstName: '', middleName: '', lastName: '', birthdate: '',
         email: '', phone: '', licenseNumber: '', specialization: '',
-        password: '', confirmPassword: '', 
         currentAddress: { ...initialAddressState },
         permanentAddress: { ...initialAddressState }
     });
 
-    const [passwordCriteria, setPasswordCriteria] = useState({
-        length: false, uppercase: false, lowercase: false, number: false
-    });
-    const [passwordsMatch, setPasswordsMatch] = useState(true); 
-    const [showPasswordRules, setShowPasswordRules] = useState(false);
-
     // --- 1. FETCH DATA ON LOAD ---
     useEffect(() => {
         const fetchDentist = async () => {
-            console.log("Fetching dentist with ID:", id); // DEBUG LOG 1
-
             try {
                 const response = await fetch(`http://localhost:5000/api/dentist/${id}`);
                 
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data");
-                }
+                if (!response.ok) throw new Error("Failed to fetch data");
 
                 const data = await response.json();
-                console.log("Fetched Data:", data); // DEBUG LOG 2 - Check console if data appears
 
-                // PRE-FILL FORM with Safety Checks (?. and || '')
                 setFormData({
                     firstName: data.name?.first || '',
                     middleName: data.name?.middle || '',
                     lastName: data.name?.last || '',
-                    
-                    // Format date to YYYY-MM-DD for input type="date"
                     birthdate: data.birthdate ? new Date(data.birthdate).toISOString().split('T')[0] : '',
-                    
                     email: data.email || '',
-                    // Remove +63 for display purposes
                     phone: data.contactNumber ? data.contactNumber.replace('+63', '') : '',
-                    
                     licenseNumber: data.licenseNumber || '',
                     specialization: data.specialization || '',
-                    
-                    password: '', // Keep blank for security
-                    confirmPassword: '',
-                    
                     currentAddress: data.currentAddress || initialAddressState,
                     permanentAddress: data.permanentAddress || initialAddressState
                 });
@@ -80,37 +57,17 @@ export default function EditDentistPage() {
 
             } catch (error) {
                 console.error("Error loading dentist:", error);
-                alert("Error loading dentist data. Please try again.");
+                alert("Error loading dentist data.");
                 navigate('/owner/manage-dentists');
             } finally {
-                setIsLoading(false); // Stop loading
+                setIsLoading(false);
             }
         };
 
-        if (id) {
-            fetchDentist();
-        }
+        if (id) fetchDentist();
     }, [id, navigate]);
 
     // --- HANDLERS ---
-    const handlePasswordChange = (e) => {
-        const val = e.target.value;
-        setFormData({ ...formData, password: val });
-        setPasswordCriteria({
-            length: val.length >= 8,
-            uppercase: /[A-Z]/.test(val),
-            lowercase: /[a-z]/.test(val),
-            number: /[0-9]/.test(val)
-        });
-        if (formData.confirmPassword) setPasswordsMatch(val === formData.confirmPassword);
-    };
-
-    const handleConfirmPasswordChange = (e) => {
-        const val = e.target.value;
-        setFormData({ ...formData, confirmPassword: val });
-        setPasswordsMatch(val === formData.password);
-    };
-
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -121,12 +78,15 @@ export default function EditDentistPage() {
     };
 
     const triggerFileInput = () => fileInputRef.current.click();
+    
     const getMaxDate = () => {
         const today = new Date();
         today.setFullYear(today.getFullYear() - 21);
         return today.toISOString().split('T')[0]; 
     };
+
     const handlePersonalChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+    
     const handlePhoneChange = (e) => {
         const value = e.target.value.replace(/[^0-9]/g, ''); 
         if (value.length <= 10) setFormData({ ...formData, phone: value });
@@ -160,11 +120,11 @@ export default function EditDentistPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // Prepare Data
         const finalData = {
             ...formData,
             phone: `+63${formData.phone}`,
             profileImage: profileImage
+            // Note: Wala ng password dito
         };
 
         try {
@@ -191,7 +151,6 @@ export default function EditDentistPage() {
         navigate('/owner/manage-dentists');
     };
 
-    // Render Address Helper
     const renderAddressFields = (type, title, isDisabled = false) => {
         const address = formData[type];
         const availableProvinces = address.region ? provinces[address.region] || [] : [];
@@ -253,7 +212,6 @@ export default function EditDentistPage() {
         );
     };
 
-    // --- RENDER LOADING STATE ---
     if (isLoading) {
         return (
             <div className={styles.container} style={{ height: '80vh', alignItems: 'center' }}>
@@ -333,49 +291,7 @@ export default function EditDentistPage() {
                         </div>
                     </div>
 
-                    <hr className={styles.divider} />
-
-                    <h3 className={styles.mainSectionTitle}>Account Security (Optional)</h3>
-                    <p style={{fontSize: '12px', color: '#888', marginBottom: '15px'}}>Leave blank if you don't want to change the password.</p>
-                    <div className={styles.row}>
-                        <div className={styles.formGroup}>
-                            <label>NEW PASSWORD</label>
-                            <input 
-                                type="password" 
-                                name="password" 
-                                className={styles.inputField} 
-                                placeholder="Enter new password" 
-                                onChange={handlePasswordChange}
-                                onFocus={() => setShowPasswordRules(true)}
-                                onBlur={() => setShowPasswordRules(false)}
-                                value={formData.password}
-                            />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label>CONFIRM NEW PASSWORD</label>
-                            <input 
-                                type="password" 
-                                name="confirmPassword" 
-                                className={`${styles.inputField} ${!passwordsMatch ? styles.errorBorder : ''}`} 
-                                placeholder="Repeat new password" 
-                                onChange={handleConfirmPasswordChange} 
-                                value={formData.confirmPassword}
-                            />
-                            {!passwordsMatch && <span className={styles.errorText}>Passwords do not match</span>}
-                        </div>
-                    </div>
-
-                    {showPasswordRules && formData.password && (
-                        <div className={styles.passwordRulesContainer}>
-                            <p className={styles.rulesLabel}>Password must contain:</p>
-                            <ul className={styles.rulesList}>
-                                <li className={passwordCriteria.length ? styles.validRule : styles.invalidRule}><span className={styles.ruleIcon}>{passwordCriteria.length ? '✓' : '○'}</span> 8+ chars</li>
-                                <li className={passwordCriteria.uppercase ? styles.validRule : styles.invalidRule}><span className={styles.ruleIcon}>{passwordCriteria.uppercase ? '✓' : '○'}</span> Uppercase</li>
-                                <li className={passwordCriteria.lowercase ? styles.validRule : styles.invalidRule}><span className={styles.ruleIcon}>{passwordCriteria.lowercase ? '✓' : '○'}</span> Lowercase</li>
-                                <li className={passwordCriteria.number ? styles.validRule : styles.invalidRule}><span className={styles.ruleIcon}>{passwordCriteria.number ? '✓' : '○'}</span> Number</li>
-                            </ul>
-                        </div>
-                    )}
+                    {/* REMOVED: ACCOUNT SECURITY SECTION (PASSWORD) */}
 
                     <hr className={styles.divider} />
                     {renderAddressFields('currentAddress', 'Current Address')}
@@ -399,7 +315,6 @@ export default function EditDentistPage() {
                 </form>
             </div>
 
-            {/* --- CUSTOM CARD MODAL --- */}
             {showSuccessModal && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalCard}>

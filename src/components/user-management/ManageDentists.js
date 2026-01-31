@@ -159,7 +159,7 @@ export default function ManageDentists() {
                                     </td>
                                     <td className={styles.actionCell}>
                                         <button className={styles.viewBtn}>VIEW</button>
-                                        <button className={styles.editBtn} onClick={handleEdit}>EDIT</button>
+                                        <button className={styles.editBtn} onClick={() => handleEdit(dentist.id)}>EDIT</button>
                                         {/* UPDATE: Call initiateDelete instead of direct delete */}
                                         <button className={styles.deleteBtn} onClick={() => initiateDelete(dentist.id)}>DELETE</button>
                                     </td>
