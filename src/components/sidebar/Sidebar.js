@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../../styles/sidebar/Sidebar.module.css';
 import logo from '../../assets/logo-white.svg'; 
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -12,42 +12,48 @@ export default function Sidebar() {
     const navigate = useNavigate();
     const location = useLocation();
     
-    // State para sa dropdown ng User Management
     const [isUserMgmtOpen, setIsUserMgmtOpen] = useState(false);
 
-    // Helper para malaman kung active ang link
     const isActive = (path) => location.pathname === path;
-
-    // Helper para malaman kung active ang parent menu (User Mgmt)
     const isUserMgmtActive = location.pathname.includes('/owner/manage');
 
+    // EFFECT: Auto-close/open base sa URL
+    useEffect(() => {
+        if (location.pathname.includes('/owner/manage')) {
+            setIsUserMgmtOpen(true);
+        } else {
+            setIsUserMgmtOpen(false);
+        }
+    }, [location.pathname]);
+
     const handleLogout = () => {
-        // Clear session logic here if needed
         navigate('/login');
     };
 
     return (
         <div className={styles.sidebar}>
-            {/* Logo Section */}
             <div className={styles.logoContainer}>
                 <img src={logo} alt="NgitiFy" className={styles.logo} />
             </div>
 
-            {/* Navigation Menu */}
             <ul className={styles.navMenu}>
                 
                 {/* DASHBOARD */}
                 <li 
-                    className={`${styles.navItem} ${isActive('/owner/dashboard') ? styles.active : ''}`}
-                    onClick={() => navigate('/owner/dashboard')}
+                    // UPDATED CONDITION: Active lang kung Dashboard route AND sarado ang User Mgmt
+                    className={`${styles.navItem} ${isActive('/owner/dashboard') && !isUserMgmtOpen ? styles.active : ''}`}
+                    onClick={() => {
+                        navigate('/owner/dashboard');
+                    }}
                 >
                     <img src={dashboardIcon} alt="Dashboard" className={styles.icon} />
                     <span>Dashboard</span>
                 </li>
 
-                {/* USER MANAGEMENT (Dropdown) */}
+                {/* USER MANAGEMENT */}
                 <li 
-                    className={`${styles.navItem} ${isUserMgmtOpen || isUserMgmtActive ? styles.parentActive : ''}`}
+                    // Ito ay active basta bukas siya o nasa loob ka ng subpages niya
+                    className={`${styles.navItem} ${isUserMgmtOpen || isUserMgmtActive ? styles.active : ''}`}
                     onClick={() => setIsUserMgmtOpen(!isUserMgmtOpen)}
                 >
                     <div className={styles.navHeader}>
@@ -85,15 +91,17 @@ export default function Sidebar() {
 
                 {/* SETTINGS */}
                 <li 
-                    className={`${styles.navItem} ${isActive('/owner/settings') ? styles.active : ''}`}
-                    onClick={() => navigate('/owner/settings')}
+                    // UPDATED CONDITION: Active lang kung Settings route AND sarado ang User Mgmt
+                    className={`${styles.navItem} ${isActive('/owner/settings') && !isUserMgmtOpen ? styles.active : ''}`}
+                    onClick={() => {
+                        navigate('/owner/settings');
+                    }}
                 >
                     <img src={settingsIcon} alt="Settings" className={styles.icon} />
                     <span>Settings</span>
                 </li>
             </ul>
 
-            {/* Logout Button */}
             <div className={styles.logoutSection}>
                 <button className={styles.logoutBtn} onClick={handleLogout}>
                     LOGOUT

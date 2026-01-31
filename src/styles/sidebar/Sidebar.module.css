@@ -1,56 +1,51 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
 
-/* GLOBAL RESET: Importante ito para ang padding ay hindi dumagdag sa width/height */
 * {
     box-sizing: border-box;
 }
 
 .sidebar {
     width: 260px;
-    height: 100vh; /* Sakupin ang buong height ng screen */
-    background-color: #005466;
+    height: 100vh;
+    background-color: #005466; /* Main Teal */
     color: white;
     position: fixed;
     top: 0;
     left: 0;
     display: flex;
-    flex-direction: column; /* I-stack ang Logo, Menu, at Logout */
+    flex-direction: column;
     padding: 25px 20px;
     box-shadow: 4px 0 10px rgba(0,0,0,0.1);
     font-family: 'Lexend Deca', sans-serif;
     z-index: 1000;
-    overflow: hidden; /* Pigilan ang sidebar mismo na mag-scroll */
+    overflow: hidden;
 }
 
 .logoContainer {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 30px; /* Binawasan ko konti para tipid sa space */
+    margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    flex-shrink: 0; /* Huwag hayaang lumiet ang logo area */
+    flex-shrink: 0;
 }
 
 .logo {
-    width: 240px;
+    width: 230px;
     height: auto;
 }
 
-/* MENU SECTION - Ito ang mag-aadjust at mag-soscroll */
 .navMenu {
     list-style: none;
     padding: 0;
     margin: 0;
-    flex-grow: 1; /* Sasakupin nito ang lahat ng available space sa gitna */
-    overflow-y: auto; /* DITO LILITAW ANG SCROLLBAR kapag sumobra ang items */
-    
-    /* Para maganda ang scrollbar (optional aesthetic) */
+    flex-grow: 1;
+    overflow-y: auto;
     scrollbar-width: thin; 
     scrollbar-color: rgba(255,255,255,0.3) transparent;
 }
 
-/* Webkit scrollbar styling (Chrome/Safari/Edge) */
 .navMenu::-webkit-scrollbar {
     width: 6px;
 }
@@ -92,11 +87,13 @@
     opacity: 1;
 }
 
+/* --- UPDATED ACTIVE STATE (Dark Teal Overlay) --- */
+/* Ito na ang ginagamit sa Dashboard, Settings, AT Parent ng User Mgmt */
 .active {
-    background-color: #ea8b89;
+    background-color: rgba(0, 0, 0, 0.2); /* Darker overlay */
     color: white;
     font-weight: 700;
-    box-shadow: 0 4px 12px rgba(234, 139, 137, 0.3);
+    box-shadow: none; /* Tinanggal ko shadow para flat look gaya ng request */
 }
 
 .active .icon {
@@ -115,10 +112,7 @@
     align-items: center;
 }
 
-.parentActive {
-    background-color: rgba(0, 0, 0, 0.2); 
-    color: white;
-}
+/* Tinanggal ko na ang .parentActive dahil .active na rin ang gamit natin sa kanya */
 
 .arrow {
     font-size: 10px;
@@ -137,7 +131,7 @@
 }
 
 .subMenuContainer.show {
-    max-height: 500px; /* Tinaasan ko para siguradong kasya */
+    max-height: 500px;
 }
 
 .subMenu {
@@ -171,8 +165,9 @@
     padding-left: 50px;
 }
 
+/* --- SUBMENU ACTIVE STATE (White & Bold) --- */
 .subActive {
-    color: #ea8b89 !important;
+    color: white !important;
     font-weight: 700;
 }
 
@@ -180,17 +175,16 @@
     content: '•';
     position: absolute;
     left: 20px;
-    color: #ea8b89;
+    color: white;
     font-size: 20px;
     line-height: 14px;
 }
 
-/* LOGOUT SECTION - Nakadikit sa baba */
 .logoutSection {
     border-top: 1px solid rgba(255, 255, 255, 0.15);
     padding-top: 20px;
-    margin-top: 20px; /* Space sa pagitan ng menu at logout */
-    flex-shrink: 0; /* Huwag hayaang ma-squish ang button na to */
+    margin-top: 20px;
+    flex-shrink: 0;
 }
 
 .logoutBtn {
