@@ -3,36 +3,38 @@ import styles from '../../styles/user-management/ManageDentists.module.css';
 import addIcon from '../../assets/button-icons/add.svg'; 
 import { useNavigate } from 'react-router-dom';
 
+// Import Icons
+import warningIcon from '../../assets/alert-icons/warning.svg'; // Siguraduhin na meron nito
+
 export default function ManageDentists() {
     const navigate = useNavigate();
     
-    // Wala na tayong INITIAL_DATA, empty array muna
+    // Data States
     const [dentists, setDentists] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(true); // Loading state
+    const [loading, setLoading] = useState(true);
 
-    // FETCH DATA FROM SERVER
+    // Modal States
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [dentistToDelete, setDentistToDelete] = useState(null); // Id na buburahin
+
+    // FETCH DATA
     const fetchDentists = async () => {
         try {
             const response = await fetch('http://localhost:5000/api/dentists');
             const data = await response.json();
             
             if (response.ok) {
-                // I-map natin ang data galing backend papunta sa format ng table
                 const formattedData = data.map(dentist => ({
-                    id: dentist._id, // MongoDB ID
-                    // Pagsamahin ang pangalan
+                    id: dentist._id,
                     name: `Dr. ${dentist.name.first} ${dentist.name.last}`, 
                     license: dentist.licenseNumber || 'N/A',
                     email: dentist.email,
                     phone: dentist.contactNumber,
-                    // Gamitin ang isVerified bilang status (o pwede ring magdagdag ng status field sa DB later)
                     status: dentist.isVerified ? 'Active' : 'Pending',
-                    image: dentist.profileImage // Base64 Image
+                    image: dentist.profileImage
                 }));
                 setDentists(formattedData);
-            } else {
-                console.error("Failed to fetch dentists");
             }
         } catch (error) {
             console.error("Error connecting to server:", error);
@@ -41,18 +43,45 @@ export default function ManageDentists() {
         }
     };
 
-    // Tawagin ang fetch sa pag-load ng page
     useEffect(() => {
         fetchDentists();
     }, []);
 
-    // ... (ACTIONS: Delete Logic Updated for API)
-    const handleDelete = async (id) => {
-        if (window.confirm("Are you sure you want to delete this dentist?")) {
-            // Note: Wala pa tayong DELETE endpoint sa backend, pero sa UI pwede natin alisin muna
-            // Sa susunod, gagawan natin ito ng app.delete('/api/user/:id')
-            setDentists(dentists.filter(d => d.id !== id));
+    // --- DELETE LOGIC ---
+
+    // 1. Open Modal (Wag muna magbura agad)
+    const initiateDelete = (id) => {
+        setDentistToDelete(id);
+        setShowDeleteModal(true);
+    };
+
+    // 2. Confirm Delete (Tumawag sa API)
+    const confirmDelete = async () => {
+        if (!dentistToDelete) return;
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/dentist/${dentistToDelete}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                // Update UI: Alisin na sa listahan para di na need mag-refresh
+                setDentists(dentists.filter(d => d.id !== dentistToDelete));
+                setShowDeleteModal(false); // Close Modal
+                setDentistToDelete(null);
+            } else {
+                alert("Failed to delete user.");
+            }
+        } catch (error) {
+            console.error("Error deleting:", error);
+            alert("Server error.");
         }
+    };
+
+    // 3. Cancel Delete
+    const cancelDelete = () => {
+        setShowDeleteModal(false);
+        setDentistToDelete(null);
     };
 
     // Filter Logic
@@ -69,10 +98,7 @@ export default function ManageDentists() {
                     <p className={styles.subTitle}>View and manage dentist accounts</p>
                 </div>
                 
-                <button 
-                    className={styles.addButton} 
-                    onClick={() => navigate('/owner/add-dentist')}
-                >
+                <button className={styles.addButton} onClick={() => navigate('/owner/add-dentist')}>
                     <img src={addIcon} alt="Add" className={styles.addIcon} />
                     ADD DENTIST
                 </button>
@@ -110,7 +136,6 @@ export default function ManageDentists() {
                                             <img src={dentist.image} alt="avatar" className={styles.avatarImage} />
                                         ) : (
                                             <div className={styles.avatarPlaceholder}>
-                                                {/* Kunin ang first letter ng First Name (skip "Dr. ") */}
                                                 {dentist.name.split(' ')[1][0]}
                                             </div>
                                         )}
@@ -131,18 +156,34 @@ export default function ManageDentists() {
                                     <td className={styles.actionCell}>
                                         <button className={styles.viewBtn}>VIEW</button>
                                         <button className={styles.editBtn}>EDIT</button>
-                                        <button className={styles.deleteBtn} onClick={() => handleDelete(dentist.id)}>DELETE</button>
+                                        {/* UPDATE: Call initiateDelete instead of direct delete */}
+                                        <button className={styles.deleteBtn} onClick={() => initiateDelete(dentist.id)}>DELETE</button>
                                     </td>
                                 </tr>
                             ))
                         ) : (
-                            <tr>
-                                <td colSpan="5" className={styles.noData}>No dentists found.</td>
-                            </tr>
+                            <tr><td colSpan="5" className={styles.noData}>No dentists found.</td></tr>
                         )}
                     </tbody>
                 </table>
             </div>
+
+            {/* --- DELETE CONFIRMATION MODAL --- */}
+            {showDeleteModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalCard}>
+                        <img src={warningIcon} alt="Warning" className={styles.modalIcon} />
+                        <h3 className={styles.modalTitle}>Delete User?</h3>
+                        <p className={styles.modalMessage}>Are you sure you want to delete this user? This action cannot be undone.</p>
+                        
+                        <div className={styles.modalActions}>
+                            <button className={styles.modalCancelBtn} onClick={cancelDelete}>Cancel</button>
+                            <button className={styles.modalDeleteBtn} onClick={confirmDelete}>Yes, Delete</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

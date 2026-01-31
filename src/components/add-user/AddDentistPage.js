@@ -3,7 +3,7 @@ import styles from '../../styles/add-user/AddDentistPage.module.css';
 import { useNavigate } from 'react-router-dom';
 import { regions, provinces, cities, barangays } from '../../utils/addressData';
 
-// IMPORT SUCCESS ICON (Siguraduhing tama ang spelling ng folder mo sa assets)
+// IMPORT SUCCESS ICON (Tama na ang path base sa github files mo)
 import successIcon from '../../assets/alert-icons/success.svg';
 
 export default function AddDentistPage() {
@@ -13,9 +13,10 @@ export default function AddDentistPage() {
     // --- STATE MANAGEMENT ---
     const [isSameAddress, setIsSameAddress] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
-    const [showSuccessModal, setShowSuccessModal] = useState(false); // Modal State
+    
+    // MODAL STATE
+    const [showSuccessModal, setShowSuccessModal] = useState(false); 
 
-    // Initial State para sa Address
     const initialAddressState = {
         country: 'Philippines',
         region: '', province: '', city: '', barangay: '',
@@ -38,21 +39,17 @@ export default function AddDentistPage() {
     const [isFormValid, setIsFormValid] = useState(false); 
     const [showPasswordRules, setShowPasswordRules] = useState(false);
 
-    // --- LOGIC: PASSWORD & FORM VALIDITY ---
+    // --- FORM LOGIC ---
     const handlePasswordChange = (e) => {
         const val = e.target.value;
         setFormData({ ...formData, password: val });
-
         setPasswordCriteria({
             length: val.length >= 8,
             uppercase: /[A-Z]/.test(val),
             lowercase: /[a-z]/.test(val),
             number: /[0-9]/.test(val)
         });
-
-        if (formData.confirmPassword) {
-            setPasswordsMatch(val === formData.confirmPassword);
-        }
+        if (formData.confirmPassword) setPasswordsMatch(val === formData.confirmPassword);
     };
 
     const handleConfirmPasswordChange = (e) => {
@@ -63,19 +60,15 @@ export default function AddDentistPage() {
 
     useEffect(() => {
         const { firstName, lastName, birthdate, email, phone, licenseNumber, specialization, password, confirmPassword } = formData;
-        
         const basicFieldsFilled = firstName && lastName && birthdate && email && phone && licenseNumber && specialization;
         const isPasswordStrong = Object.values(passwordCriteria).every(Boolean);
         const isMatching = password === confirmPassword && password !== '';
-        
         const { region, province, city, barangay, street, houseNumber } = formData.currentAddress;
         const addressFilled = region && province && city && barangay && street && houseNumber;
 
         setIsFormValid(basicFieldsFilled && isPasswordStrong && isMatching && addressFilled);
-
     }, [formData, passwordCriteria]);
 
-    // --- HANDLERS ---
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -93,27 +86,19 @@ export default function AddDentistPage() {
         return today.toISOString().split('T')[0]; 
     };
 
-    const handlePersonalChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    const handlePersonalChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const handlePhoneChange = (e) => {
         const value = e.target.value.replace(/[^0-9]/g, ''); 
-        if (value.length <= 10) { 
-            setFormData({ ...formData, phone: value });
-        }
+        if (value.length <= 10) setFormData({ ...formData, phone: value });
     };
 
     const handleAddressChange = (type, field, value) => {
         setFormData(prev => {
             const updatedAddress = { ...prev[type], [field]: value };
-            if (field === 'region') {
-                updatedAddress.province = ''; updatedAddress.city = ''; updatedAddress.barangay = '';
-            } else if (field === 'province') {
-                updatedAddress.city = ''; updatedAddress.barangay = '';
-            } else if (field === 'city') {
-                updatedAddress.barangay = '';
-            }
+            if (field === 'region') { updatedAddress.province = ''; updatedAddress.city = ''; updatedAddress.barangay = ''; }
+            else if (field === 'province') { updatedAddress.city = ''; updatedAddress.barangay = ''; }
+            else if (field === 'city') { updatedAddress.barangay = ''; }
 
             if (type === 'currentAddress' && isSameAddress) {
                 return { ...prev, currentAddress: updatedAddress, permanentAddress: updatedAddress };
@@ -132,7 +117,7 @@ export default function AddDentistPage() {
         }
     };
 
-    // --- SUBMIT LOGIC ---
+    // --- SUBMIT HANDLER ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!isFormValid) return; 
@@ -153,7 +138,7 @@ export default function AddDentistPage() {
             const data = await response.json();
 
             if (response.ok) {
-                // SUCCESS: Show Modal
+                // SUCCESS: Ipakita ang modal
                 setShowSuccessModal(true);
             } else {
                 alert(data.message || "Failed to create account.");
@@ -164,12 +149,13 @@ export default function AddDentistPage() {
         }
     };
 
+    // --- CLOSE MODAL & NAVIGATE BACK ---
     const handleCloseModal = () => {
         setShowSuccessModal(false);
-        navigate('/user-management/manage-dentists');
+        // Ito ang magbabalik sa Manage Dentists page
+        navigate('/owner/manage-dentists');
     };
 
-    // Helper for Address Rendering
     const renderAddressFields = (type, title, isDisabled = false) => {
         const address = formData[type];
         const availableProvinces = address.region ? provinces[address.region] || [] : [];
@@ -240,7 +226,6 @@ export default function AddDentistPage() {
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                    {/* IMAGE UPLOAD */}
                     <div className={styles.uploadSection}>
                         <div className={styles.imageWrapper} onClick={triggerFileInput}>
                             {profileImage ? (
@@ -256,7 +241,6 @@ export default function AddDentistPage() {
                         <p className={styles.uploadHint}>Optional. Click circle to upload.</p>
                     </div>
 
-                    {/* PERSONAL INFO */}
                     <h3 className={styles.mainSectionTitle}>Personal Information</h3>
                     <div className={styles.row}>
                         <div className={styles.formGroup}>
@@ -293,7 +277,6 @@ export default function AddDentistPage() {
                         </div>
                     </div>
 
-                    {/* CONTACT INFO */}
                     <div className={styles.row}>
                         <div className={styles.formGroup}>
                             <label>EMAIL ADDRESS</label>
@@ -310,7 +293,6 @@ export default function AddDentistPage() {
 
                     <hr className={styles.divider} />
 
-                    {/* ACCOUNT SECURITY */}
                     <h3 className={styles.mainSectionTitle}>Account Security</h3>
                     <div className={styles.row}>
                         <div className={styles.formGroup}>
@@ -376,7 +358,7 @@ export default function AddDentistPage() {
                     {isSameAddress ? <div className={styles.disabledOverlay}>{renderAddressFields('permanentAddress', '', true)}</div> : renderAddressFields('permanentAddress', '')}
 
                     <div className={styles.buttonGroup}>
-                        <button type="button" className={styles.cancelBtn} onClick={() => navigate('/user-management/manage-dentists')}>CANCEL</button>
+                        <button type="button" className={styles.cancelBtn} onClick={() => navigate('/owner/manage-dentists')}>CANCEL</button>
                         <button type="submit" className={`${styles.submitBtn} ${!isFormValid ? styles.disabledBtn : ''}`} disabled={!isFormValid}>
                             CREATE ACCOUNT
                         </button>
@@ -384,17 +366,18 @@ export default function AddDentistPage() {
                 </form>
             </div>
 
-            {/* --- NEW: CUSTOM SUCCESS MODAL --- */}
+            {/* --- CUSTOM CARD MODAL --- */}
             {showSuccessModal && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalCard}>
-                        {/* Check Icon Image */}
+                        {/* 1. Success Icon */}
                         <img src={successIcon} alt="Success" className={styles.modalIcon} />
                         
+                        {/* 2. Success Text */}
                         <h3 className={styles.modalTitle}>Successfully Registered!</h3>
                         <p className={styles.modalMessage}>The dentist account has been successfully created.</p>
                         
-                        {/* Text Link (Close) */}
+                        {/* 3. Text Link (Clickable "Close") */}
                         <p className={styles.closeLink} onClick={handleCloseModal}>
                             Close
                         </p>

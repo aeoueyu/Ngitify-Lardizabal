@@ -144,9 +144,14 @@
 .avatarPlaceholder {
     width: 35px;
     height: 35px;
+    /* FIX: Para hindi mapitpit (maging oval) */
+    min-width: 35px; 
+    min-height: 35px;
+    flex-shrink: 0; 
+    
     background-color: #e0f7fa;
     color: #005466;
-    border-radius: 50%;
+    border-radius: 50%; /* Perfect Circle */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -154,14 +159,16 @@
     font-size: 14px;
 }
 
-/* ... EXISTING STYLES ... */
-
-/* Idagdag mo ito sa ilalim ng .avatarPlaceholder */
 .avatarImage {
     width: 35px;
     height: 35px;
-    border-radius: 50%;
-    object-fit: cover;
+    /* FIX: Para hindi mapitpit */
+    min-width: 35px; 
+    min-height: 35px;
+    flex-shrink: 0;
+    
+    border-radius: 50%; /* Perfect Circle */
+    object-fit: cover; /* Para hindi ma-stretch ang picture sa loob */
     border: 1px solid #ddd;
 }
 
@@ -249,3 +256,113 @@
     padding: 40px;
     color: #999;
 }
+
+/* ... (EXISTING STYLES) ... */
+
+/* --- DELETE MODAL STYLES --- */
+
+/* 1. Overlay */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.3s ease;
+}
+
+/* 2. Card */
+.modalCard {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: scaleUp 0.3s ease;
+    max-width: 350px;
+    width: 90%;
+}
+
+/* 3. Icon */
+.modalIcon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 20px;
+    object-fit: contain;
+    animation: bounceIn 0.5s ease;
+}
+
+/* 4. Texts */
+.modalTitle {
+    color: #333;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+}
+
+.modalMessage {
+    color: #666;
+    font-size: 13px;
+    margin: 0 0 25px 0;
+    line-height: 1.5;
+}
+
+/* 5. Action Buttons */
+.modalActions {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+}
+
+.modalCancelBtn {
+    background-color: #f0f0f0;
+    color: #555;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    flex: 1;
+}
+
+.modalCancelBtn:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(51, 51, 51, 0.3);
+}
+
+.modalDeleteBtn {
+    background-color: #c62828; /* Red for danger */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    flex: 1;
+}
+
+.modalDeleteBtn:hover {
+    background-color: #b71c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(198, 40, 40, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes bounceIn { 0% { transform: scale(0); } 60% { transform: scale(1.1); } 100% { transform: scale(1); } }
