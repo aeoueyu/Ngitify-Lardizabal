@@ -54,6 +54,7 @@ app.post('/api/add-dentist', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // Create User
+        // ... sa loob ng /api/add-dentist
         const newDentist = new User({
             name: {
                 first: firstName,
@@ -65,12 +66,28 @@ app.post('/api/add-dentist', async (req, res) => {
             birthdate,
             licenseNumber,
             specialization,
-            currentAddress,   // Saved as object from frontend
-            permanentAddress, // Saved as object from frontend
+            // --- CHANGE STARTS HERE ---
+            currentAddress: {
+                region: currentAddress.region,
+                province: currentAddress.province,
+                city: currentAddress.city,
+                brgy: currentAddress.barangay, // FRONTEND SENDS 'barangay', DB NEEDS 'brgy'
+                street: currentAddress.street,
+                houseNumber: currentAddress.houseNumber
+            },
+            permanentAddress: {
+                region: permanentAddress.region,
+                province: permanentAddress.province,
+                city: permanentAddress.city,
+                brgy: permanentAddress.barangay, // SAME HERE
+                street: permanentAddress.street,
+                houseNumber: permanentAddress.houseNumber
+            },
+            // --- CHANGE ENDS HERE ---
             profileImage,
             password: hashedPassword,
-            role: 'dentist',    // IMPORTANT: Role is dentist
-            isVerified: true    // Auto-verified kasi admin gumawa
+            role: 'dentist',
+            isVerified: true
         });
 
         await newDentist.save();
@@ -171,19 +188,35 @@ app.put('/api/dentist/:id', async (req, res) => {
         if (!user) return res.status(404).json({ message: "User not found" });
 
         // Update fields
-        user.name = {
-            first: firstName,
-            middle: middleName,
-            last: lastName
-        };
+        // ... sa loob ng /api/dentist/:id (PUT)
+
+        // Update fields
+        user.name = { first: firstName, middle: middleName, last: lastName };
         user.email = email;
         user.contactNumber = phone;
         user.birthdate = birthdate;
         user.licenseNumber = licenseNumber;
         user.specialization = specialization;
-        
-        user.currentAddress = currentAddress;
-        user.permanentAddress = permanentAddress;
+
+        // --- CHANGE STARTS HERE ---
+        user.currentAddress = {
+            region: currentAddress.region,
+            province: currentAddress.province,
+            city: currentAddress.city,
+            brgy: currentAddress.barangay, // FRONTEND 'barangay' -> DB 'brgy'
+            street: currentAddress.street,
+            houseNumber: currentAddress.houseNumber
+        };
+
+        user.permanentAddress = {
+            region: permanentAddress.region,
+            province: permanentAddress.province,
+            city: permanentAddress.city,
+            brgy: permanentAddress.barangay, // FRONTEND 'barangay' -> DB 'brgy'
+            street: permanentAddress.street,
+            houseNumber: permanentAddress.houseNumber
+        };
+        // --- CHANGE ENDS HERE ---
 
         if (profileImage) {
             user.profileImage = profileImage;

@@ -157,7 +157,10 @@ export default function ManageDentists() {
                                     <td className={styles.actionCell}>
                                         {/* AAYUSIN NATIN ITO: Dapat may () => arrow function */}
                                         <button className={styles.viewBtn} onClick={() => handleView(dentist.id)}>VIEW</button>
+                                        
+                                        {/* ITO YUNG BINAGO KO */}
                                         <button className={styles.editBtn} onClick={() => handleEdit(dentist.id)}>EDIT</button>
+                                        
                                         <button className={styles.deleteBtn} onClick={() => initiateDelete(dentist.id)}>DELETE</button>
                                     </td>
                                 </tr>
