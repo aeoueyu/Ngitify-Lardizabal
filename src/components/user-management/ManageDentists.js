@@ -90,6 +90,10 @@ export default function ManageDentists() {
         dentist.license.includes(searchTerm)
     );
 
+    const handleEdit = (id) => {
+        navigate(`/owner/edit-dentist/${id}`);
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.headerContainer}>
@@ -155,7 +159,7 @@ export default function ManageDentists() {
                                     </td>
                                     <td className={styles.actionCell}>
                                         <button className={styles.viewBtn}>VIEW</button>
-                                        <button className={styles.editBtn}>EDIT</button>
+                                        <button className={styles.editBtn} onClick={handleEdit}>EDIT</button>
                                         {/* UPDATE: Call initiateDelete instead of direct delete */}
                                         <button className={styles.deleteBtn} onClick={() => initiateDelete(dentist.id)}>DELETE</button>
                                     </td>

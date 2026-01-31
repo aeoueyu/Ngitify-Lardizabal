@@ -138,6 +138,67 @@ app.delete('/api/dentist/:id', async (req, res) => {
     }
 });
 
+// ... (sa ilalim ng app.delete...)
+
+// GET SINGLE DENTIST (For Editing)
+app.get('/api/dentist/:id', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+// UPDATE DENTIST
+app.put('/api/dentist/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { 
+            firstName, middleName, lastName, 
+            email, phone, birthdate, 
+            licenseNumber, specialization, 
+            currentAddress, permanentAddress,
+            password, profileImage 
+        } = req.body;
+
+        const user = await User.findById(id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        // Update Fields
+        user.name.first = firstName;
+        user.name.middle = middleName;
+        user.name.last = lastName;
+        user.email = email;
+        user.contactNumber = phone;
+        user.birthdate = birthdate;
+        user.licenseNumber = licenseNumber;
+        user.specialization = specialization;
+        
+        user.currentAddress = currentAddress;
+        user.permanentAddress = permanentAddress;
+
+        // Update Image only if provided
+        if (profileImage) {
+            user.profileImage = profileImage;
+        }
+
+        // Update Password only if provided (not empty)
+        if (password && password.trim() !== "") {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(password, salt);
+        }
+
+        await user.save();
+        res.json({ message: "Dentist updated successfully" });
+
+    } catch (error) {
+        console.error("Error updating:", error);
+        res.status(500).json({ message: "Server error updating dentist" });
+    }
+});
+
 // ... (tuloy sa ibang routes)
 
 // 2. PATIENT SIGNUP (Modified for new Schema)

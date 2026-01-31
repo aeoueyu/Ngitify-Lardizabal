@@ -21,6 +21,7 @@ import RoleSelectionPage from './components/login/RoleSelectionPage';
 // --- USER MANAGEMENT IMPORTS ---
 import ManageDentists from './components/user-management/ManageDentists';
 import AddDentistPage from './components/add-user/AddDentistPage';
+import EditDentistPage from './components/edit-user/EditDentistPage';
 
 // --- PROTECTED ROUTE CHECKER ---
 function ProtectedRoute({ children }) {
@@ -75,6 +76,7 @@ function App() {
             {/* User Management Routes */}
             <Route path="/owner/manage-dentists" element={<ManageDentists />} />
             <Route path="/owner/add-dentist" element={<AddDentistPage />} />
+            <Route path="/owner/edit-dentist/:id" element={<EditDentistPage />} />
             
             {/* Other Protected Pages */}
             <Route path="/patientprofile" element={<PatientProfilePage />} />
