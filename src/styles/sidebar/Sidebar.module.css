@@ -1,52 +1,106 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
 
+/* GLOBAL RESET: Importante ito para ang padding ay hindi dumagdag sa width/height */
+* {
+    box-sizing: border-box;
+}
+
 .sidebar {
     width: 260px;
-    height: 100vh;
-    background-color: #005466; /* Main Teal */
+    height: 100vh; /* Sakupin ang buong height ng screen */
+    background-color: #005466;
     color: white;
     position: fixed;
     top: 0;
     left: 0;
     display: flex;
-    flex-direction: column;
-    padding: 20px;
+    flex-direction: column; /* I-stack ang Logo, Menu, at Logout */
+    padding: 25px 20px;
     box-shadow: 4px 0 10px rgba(0,0,0,0.1);
     font-family: 'Lexend Deca', sans-serif;
     z-index: 1000;
+    overflow: hidden; /* Pigilan ang sidebar mismo na mag-scroll */
 }
 
 .logoContainer {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px; /* Binawasan ko konti para tipid sa space */
     padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0; /* Huwag hayaang lumiet ang logo area */
 }
 
 .logo {
-    width: 150px; /* Adjust base sa laki ng SVG mo */
+    width: 240px;
     height: auto;
 }
 
+/* MENU SECTION - Ito ang mag-aadjust at mag-soscroll */
 .navMenu {
     list-style: none;
     padding: 0;
     margin: 0;
-    flex-grow: 1;
+    flex-grow: 1; /* Sasakupin nito ang lahat ng available space sa gitna */
+    overflow-y: auto; /* DITO LILITAW ANG SCROLLBAR kapag sumobra ang items */
+    
+    /* Para maganda ang scrollbar (optional aesthetic) */
+    scrollbar-width: thin; 
+    scrollbar-color: rgba(255,255,255,0.3) transparent;
+}
+
+/* Webkit scrollbar styling (Chrome/Safari/Edge) */
+.navMenu::-webkit-scrollbar {
+    width: 6px;
+}
+.navMenu::-webkit-scrollbar-track {
+    background: transparent;
+}
+.navMenu::-webkit-scrollbar-thumb {
+    background-color: rgba(255,255,255,0.3);
+    border-radius: 20px;
 }
 
 .navItem {
-    padding: 15px 20px;
-    margin-bottom: 8px;
-    border-radius: 10px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: 12px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     display: flex;
-    flex-direction: column; /* Para sa submenu flow */
+    align-items: center;
+    color: #e0f7fa;
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+}
+
+.navItem:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.navItem:hover .icon {
+    opacity: 1;
+}
+
+.active {
+    background-color: #ea8b89;
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(234, 139, 137, 0.3);
+}
+
+.active .icon {
+    opacity: 1;
 }
 
 .navHeader {
@@ -56,77 +110,106 @@
     width: 100%;
 }
 
-.icon {
-    margin-right: 15px;
+.navLabel {
+    display: flex;
+    align-items: center;
 }
 
-.navItem:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Active State */
-.active {
-    background-color: #ea8b89; /* Coral Pink Highlight */
+.parentActive {
+    background-color: rgba(0, 0, 0, 0.2); 
     color: white;
-    font-weight: 700;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-/* Submenu Styles */
-.subMenu {
-    list-style: none;
-    padding: 0;
-    margin-top: 10px;
-    padding-left: 35px; /* Indent */
-    animation: slideDown 0.3s ease-out;
-}
-
-.subMenu li {
-    padding: 10px;
-    font-size: 13px;
-    color: #b3ccd1; /* Lighter teal text */
-    cursor: pointer;
-    transition: color 0.3s;
-}
-
-.subMenu li:hover {
-    color: white;
-}
-
-.subActive {
-    color: #ea8b89 !important; /* Pink text pag nasa loob ka ng subpage */
-    font-weight: 700;
 }
 
 .arrow {
     font-size: 10px;
+    transition: transform 0.3s ease;
+    opacity: 0.7;
 }
 
-/* Logout Section */
+.rotate {
+    transform: rotate(180deg);
+}
+
+.subMenuContainer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.subMenuContainer.show {
+    max-height: 500px; /* Tinaasan ko para siguradong kasya */
+}
+
+.subMenu {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 15px 0;
+    position: relative;
+}
+
+.subMenu::before {
+    content: '';
+    position: absolute;
+    left: 24px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.subMenu li {
+    padding: 10px 10px 10px 45px;
+    font-size: 14px;
+    color: #b3ccd1;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.subMenu li:hover {
+    color: white;
+    padding-left: 50px;
+}
+
+.subActive {
+    color: #ea8b89 !important;
+    font-weight: 700;
+}
+
+.subActive::before {
+    content: '•';
+    position: absolute;
+    left: 20px;
+    color: #ea8b89;
+    font-size: 20px;
+    line-height: 14px;
+}
+
+/* LOGOUT SECTION - Nakadikit sa baba */
 .logoutSection {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
     padding-top: 20px;
+    margin-top: 20px; /* Space sa pagitan ng menu at logout */
+    flex-shrink: 0; /* Huwag hayaang ma-squish ang button na to */
 }
 
 .logoutBtn {
     width: 100%;
     padding: 12px;
     background-color: transparent;
-    border: 1px solid rgba(255,255,255,0.3);
+    border: 1.5px solid rgba(255,255,255,0.4);
     color: white;
-    border-radius: 8px;
+    border-radius: 50px;
     cursor: pointer;
     font-family: 'Lexend Deca', sans-serif;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 13px;
     transition: all 0.3s;
+    letter-spacing: 1px;
 }
 
 .logoutBtn:hover {
-    background-color: #c94c4c; /* Red hover for logout */
-    border-color: #c94c4c;
-}
-
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    background-color: white;
+    color: #005466;
+    border-color: white;
 }

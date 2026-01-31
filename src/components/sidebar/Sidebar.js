@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import styles from '../../styles/sidebar/Sidebar.module.css'; // Gagawa tayo ng module css para dito
-import logo from '../../assets/logo-white.svg'; // Siguraduhin na may white version ka, kung wala use text muna
+import styles from '../../styles/sidebar/Sidebar.module.css';
+import logo from '../../assets/logo-white.svg'; 
 import { useNavigate, useLocation } from 'react-router-dom';
 
-// Icons (Pwede mong palitan ng actual icons mo later, gumamit muna ako ng text/unicode)
-// Mas maganda kung may library ka like 'react-icons' o yung svg assets mo.
+// Import Sidebar Icons
+import dashboardIcon from '../../assets/sidebar-icons/dashboard.svg';
+import usersIcon from '../../assets/sidebar-icons/users.svg';
+import settingsIcon from '../../assets/sidebar-icons/settings.svg';
 
 export default function Sidebar() {
     const navigate = useNavigate();
@@ -15,6 +17,9 @@ export default function Sidebar() {
 
     // Helper para malaman kung active ang link
     const isActive = (path) => location.pathname === path;
+
+    // Helper para malaman kung active ang parent menu (User Mgmt)
+    const isUserMgmtActive = location.pathname.includes('/owner/manage');
 
     const handleLogout = () => {
         // Clear session logic here if needed
@@ -36,26 +41,26 @@ export default function Sidebar() {
                     className={`${styles.navItem} ${isActive('/owner/dashboard') ? styles.active : ''}`}
                     onClick={() => navigate('/owner/dashboard')}
                 >
-                    <span className={styles.icon}>📊</span> {/* Palitan ng SVG mo */}
-                    Dashboard
+                    <img src={dashboardIcon} alt="Dashboard" className={styles.icon} />
+                    <span>Dashboard</span>
                 </li>
 
                 {/* USER MANAGEMENT (Dropdown) */}
                 <li 
-                    className={`${styles.navItem} ${isUserMgmtOpen ? styles.open : ''}`}
+                    className={`${styles.navItem} ${isUserMgmtOpen || isUserMgmtActive ? styles.parentActive : ''}`}
                     onClick={() => setIsUserMgmtOpen(!isUserMgmtOpen)}
                 >
                     <div className={styles.navHeader}>
-                        <span>
-                            <span className={styles.icon}>👥</span>
-                            User Management
-                        </span>
-                        <span className={styles.arrow}>{isUserMgmtOpen ? '▲' : '▼'}</span>
+                        <div className={styles.navLabel}>
+                            <img src={usersIcon} alt="Users" className={styles.icon} />
+                            <span>User Management</span>
+                        </div>
+                        <span className={`${styles.arrow} ${isUserMgmtOpen ? styles.rotate : ''}`}>▼</span>
                     </div>
                 </li>
 
                 {/* SUBMENU ITEMS */}
-                {isUserMgmtOpen && (
+                <div className={`${styles.subMenuContainer} ${isUserMgmtOpen ? styles.show : ''}`}>
                     <ul className={styles.subMenu}>
                         <li 
                             className={isActive('/owner/manage-dentists') ? styles.subActive : ''}
@@ -76,15 +81,15 @@ export default function Sidebar() {
                             Patients
                         </li>
                     </ul>
-                )}
+                </div>
 
                 {/* SETTINGS */}
                 <li 
                     className={`${styles.navItem} ${isActive('/owner/settings') ? styles.active : ''}`}
                     onClick={() => navigate('/owner/settings')}
                 >
-                    <span className={styles.icon}>⚙️</span>
-                    Settings
+                    <img src={settingsIcon} alt="Settings" className={styles.icon} />
+                    <span>Settings</span>
                 </li>
             </ul>
 
