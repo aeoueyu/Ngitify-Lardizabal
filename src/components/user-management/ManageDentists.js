@@ -1,52 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../../styles/user-management/ManageDentists.module.css';
 import addIcon from '../../assets/button-icons/add.svg'; 
 import { useNavigate } from 'react-router-dom';
 
-// MOCK DATA: Yung una may picture (sample URL), yung iba wala (null)
-const INITIAL_DATA = [
-    { 
-        id: 1, 
-        name: 'Dr. Juan Dela Cruz', 
-        license: '1234567', 
-        email: 'juan@gmail.com', 
-        phone: '+639123456789', 
-        status: 'Active',
-        image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=100&q=80' // Sample image
-    },
-    { 
-        id: 2, 
-        name: 'Dr. Maria Santos', 
-        license: '7654321', 
-        email: 'maria@yahoo.com', 
-        phone: '+639987654321', 
-        status: 'Inactive',
-        image: null // Wala siyang image, dapat letter 'M' lumabas
-    },
-    { 
-        id: 3, 
-        name: 'Dr. Jose Rizal', 
-        license: '1112223', 
-        email: 'pepe@gmail.com', 
-        phone: '+639111111111', 
-        status: 'Active',
-        image: null 
-    },
-];
-
 export default function ManageDentists() {
     const navigate = useNavigate();
-    const [dentists, setDentists] = useState(INITIAL_DATA);
+    
+    // Wala na tayong INITIAL_DATA, empty array muna
+    const [dentists, setDentists] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(true); // Loading state
 
-    const handleEdit = (id) => alert(`Edit Dentist ID: ${id}`);
-    const handleView = (dentist) => alert(`Profile: ${dentist.name}`);
-    const handleDelete = (id) => {
+    // FETCH DATA FROM SERVER
+    const fetchDentists = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/dentists');
+            const data = await response.json();
+            
+            if (response.ok) {
+                // I-map natin ang data galing backend papunta sa format ng table
+                const formattedData = data.map(dentist => ({
+                    id: dentist._id, // MongoDB ID
+                    // Pagsamahin ang pangalan
+                    name: `Dr. ${dentist.name.first} ${dentist.name.last}`, 
+                    license: dentist.licenseNumber || 'N/A',
+                    email: dentist.email,
+                    phone: dentist.contactNumber,
+                    // Gamitin ang isVerified bilang status (o pwede ring magdagdag ng status field sa DB later)
+                    status: dentist.isVerified ? 'Active' : 'Pending',
+                    image: dentist.profileImage // Base64 Image
+                }));
+                setDentists(formattedData);
+            } else {
+                console.error("Failed to fetch dentists");
+            }
+        } catch (error) {
+            console.error("Error connecting to server:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Tawagin ang fetch sa pag-load ng page
+    useEffect(() => {
+        fetchDentists();
+    }, []);
+
+    // ... (ACTIONS: Delete Logic Updated for API)
+    const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this dentist?")) {
+            // Note: Wala pa tayong DELETE endpoint sa backend, pero sa UI pwede natin alisin muna
+            // Sa susunod, gagawan natin ito ng app.delete('/api/user/:id')
             setDentists(dentists.filter(d => d.id !== id));
         }
     };
 
+    // Filter Logic
     const filteredDentists = dentists.filter(dentist => 
         dentist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         dentist.license.includes(searchTerm)
@@ -59,7 +68,11 @@ export default function ManageDentists() {
                     <h1 className={styles.pageTitle}>Manage <span className={styles.highlight}>Dentists</span></h1>
                     <p className={styles.subTitle}>View and manage dentist accounts</p>
                 </div>
-                <button className={styles.addButton} onClick={() => navigate('/owner/add-dentist')}>
+                
+                <button 
+                    className={styles.addButton} 
+                    onClick={() => navigate('/owner/add-dentist')}
+                >
                     <img src={addIcon} alt="Add" className={styles.addIcon} />
                     ADD DENTIST
                 </button>
@@ -87,20 +100,18 @@ export default function ManageDentists() {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredDentists.length > 0 ? (
+                        {loading ? (
+                            <tr><td colSpan="5" className={styles.noData}>Loading dentists...</td></tr>
+                        ) : filteredDentists.length > 0 ? (
                             filteredDentists.map((dentist) => (
                                 <tr key={dentist.id}>
                                     <td className={styles.nameCell}>
-                                        {/* LOGIC: Show Image OR Letter */}
                                         {dentist.image ? (
-                                            <img 
-                                                src={dentist.image} 
-                                                alt="avatar" 
-                                                className={styles.avatarImage} 
-                                            />
+                                            <img src={dentist.image} alt="avatar" className={styles.avatarImage} />
                                         ) : (
                                             <div className={styles.avatarPlaceholder}>
-                                                {dentist.name.charAt(4)} {/* Assuming 'Dr. ' prefix, charAt(4) is the name start */}
+                                                {/* Kunin ang first letter ng First Name (skip "Dr. ") */}
+                                                {dentist.name.split(' ')[1][0]}
                                             </div>
                                         )}
                                         {dentist.name}
@@ -118,14 +129,16 @@ export default function ManageDentists() {
                                         </span>
                                     </td>
                                     <td className={styles.actionCell}>
-                                        <button className={styles.viewBtn} onClick={() => handleView(dentist)}>VIEW</button>
-                                        <button className={styles.editBtn} onClick={() => handleEdit(dentist.id)}>EDIT</button>
+                                        <button className={styles.viewBtn}>VIEW</button>
+                                        <button className={styles.editBtn}>EDIT</button>
                                         <button className={styles.deleteBtn} onClick={() => handleDelete(dentist.id)}>DELETE</button>
                                     </td>
                                 </tr>
                             ))
                         ) : (
-                            <tr><td colSpan="5" className={styles.noData}>No dentists found.</td></tr>
+                            <tr>
+                                <td colSpan="5" className={styles.noData}>No dentists found.</td>
+                            </tr>
                         )}
                     </tbody>
                 </table>

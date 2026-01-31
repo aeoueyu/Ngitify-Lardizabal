@@ -10,6 +10,7 @@ export default function AddDentistPage() {
     // --- STATE MANAGEMENT ---
     const [isSameAddress, setIsSameAddress] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
+    const [showModal, setShowModal] = useState(false); // NEW: Modal State
 
     // Initial State para sa Address
     const initialAddressState = {
@@ -26,16 +27,16 @@ export default function AddDentistPage() {
         permanentAddress: { ...initialAddressState }
     });
 
-    // --- PASSWORD VALIDATION STATE ---
     const [passwordCriteria, setPasswordCriteria] = useState({
         length: false, uppercase: false, lowercase: false, number: false
     });
 
     const [passwordsMatch, setPasswordsMatch] = useState(true); 
     const [isFormValid, setIsFormValid] = useState(false); 
-
-    // BAGONG STATE: Para sa pagpapakita ng Rules
     const [showPasswordRules, setShowPasswordRules] = useState(false);
+
+    // --- NEW: SUCCESS MODAL STATE ---
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     // --- LOGIC: HANDLE PASSWORD CHANGE ---
     const handlePasswordChange = (e) => {
@@ -76,7 +77,7 @@ export default function AddDentistPage() {
     }, [formData, passwordCriteria]);
 
 
-    // --- EXISTING HANDLERS (Image, Address, etc.) ---
+    // --- EXISTING HANDLERS ---
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -133,7 +134,10 @@ export default function AddDentistPage() {
         }
     };
 
-    const handleSubmit = (e) => {
+    // --- UPDATED SUBMIT HANDLER ---
+    // Sa AddDentistPage.js
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!isFormValid) return; 
 
@@ -143,8 +147,30 @@ export default function AddDentistPage() {
             profileImage: profileImage
         };
 
-        console.log("Submitting Data:", finalData);
-        alert("Dentist Account Created Successfully!");
+        try {
+            const response = await fetch('http://localhost:5000/api/add-dentist', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(finalData),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // SUCCESS: Show Custom Modal instead of alert
+                setShowModal(true);
+            } else {
+                alert(data.message || "Failed to create account.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Cannot connect to server.");
+        }
+    };
+
+    // --- MODAL ACTION ---
+    const handleCloseModal = () => {
+        setShowModal(false);
         navigate('/owner/manage-dentists');
     };
 
@@ -212,6 +238,27 @@ export default function AddDentistPage() {
 
     return (
         <div className={styles.container}>
+            
+            {/* --- CUSTOM SUCCESS MODAL --- */}
+            {showSuccessModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalBox}>
+                        <div className={styles.successIconContainer}>
+                            <svg className={styles.successIcon} viewBox="0 0 24 24">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                        <h3 className={styles.modalTitle}>Registration Successful!</h3>
+                        <p className={styles.modalMessage}>
+                            The dentist account has been successfully created and added to the system.
+                        </p>
+                        <button className={styles.modalBtn} onClick={handleCloseModal}>
+                            Okay, Continue
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className={styles.formCard}>
                 <div className={styles.header}>
                     <h2>Add New <span className={styles.highlight}>Dentist</span></h2>
@@ -289,7 +336,7 @@ export default function AddDentistPage() {
 
                     <hr className={styles.divider} />
 
-                    {/* --- ACCOUNT PASSWORD SECTION --- */}
+                    {/* ACCOUNT SECURITY */}
                     <h3 className={styles.mainSectionTitle}>Account Security</h3>
                     <div className={styles.row}>
                         <div className={styles.formGroup}>
@@ -300,7 +347,6 @@ export default function AddDentistPage() {
                                 className={styles.inputField} 
                                 placeholder="Create Password" 
                                 onChange={handlePasswordChange}
-                                // ADDED HANDLERS HERE
                                 onFocus={() => setShowPasswordRules(true)}
                                 onBlur={() => setShowPasswordRules(false)}
                                 value={formData.password}
@@ -322,27 +368,21 @@ export default function AddDentistPage() {
                         </div>
                     </div>
 
-                    {/* PASSWORD RULES CHECKLIST (CONDITIONAL RENDERING) */}
-                    {/* Lalabas lang ito kapag 'showPasswordRules' ay true */}
                     {showPasswordRules && (
                         <div className={styles.passwordRulesContainer}>
                             <p className={styles.rulesLabel}>Password must contain:</p>
                             <ul className={styles.rulesList}>
                                 <li className={passwordCriteria.length ? styles.validRule : styles.invalidRule}>
-                                    <span className={styles.ruleIcon}>{passwordCriteria.length ? '✓' : '○'}</span>
-                                    At least 8 characters
+                                    <span className={styles.ruleIcon}>{passwordCriteria.length ? '✓' : '○'}</span> At least 8 characters
                                 </li>
                                 <li className={passwordCriteria.uppercase ? styles.validRule : styles.invalidRule}>
-                                    <span className={styles.ruleIcon}>{passwordCriteria.uppercase ? '✓' : '○'}</span>
-                                    At least one uppercase letter (A-Z)
+                                    <span className={styles.ruleIcon}>{passwordCriteria.uppercase ? '✓' : '○'}</span> At least one uppercase letter (A-Z)
                                 </li>
                                 <li className={passwordCriteria.lowercase ? styles.validRule : styles.invalidRule}>
-                                    <span className={styles.ruleIcon}>{passwordCriteria.lowercase ? '✓' : '○'}</span>
-                                    At least one lowercase letter (a-z)
+                                    <span className={styles.ruleIcon}>{passwordCriteria.lowercase ? '✓' : '○'}</span> At least one lowercase letter (a-z)
                                 </li>
                                 <li className={passwordCriteria.number ? styles.validRule : styles.invalidRule}>
-                                    <span className={styles.ruleIcon}>{passwordCriteria.number ? '✓' : '○'}</span>
-                                    At least one number (0-9)
+                                    <span className={styles.ruleIcon}>{passwordCriteria.number ? '✓' : '○'}</span> At least one number (0-9)
                                 </li>
                             </ul>
                         </div>

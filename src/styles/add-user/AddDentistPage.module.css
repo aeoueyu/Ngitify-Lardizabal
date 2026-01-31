@@ -378,6 +378,109 @@ select.inputField {
     color: #444;
 }
 
+/* ... (Existing styles above) ... */
+
+/* --- CUSTOM SUCCESS MODAL --- */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* Siguradong nasa ibabaw ng lahat */
+    backdrop-filter: blur(4px); /* Optional: Blur effect sa likod */
+    animation: fadeIn 0.3s ease;
+}
+
+/* 2. Ang puting box */
+.modalContent {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 3. Green Circle na may Check */
+.successIconCircle {
+    width: 70px;
+    height: 70px;
+    background-color: #e0f7fa; /* Light teal background */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.checkIcon {
+    width: 35px;
+    height: 35px;
+    color: #005466; /* Main Teal color */
+    animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 4. Text Styles */
+.modalTitle {
+    color: #005466;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+}
+
+.modalMessage {
+    color: #666;
+    font-size: 14px;
+    margin: 0 0 25px 0;
+    line-height: 1.5;
+}
+
+/* 5. Continue Button */
+.modalBtn {
+    background-color: #005466;
+    color: white;
+    border: none;
+    padding: 12px 40px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.modalBtn:hover {
+    background-color: #337685;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 84, 102, 0.2);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
 @media (max-width: 768px) {
     .row { flex-direction: column; gap: 15px; }
     .rulesList { grid-template-columns: 1fr; } /* 1 column sa mobile */
