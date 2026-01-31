@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
 
-/* ... (Keep existing styles) ... */
 .container {
     width: 100%;
     display: flex;
@@ -202,10 +201,7 @@ select.inputField {
     font-size: 14px;
 }
 
-/* --- NEW: PASSWORD RULES STYLING --- */
-/* ... (Ibang styles sa taas wag galawin) ... */
-
-/* PASSWORD RULES CONTAINER */
+/* Password Rules Container */
 .passwordRulesContainer {
     background-color: #f8f9fa;
     padding: 10px 15px;
@@ -213,13 +209,7 @@ select.inputField {
     margin-top: -10px;
     margin-bottom: 15px;
     border: 1px solid #eee;
-    /* Optional: Dagdag animation para smooth ang paglabas */
     animation: fadeIn 0.2s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 .rulesLabel {
@@ -253,31 +243,14 @@ select.inputField {
     font-size: 11px;
 }
 
-/* Valid Rule (Green) */
 .validRule {
     color: #2e7d32;
     font-weight: 600;
 }
 
-/* Invalid Rule (Gray/Muted) */
 .invalidRule {
     color: #999;
 }
-
-.errorBorder {
-    border-color: #c62828 !important;
-}
-
-/* UPDATED: KASING LAKI NA SYA NG RULES (11px) */
-.errorText {
-    color: #c62828;
-    font-size: 11px; /* Dating default/larger, ngayon match na sa rules */
-    margin-top: 5px;
-    margin-left: 15px;
-    font-weight: 600;
-}
-
-/* ... (Ibang styles sa baba wag galawin) ... */
 
 .errorBorder {
     border-color: #c62828 !important;
@@ -354,7 +327,6 @@ select.inputField {
     transform: translateY(-2px);
 }
 
-/* --- NEW: DISABLED BUTTON STATE --- */
 .disabledBtn {
     background-color: #ccc !important;
     cursor: not-allowed !important;
@@ -378,62 +350,51 @@ select.inputField {
     color: #444;
 }
 
-/* ... (Existing styles above) ... */
+/* --- CUSTOM MODAL STYLES --- */
 
-/* --- CUSTOM SUCCESS MODAL --- */
+/* 1. Dimmed Background Overlay */
 .modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent dim */
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2000; /* Siguradong nasa ibabaw ng lahat */
-    backdrop-filter: blur(4px); /* Optional: Blur effect sa likod */
+    z-index: 2000;
+    backdrop-filter: blur(3px); /* Blur effect */
     animation: fadeIn 0.3s ease;
 }
 
-/* 2. Ang puting box */
-.modalContent {
+/* 2. The Card Itself */
+.modalCard {
     background: white;
-    padding: 40px;
+    padding: 40px 50px;
     border-radius: 20px;
     text-align: center;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    animation: slideUp 0.3s ease;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
+    animation: scaleUp 0.3s ease;
+    max-width: 400px;
+    width: 90%;
 }
 
-/* 3. Green Circle na may Check */
-.successIconCircle {
-    width: 70px;
-    height: 70px;
-    background-color: #e0f7fa; /* Light teal background */
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
+/* 3. Success Icon Image */
+.modalIcon {
+    width: 80px; 
+    height: 80px;
+    margin-bottom: 25px;
+    animation: bounceIn 0.5s ease;
 }
 
-.checkIcon {
-    width: 35px;
-    height: 35px;
-    color: #005466; /* Main Teal color */
-    animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-/* 4. Text Styles */
+/* 4. Title Text */
 .modalTitle {
-    color: #005466;
-    font-size: 24px;
+    color: #333;
+    font-size: 22px;
     font-weight: 700;
     margin: 0 0 10px 0;
 }
@@ -441,47 +402,45 @@ select.inputField {
 .modalMessage {
     color: #666;
     font-size: 14px;
-    margin: 0 0 25px 0;
+    margin: 0 0 30px 0;
     line-height: 1.5;
 }
 
-/* 5. Continue Button */
-.modalBtn {
-    background-color: #005466;
-    color: white;
-    border: none;
-    padding: 12px 40px;
-    border-radius: 50px;
+/* 5. "Close" Text Link */
+.closeLink {
+    color: #005466; /* Teal color */
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
-    width: 100%;
+    margin: 0;
+    padding-bottom: 2px;
+    border-bottom: 2px solid transparent; 
+    transition: all 0.2s ease;
 }
 
-.modalBtn:hover {
-    background-color: #337685;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 84, 102, 0.2);
+.closeLink:hover {
+    border-bottom-color: #ea8b89; /* Pink underline on hover */
+    color: #337685;
 }
 
-/* Animations */
+/* --- Animations --- */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-@keyframes slideUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+@keyframes scaleUp {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
-@keyframes scaleIn {
-    from { transform: scale(0); }
-    to { transform: scale(1); }
+@keyframes bounceIn {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 @media (max-width: 768px) {
     .row { flex-direction: column; gap: 15px; }
-    .rulesList { grid-template-columns: 1fr; } /* 1 column sa mobile */
+    .rulesList { grid-template-columns: 1fr; }
 }

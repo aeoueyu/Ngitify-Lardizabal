@@ -3,6 +3,9 @@ import styles from '../../styles/add-user/AddDentistPage.module.css';
 import { useNavigate } from 'react-router-dom';
 import { regions, provinces, cities, barangays } from '../../utils/addressData';
 
+// IMPORT SUCCESS ICON (Siguraduhing tama ang spelling ng folder mo sa assets)
+import successIcon from '../../assets/alert-icons/success.svg';
+
 export default function AddDentistPage() {
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
@@ -10,7 +13,7 @@ export default function AddDentistPage() {
     // --- STATE MANAGEMENT ---
     const [isSameAddress, setIsSameAddress] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
-    const [showModal, setShowModal] = useState(false); // NEW: Modal State
+    const [showSuccessModal, setShowSuccessModal] = useState(false); // Modal State
 
     // Initial State para sa Address
     const initialAddressState = {
@@ -35,10 +38,7 @@ export default function AddDentistPage() {
     const [isFormValid, setIsFormValid] = useState(false); 
     const [showPasswordRules, setShowPasswordRules] = useState(false);
 
-    // --- NEW: SUCCESS MODAL STATE ---
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
-
-    // --- LOGIC: HANDLE PASSWORD CHANGE ---
+    // --- LOGIC: PASSWORD & FORM VALIDITY ---
     const handlePasswordChange = (e) => {
         const val = e.target.value;
         setFormData({ ...formData, password: val });
@@ -61,7 +61,6 @@ export default function AddDentistPage() {
         setPasswordsMatch(val === formData.password);
     };
 
-    // --- LOGIC: CHECK OVERALL FORM VALIDITY ---
     useEffect(() => {
         const { firstName, lastName, birthdate, email, phone, licenseNumber, specialization, password, confirmPassword } = formData;
         
@@ -76,8 +75,7 @@ export default function AddDentistPage() {
 
     }, [formData, passwordCriteria]);
 
-
-    // --- EXISTING HANDLERS ---
+    // --- HANDLERS ---
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -134,9 +132,7 @@ export default function AddDentistPage() {
         }
     };
 
-    // --- UPDATED SUBMIT HANDLER ---
-    // Sa AddDentistPage.js
-
+    // --- SUBMIT LOGIC ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!isFormValid) return; 
@@ -157,21 +153,20 @@ export default function AddDentistPage() {
             const data = await response.json();
 
             if (response.ok) {
-                // SUCCESS: Show Custom Modal instead of alert
-                setShowModal(true);
+                // SUCCESS: Show Modal
+                setShowSuccessModal(true);
             } else {
                 alert(data.message || "Failed to create account.");
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("Cannot connect to server.");
+            alert("Cannot connect to server. Make sure your local server is running.");
         }
     };
 
-    // --- MODAL ACTION ---
     const handleCloseModal = () => {
-        setShowModal(false);
-        navigate('/owner/manage-dentists');
+        setShowSuccessModal(false);
+        navigate('/user-management/manage-dentists');
     };
 
     // Helper for Address Rendering
@@ -238,27 +233,6 @@ export default function AddDentistPage() {
 
     return (
         <div className={styles.container}>
-            
-            {/* --- CUSTOM SUCCESS MODAL --- */}
-            {showSuccessModal && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalBox}>
-                        <div className={styles.successIconContainer}>
-                            <svg className={styles.successIcon} viewBox="0 0 24 24">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                        </div>
-                        <h3 className={styles.modalTitle}>Registration Successful!</h3>
-                        <p className={styles.modalMessage}>
-                            The dentist account has been successfully created and added to the system.
-                        </p>
-                        <button className={styles.modalBtn} onClick={handleCloseModal}>
-                            Okay, Continue
-                        </button>
-                    </div>
-                </div>
-            )}
-
             <div className={styles.formCard}>
                 <div className={styles.header}>
                     <h2>Add New <span className={styles.highlight}>Dentist</span></h2>
@@ -376,21 +350,19 @@ export default function AddDentistPage() {
                                     <span className={styles.ruleIcon}>{passwordCriteria.length ? '✓' : '○'}</span> At least 8 characters
                                 </li>
                                 <li className={passwordCriteria.uppercase ? styles.validRule : styles.invalidRule}>
-                                    <span className={styles.ruleIcon}>{passwordCriteria.uppercase ? '✓' : '○'}</span> At least one uppercase letter (A-Z)
+                                    <span className={styles.ruleIcon}>{passwordCriteria.uppercase ? '✓' : '○'}</span> Uppercase letter
                                 </li>
                                 <li className={passwordCriteria.lowercase ? styles.validRule : styles.invalidRule}>
-                                    <span className={styles.ruleIcon}>{passwordCriteria.lowercase ? '✓' : '○'}</span> At least one lowercase letter (a-z)
+                                    <span className={styles.ruleIcon}>{passwordCriteria.lowercase ? '✓' : '○'}</span> Lowercase letter
                                 </li>
                                 <li className={passwordCriteria.number ? styles.validRule : styles.invalidRule}>
-                                    <span className={styles.ruleIcon}>{passwordCriteria.number ? '✓' : '○'}</span> At least one number (0-9)
+                                    <span className={styles.ruleIcon}>{passwordCriteria.number ? '✓' : '○'}</span> Number
                                 </li>
                             </ul>
                         </div>
                     )}
 
                     <hr className={styles.divider} />
-
-                    {/* ADDRESSES */}
                     {renderAddressFields('currentAddress', 'Current Address')}
 
                     <div className={styles.permanentHeader}>
@@ -403,20 +375,33 @@ export default function AddDentistPage() {
 
                     {isSameAddress ? <div className={styles.disabledOverlay}>{renderAddressFields('permanentAddress', '', true)}</div> : renderAddressFields('permanentAddress', '')}
 
-                    {/* BUTTONS */}
                     <div className={styles.buttonGroup}>
-                        <button type="button" className={styles.cancelBtn} onClick={() => navigate('/owner/manage-dentists')}>CANCEL</button>
-                        
-                        <button 
-                            type="submit" 
-                            className={`${styles.submitBtn} ${!isFormValid ? styles.disabledBtn : ''}`}
-                            disabled={!isFormValid}
-                        >
+                        <button type="button" className={styles.cancelBtn} onClick={() => navigate('/user-management/manage-dentists')}>CANCEL</button>
+                        <button type="submit" className={`${styles.submitBtn} ${!isFormValid ? styles.disabledBtn : ''}`} disabled={!isFormValid}>
                             CREATE ACCOUNT
                         </button>
                     </div>
                 </form>
             </div>
+
+            {/* --- NEW: CUSTOM SUCCESS MODAL --- */}
+            {showSuccessModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalCard}>
+                        {/* Check Icon Image */}
+                        <img src={successIcon} alt="Success" className={styles.modalIcon} />
+                        
+                        <h3 className={styles.modalTitle}>Successfully Registered!</h3>
+                        <p className={styles.modalMessage}>The dentist account has been successfully created.</p>
+                        
+                        {/* Text Link (Close) */}
+                        <p className={styles.closeLink} onClick={handleCloseModal}>
+                            Close
+                        </p>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }
