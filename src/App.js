@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router , Routes , Route, Navigate } from 'react-router-dom';
-import LoginPage from './components/LoginPage';
-import SignupPage from './components/SignupPage';
+import LoginPage from './components/login/LoginPage';
 import './App.css';
 import HomePage from './components/HomePage';
 import DashboardPage from './components/DashboardPage';
@@ -14,6 +13,8 @@ import ForgotPassPage from './components/ForgotPassPage';
 import VerificationCodePage from './components/VerificationCodePage';
 import NewPasswordPage from './components/NewPasswordPage';
 import NewPasswordRedirectPage from './components/NewPasswordRedirectPage';
+import Website from './components/welcome/Website';
+import RoleSelectionPage from './components/login/RoleSelectionPage';
 
 function ProtectedRoute({children}) {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -24,9 +25,10 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<Website/>}/>
+        <Route path="/role-selection" element={<RoleSelectionPage/>}/>
         <Route path="/login" element={<LoginPage/>}/>
         <Route path="/email-verification" element={<EmailVerificationPage/>}/>
-        <Route path="/signup" element={<SignupPage/>}/>
         <Route path="/otp" element={<OTP/>}/>
 
         <Route path="/forgot-password" element={<ForgotPassPage/>}/>
