@@ -27,14 +27,15 @@ mongoose.connect(uri)
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'garciaaeiounicole@gmail.com', // Siguraduhin na tama ang App Password mo dito
-        pass: 'igahrcpmubbnpzpt'
+        user: 'garciaaeiounicole@gmail.com', // Palitan kung iba ang sender email
+        pass: 'igahrcpmubbnpzpt'             // App Password
     }
 });
 
 // ======================= ROUTES =======================
 
 // 1. ADD DENTIST (Admin/Owner Only)
+// 1. ADD DENTIST (With Activation Link)
 app.post('/api/add-dentist', async (req, res) => {
     try {
         const { 
@@ -45,33 +46,29 @@ app.post('/api/add-dentist', async (req, res) => {
             password, profileImage 
         } = req.body;
 
-        // Check duplicate email
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ message: 'Email already exists.' });
 
-        // Hash Password
+        // 1. Generate Security Token & Expiry (24 Hours)
+        const activationToken = crypto.randomBytes(32).toString('hex');
+        const activationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        // 2. Hash Password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Create User
-        // ... sa loob ng /api/add-dentist
+        // 3. Create User
         const newDentist = new User({
-            name: {
-                first: firstName,
-                middle: middleName,
-                last: lastName
-            },
-            email,
-            contactNumber: phone,
-            birthdate,
-            licenseNumber,
-            specialization,
-            // --- CHANGE STARTS HERE ---
+            name: { first: firstName, middle: middleName, last: lastName },
+            email, contactNumber: phone, birthdate,
+            licenseNumber, specialization,
+            
+            // Fix sa Address (Barangay Mapping)
             currentAddress: {
                 region: currentAddress.region,
                 province: currentAddress.province,
                 city: currentAddress.city,
-                brgy: currentAddress.barangay, // FRONTEND SENDS 'barangay', DB NEEDS 'brgy'
+                brgy: currentAddress.barangay, 
                 street: currentAddress.street,
                 houseNumber: currentAddress.houseNumber
             },
@@ -79,41 +76,78 @@ app.post('/api/add-dentist', async (req, res) => {
                 region: permanentAddress.region,
                 province: permanentAddress.province,
                 city: permanentAddress.city,
-                brgy: permanentAddress.barangay, // SAME HERE
+                brgy: permanentAddress.barangay,
                 street: permanentAddress.street,
                 houseNumber: permanentAddress.houseNumber
             },
-            // --- CHANGE ENDS HERE ---
-            profileImage,
-            password: hashedPassword,
+
+            profileImage, password: hashedPassword,
             role: 'dentist',
-            isVerified: true
+            
+            // --- SECURITY SETTINGS ---
+            isVerified: false, // HINDI PA ACTIVE
+            activationToken,
+            activationExpires
         });
 
         await newDentist.save();
 
-        // Send Email Credentials
+        // 4. Send Email
+        // Gamit ang LOCALHOST link (Gagana ito sa laptop mo)
+        const activationLink = `http://localhost:3000/activate-account/${activationToken}`;
+
         const mailOptions = {
-            from: '"NgitiFy Team" <garciaaeiounicole@gmail.com>',
+            from: 'NgitiFy Admin <garciaaeiounicole@gmail.com>',
             to: email,
-            subject: 'Welcome to NgitiFy - Dentist Account Created',
+            subject: 'Activate your Dentist Account',
             html: `
-                <div style="font-family: Arial, sans-serif; color: #333;">
-                    <h1 style="color: #005466;">Welcome Dr. ${lastName}!</h1>
-                    <p>Your dentist account has been successfully created.</p>
-                    <p><strong>Email:</strong> ${email}</p>
-                    <p><strong>Initial Password:</strong> (The password set by the admin)</p>
-                    <p>Please login to your dashboard to update your profile.</p>
+                <div style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h2>Welcome to NgitiFy, Dr. ${lastName}!</h2>
+                    <p>Your account has been created successfully.</p>
+                    <p>To start using your account, please verify your email by clicking the button below:</p>
+                    <a href="${activationLink}" style="background-color: #005466; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify Account</a>
+                    <p style="margin-top: 20px; font-size: 12px; color: #666;">This link will expire in 24 hours.</p>
                 </div>
             `
         };
-        transporter.sendMail(mailOptions);
 
-        res.status(201).json({ message: 'Dentist account created successfully!' });
+        await transporter.sendMail(mailOptions);
+
+        res.status(201).json({ message: 'Account created! Please check email for activation.' });
 
     } catch (error) {
         console.error("Error adding dentist:", error);
         res.status(500).json({ message: 'Server error adding dentist.' });
+    }
+});
+
+// ACTIVATE ACCOUNT
+app.post('/api/activate-account', async (req, res) => {
+    try {
+        const { token } = req.body;
+
+        // Hanapin ang user na may ganitong token AT hindi pa expired ang oras
+        const user = await User.findOne({
+            activationToken: token,
+            activationExpires: { $gt: Date.now() } // "Greater Than" now
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired activation link.' });
+        }
+
+        // Activate User
+        user.isVerified = true;
+        user.activationToken = undefined; // Clear token
+        user.activationExpires = undefined; // Clear expiry
+        
+        await user.save();
+
+        res.status(200).json({ message: 'Account successfully activated!' });
+
+    } catch (error) {
+        console.error("Activation error:", error);
+        res.status(500).json({ message: "Server error during activation." });
     }
 });
 
@@ -316,7 +350,9 @@ app.post('/api/login', async (req, res) => {
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: "Invalid email or password." });
 
-        if (!user.isVerified) return res.status(401).json({ message: "Please verify your email first." });
+        if (!user.isVerified) {
+            return res.status(403).json({ message: "Account not activated. Please check your email." });
+        }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: "Invalid email or password." });
