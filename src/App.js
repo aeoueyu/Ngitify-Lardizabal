@@ -22,6 +22,7 @@ import RoleSelectionPage from './components/login/RoleSelectionPage';
 import ManageDentists from './components/user-management/ManageDentists';
 import AddDentistPage from './components/add-user/AddDentistPage';
 import EditDentistPage from './components/edit-user/EditDentistPage';
+import ViewDentistPage from './components/view-user/ViewDentistPage';
 
 // --- PROTECTED ROUTE CHECKER ---
 function ProtectedRoute({ children }) {
@@ -77,6 +78,7 @@ function App() {
             <Route path="/owner/manage-dentists" element={<ManageDentists />} />
             <Route path="/owner/add-dentist" element={<AddDentistPage />} />
             <Route path="/owner/edit-dentist/:id" element={<EditDentistPage />} />
+            <Route path="/owner/view-dentist/:id" element={<ViewDentistPage />} />
             
             {/* Other Protected Pages */}
             <Route path="/patientprofile" element={<PatientProfilePage />} />

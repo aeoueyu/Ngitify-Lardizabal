@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from '../../styles/user-management/ManageDentists.module.css';
 import addIcon from '../../assets/button-icons/add.svg'; 
 import { useNavigate } from 'react-router-dom';
-
-// Import Icons
-import warningIcon from '../../assets/alert-icons/warning.svg'; // Siguraduhin na meron nito
+import warningIcon from '../../assets/alert-icons/warning.svg'; 
 
 export default function ManageDentists() {
     const navigate = useNavigate();
@@ -16,7 +14,7 @@ export default function ManageDentists() {
 
     // Modal States
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [dentistToDelete, setDentistToDelete] = useState(null); // Id na buburahin
+    const [dentistToDelete, setDentistToDelete] = useState(null); 
 
     // FETCH DATA
     const fetchDentists = async () => {
@@ -48,14 +46,11 @@ export default function ManageDentists() {
     }, []);
 
     // --- DELETE LOGIC ---
-
-    // 1. Open Modal (Wag muna magbura agad)
     const initiateDelete = (id) => {
         setDentistToDelete(id);
         setShowDeleteModal(true);
     };
 
-    // 2. Confirm Delete (Tumawag sa API)
     const confirmDelete = async () => {
         if (!dentistToDelete) return;
 
@@ -65,9 +60,8 @@ export default function ManageDentists() {
             });
 
             if (response.ok) {
-                // Update UI: Alisin na sa listahan para di na need mag-refresh
                 setDentists(dentists.filter(d => d.id !== dentistToDelete));
-                setShowDeleteModal(false); // Close Modal
+                setShowDeleteModal(false);
                 setDentistToDelete(null);
             } else {
                 alert("Failed to delete user.");
@@ -78,7 +72,6 @@ export default function ManageDentists() {
         }
     };
 
-    // 3. Cancel Delete
     const cancelDelete = () => {
         setShowDeleteModal(false);
         setDentistToDelete(null);
@@ -92,6 +85,10 @@ export default function ManageDentists() {
 
     const handleEdit = (id) => {
         navigate(`/owner/edit-dentist/${id}`);
+    };
+
+    const handleView = (id) => {
+        navigate(`/owner/view-dentist/${id}`);
     };
 
     return (
@@ -158,9 +155,15 @@ export default function ManageDentists() {
                                         </span>
                                     </td>
                                     <td className={styles.actionCell}>
-                                        <button className={styles.viewBtn}>VIEW</button>
+                                        {/* Update this button */}
+                                        <button 
+                                            className={styles.viewBtn} 
+                                            onClick={() => handleView(dentist.id)}
+                                        >
+                                            VIEW
+                                        </button>
+                                        
                                         <button className={styles.editBtn} onClick={() => handleEdit(dentist.id)}>EDIT</button>
-                                        {/* UPDATE: Call initiateDelete instead of direct delete */}
                                         <button className={styles.deleteBtn} onClick={() => initiateDelete(dentist.id)}>DELETE</button>
                                     </td>
                                 </tr>
@@ -187,7 +190,6 @@ export default function ManageDentists() {
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styles from '../../styles/add-user/AddDentistPage.module.css';
+import styles from '../../styles/edit-user/EditDentistPage.module.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { regions, provinces, cities, barangays } from '../../utils/addressData';
 import successIcon from '../../assets/alert-icons/success.svg';
@@ -10,10 +10,10 @@ export default function EditDentistPage() {
     const fileInputRef = useRef(null);
     
     // --- STATE MANAGEMENT ---
-    const [isLoading, setIsLoading] = useState(true);
     const [isSameAddress, setIsSameAddress] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const initialAddressState = {
         country: 'Philippines',
@@ -28,46 +28,41 @@ export default function EditDentistPage() {
         permanentAddress: { ...initialAddressState }
     });
 
-    // --- 1. FETCH DATA ON LOAD ---
+    // --- 1. FETCH DATA ON MOUNT ---
     useEffect(() => {
         const fetchDentist = async () => {
             try {
                 const response = await fetch(`http://localhost:5000/api/dentist/${id}`);
-                
-                if (!response.ok) throw new Error("Failed to fetch data");
-
                 const data = await response.json();
-
-                setFormData({
-                    firstName: data.name?.first || '',
-                    middleName: data.name?.middle || '',
-                    lastName: data.name?.last || '',
-                    birthdate: data.birthdate ? new Date(data.birthdate).toISOString().split('T')[0] : '',
-                    email: data.email || '',
-                    phone: data.contactNumber ? data.contactNumber.replace('+63', '') : '',
-                    licenseNumber: data.licenseNumber || '',
-                    specialization: data.specialization || '',
-                    currentAddress: data.currentAddress || initialAddressState,
-                    permanentAddress: data.permanentAddress || initialAddressState
-                });
-
-                if (data.profileImage) {
+                
+                if (response.ok) {
+                    setFormData({
+                        firstName: data.name?.first || '',
+                        middleName: data.name?.middle || '',
+                        lastName: data.name?.last || '',
+                        birthdate: data.birthdate ? data.birthdate.split('T')[0] : '',
+                        email: data.email || '',
+                        phone: data.contactNumber ? data.contactNumber.replace('+63', '') : '',
+                        licenseNumber: data.licenseNumber || '',
+                        specialization: data.specialization || '',
+                        currentAddress: data.currentAddress || initialAddressState,
+                        permanentAddress: data.permanentAddress || initialAddressState
+                    });
                     setProfileImage(data.profileImage);
+                } else {
+                    alert("Failed to fetch dentist data");
+                    navigate('/owner/manage-dentists');
                 }
-
             } catch (error) {
-                console.error("Error loading dentist:", error);
-                alert("Error loading dentist data.");
-                navigate('/owner/manage-dentists');
+                console.error("Error:", error);
             } finally {
                 setIsLoading(false);
             }
         };
-
-        if (id) fetchDentist();
+        fetchDentist();
     }, [id, navigate]);
 
-    // --- HANDLERS ---
+    // --- FORM HANDLERS ---
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -116,7 +111,7 @@ export default function EditDentistPage() {
         }
     };
 
-    // --- SUBMIT (UPDATE) ---
+    // --- SUBMIT HANDLER (UPDATE) ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -124,7 +119,6 @@ export default function EditDentistPage() {
             ...formData,
             phone: `+63${formData.phone}`,
             profileImage: profileImage
-            // Note: Wala ng password dito
         };
 
         try {
@@ -137,8 +131,7 @@ export default function EditDentistPage() {
             if (response.ok) {
                 setShowSuccessModal(true);
             } else {
-                const err = await response.json();
-                alert(err.message || "Failed to update account.");
+                alert("Failed to update account.");
             }
         } catch (error) {
             console.error("Error:", error);
@@ -212,13 +205,7 @@ export default function EditDentistPage() {
         );
     };
 
-    if (isLoading) {
-        return (
-            <div className={styles.container} style={{ height: '80vh', alignItems: 'center' }}>
-                <p style={{ color: '#005466', fontWeight: 'bold' }}>Loading dentist information...</p>
-            </div>
-        );
-    }
+    if (isLoading) return <div className={styles.container}><p>Loading...</p></div>;
 
     return (
         <div className={styles.container}>
@@ -234,7 +221,9 @@ export default function EditDentistPage() {
                             {profileImage ? (
                                 <img src={profileImage} alt="Profile" className={styles.previewImage} />
                             ) : (
-                                <div className={styles.uploadPlaceholder}><span>No Image</span></div>
+                                <div className={styles.uploadPlaceholder}>
+                                    <span>No Image</span>
+                                </div>
                             )}
                         </div>
                         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} style={{ display: 'none' }} />
@@ -290,8 +279,6 @@ export default function EditDentistPage() {
                             </div>
                         </div>
                     </div>
-
-                    {/* REMOVED: ACCOUNT SECURITY SECTION (PASSWORD) */}
 
                     <hr className={styles.divider} />
                     {renderAddressFields('currentAddress', 'Current Address')}
