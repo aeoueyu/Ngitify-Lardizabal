@@ -1,15 +1,15 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from '../../styles/add-user/AddDentistPage.module.css';
 import { useNavigate } from 'react-router-dom';
 import { regions, provinces, cities, barangays } from '../../utils/addressData';
 
 export default function AddDentistPage() {
     const navigate = useNavigate();
-    const fileInputRef = useRef(null); // Reference para sa hidden file input
+    const fileInputRef = useRef(null);
     
     // --- STATE MANAGEMENT ---
     const [isSameAddress, setIsSameAddress] = useState(false);
-    const [profileImage, setProfileImage] = useState(null); // Dito store ang image preview
+    const [profileImage, setProfileImage] = useState(null);
 
     // Initial State para sa Address
     const initialAddressState = {
@@ -21,28 +21,73 @@ export default function AddDentistPage() {
     const [formData, setFormData] = useState({
         firstName: '', middleName: '', lastName: '', birthdate: '',
         email: '', phone: '', licenseNumber: '', specialization: '',
+        password: '', confirmPassword: '', 
         currentAddress: { ...initialAddressState },
         permanentAddress: { ...initialAddressState }
     });
 
-    // --- LOGIC: IMAGE UPLOAD ---
+    // --- PASSWORD VALIDATION STATE ---
+    const [passwordCriteria, setPasswordCriteria] = useState({
+        length: false, uppercase: false, lowercase: false, number: false
+    });
+
+    const [passwordsMatch, setPasswordsMatch] = useState(true); 
+    const [isFormValid, setIsFormValid] = useState(false); 
+
+    // BAGONG STATE: Para sa pagpapakita ng Rules
+    const [showPasswordRules, setShowPasswordRules] = useState(false);
+
+    // --- LOGIC: HANDLE PASSWORD CHANGE ---
+    const handlePasswordChange = (e) => {
+        const val = e.target.value;
+        setFormData({ ...formData, password: val });
+
+        setPasswordCriteria({
+            length: val.length >= 8,
+            uppercase: /[A-Z]/.test(val),
+            lowercase: /[a-z]/.test(val),
+            number: /[0-9]/.test(val)
+        });
+
+        if (formData.confirmPassword) {
+            setPasswordsMatch(val === formData.confirmPassword);
+        }
+    };
+
+    const handleConfirmPasswordChange = (e) => {
+        const val = e.target.value;
+        setFormData({ ...formData, confirmPassword: val });
+        setPasswordsMatch(val === formData.password);
+    };
+
+    // --- LOGIC: CHECK OVERALL FORM VALIDITY ---
+    useEffect(() => {
+        const { firstName, lastName, birthdate, email, phone, licenseNumber, specialization, password, confirmPassword } = formData;
+        
+        const basicFieldsFilled = firstName && lastName && birthdate && email && phone && licenseNumber && specialization;
+        const isPasswordStrong = Object.values(passwordCriteria).every(Boolean);
+        const isMatching = password === confirmPassword && password !== '';
+        
+        const { region, province, city, barangay, street, houseNumber } = formData.currentAddress;
+        const addressFilled = region && province && city && barangay && street && houseNumber;
+
+        setIsFormValid(basicFieldsFilled && isPasswordStrong && isMatching && addressFilled);
+
+    }, [formData, passwordCriteria]);
+
+
+    // --- EXISTING HANDLERS (Image, Address, etc.) ---
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Convert file to Base64 string for preview
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setProfileImage(reader.result);
-            };
+            reader.onloadend = () => setProfileImage(reader.result);
             reader.readAsDataURL(file);
         }
     };
 
-    const triggerFileInput = () => {
-        fileInputRef.current.click();
-    };
+    const triggerFileInput = () => fileInputRef.current.click();
 
-    // --- LOGIC: BIRTHDAY (21 Years Old Validation) ---
     const getMaxDate = () => {
         const today = new Date();
         today.setFullYear(today.getFullYear() - 21);
@@ -63,7 +108,6 @@ export default function AddDentistPage() {
     const handleAddressChange = (type, field, value) => {
         setFormData(prev => {
             const updatedAddress = { ...prev[type], [field]: value };
-            
             if (field === 'region') {
                 updatedAddress.province = ''; updatedAddress.city = ''; updatedAddress.barangay = '';
             } else if (field === 'province') {
@@ -91,18 +135,20 @@ export default function AddDentistPage() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+        if (!isFormValid) return; 
+
         const finalData = {
             ...formData,
             phone: `+63${formData.phone}`,
-            profileImage: profileImage // Isama ang image sa data (Optional: null kung wala)
+            profileImage: profileImage
         };
 
         console.log("Submitting Data:", finalData);
-        alert("Dentist Added Successfully!");
+        alert("Dentist Account Created Successfully!");
         navigate('/owner/manage-dentists');
     };
 
+    // Helper for Address Rendering
     const renderAddressFields = (type, title, isDisabled = false) => {
         const address = formData[type];
         const availableProvinces = address.region ? provinces[address.region] || [] : [];
@@ -173,33 +219,23 @@ export default function AddDentistPage() {
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                    {/* --- IMAGE UPLOAD SECTION --- */}
+                    {/* IMAGE UPLOAD */}
                     <div className={styles.uploadSection}>
                         <div className={styles.imageWrapper} onClick={triggerFileInput}>
                             {profileImage ? (
                                 <img src={profileImage} alt="Profile" className={styles.previewImage} />
                             ) : (
                                 <div className={styles.uploadPlaceholder}>
-                                    {/* Camera Icon (SVG) */}
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                                        <circle cx="12" cy="13" r="4"></circle>
-                                    </svg>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                                     <span>Upload Photo</span>
                                 </div>
                             )}
                         </div>
-                        <input 
-                            type="file" 
-                            accept="image/*" 
-                            ref={fileInputRef} 
-                            onChange={handleImageChange} 
-                            style={{ display: 'none' }} // Hidden input
-                        />
+                        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} style={{ display: 'none' }} />
                         <p className={styles.uploadHint}>Optional. Click circle to upload.</p>
                     </div>
 
-                    {/* --- PERSONAL DETAILS --- */}
+                    {/* PERSONAL INFO */}
                     <h3 className={styles.mainSectionTitle}>Personal Information</h3>
                     <div className={styles.row}>
                         <div className={styles.formGroup}>
@@ -236,7 +272,7 @@ export default function AddDentistPage() {
                         </div>
                     </div>
 
-                    {/* --- CONTACT DETAILS --- */}
+                    {/* CONTACT INFO */}
                     <div className={styles.row}>
                         <div className={styles.formGroup}>
                             <label>EMAIL ADDRESS</label>
@@ -252,6 +288,69 @@ export default function AddDentistPage() {
                     </div>
 
                     <hr className={styles.divider} />
+
+                    {/* --- ACCOUNT PASSWORD SECTION --- */}
+                    <h3 className={styles.mainSectionTitle}>Account Security</h3>
+                    <div className={styles.row}>
+                        <div className={styles.formGroup}>
+                            <label>PASSWORD</label>
+                            <input 
+                                type="password" 
+                                name="password" 
+                                className={styles.inputField} 
+                                placeholder="Create Password" 
+                                onChange={handlePasswordChange}
+                                // ADDED HANDLERS HERE
+                                onFocus={() => setShowPasswordRules(true)}
+                                onBlur={() => setShowPasswordRules(false)}
+                                value={formData.password}
+                                required 
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>CONFIRM PASSWORD</label>
+                            <input 
+                                type="password" 
+                                name="confirmPassword" 
+                                className={`${styles.inputField} ${!passwordsMatch ? styles.errorBorder : ''}`} 
+                                placeholder="Repeat Password" 
+                                onChange={handleConfirmPasswordChange} 
+                                value={formData.confirmPassword}
+                                required 
+                            />
+                            {!passwordsMatch && <span className={styles.errorText}>Passwords do not match</span>}
+                        </div>
+                    </div>
+
+                    {/* PASSWORD RULES CHECKLIST (CONDITIONAL RENDERING) */}
+                    {/* Lalabas lang ito kapag 'showPasswordRules' ay true */}
+                    {showPasswordRules && (
+                        <div className={styles.passwordRulesContainer}>
+                            <p className={styles.rulesLabel}>Password must contain:</p>
+                            <ul className={styles.rulesList}>
+                                <li className={passwordCriteria.length ? styles.validRule : styles.invalidRule}>
+                                    <span className={styles.ruleIcon}>{passwordCriteria.length ? '✓' : '○'}</span>
+                                    At least 8 characters
+                                </li>
+                                <li className={passwordCriteria.uppercase ? styles.validRule : styles.invalidRule}>
+                                    <span className={styles.ruleIcon}>{passwordCriteria.uppercase ? '✓' : '○'}</span>
+                                    At least one uppercase letter (A-Z)
+                                </li>
+                                <li className={passwordCriteria.lowercase ? styles.validRule : styles.invalidRule}>
+                                    <span className={styles.ruleIcon}>{passwordCriteria.lowercase ? '✓' : '○'}</span>
+                                    At least one lowercase letter (a-z)
+                                </li>
+                                <li className={passwordCriteria.number ? styles.validRule : styles.invalidRule}>
+                                    <span className={styles.ruleIcon}>{passwordCriteria.number ? '✓' : '○'}</span>
+                                    At least one number (0-9)
+                                </li>
+                            </ul>
+                        </div>
+                    )}
+
+                    <hr className={styles.divider} />
+
+                    {/* ADDRESSES */}
                     {renderAddressFields('currentAddress', 'Current Address')}
 
                     <div className={styles.permanentHeader}>
@@ -264,9 +363,17 @@ export default function AddDentistPage() {
 
                     {isSameAddress ? <div className={styles.disabledOverlay}>{renderAddressFields('permanentAddress', '', true)}</div> : renderAddressFields('permanentAddress', '')}
 
+                    {/* BUTTONS */}
                     <div className={styles.buttonGroup}>
                         <button type="button" className={styles.cancelBtn} onClick={() => navigate('/owner/manage-dentists')}>CANCEL</button>
-                        <button type="submit" className={styles.submitBtn}>CREATE ACCOUNT</button>
+                        
+                        <button 
+                            type="submit" 
+                            className={`${styles.submitBtn} ${!isFormValid ? styles.disabledBtn : ''}`}
+                            disabled={!isFormValid}
+                        >
+                            CREATE ACCOUNT
+                        </button>
                     </div>
                 </form>
             </div>
