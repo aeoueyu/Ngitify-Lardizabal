@@ -1,10 +1,17 @@
+/* Container ng buong layout */
 .leftnav-div {
     display: flex;
+    width: 100%;
+    min-height: 100vh;
 }
 
+/* Content Area sa kanan */
 .leftnav-main {
-    margin-left: 100px;
-    padding: 20px;
-    width: fit-content;
-    flex:1
+    margin-left: 260px; /* IMPORTANT: Dapat match ito sa width ng Sidebar mo */
+    width: calc(100% - 260px); /* Kunin ang natitirang space */
+    padding: 40px;
+    background-color: #f8f9fa; /* Light gray background para malinis tignan */
+    min-height: 100vh;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
 }
