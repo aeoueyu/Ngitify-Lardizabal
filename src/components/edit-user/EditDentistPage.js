@@ -7,14 +7,14 @@ import successIcon from '../../assets/alert-icons/success.svg';
 
 export default function EditDentistPage() {
     const navigate = useNavigate();
-    const { id } = useParams(); // Kunin ang ID mula sa URL
+    const { id } = useParams(); // Get ID from URL
     const fileInputRef = useRef(null);
     
-    // --- STATE MANAGEMENT ---
+    // --- STATE ---
+    const [isLoading, setIsLoading] = useState(true); // Loading State
     const [isSameAddress, setIsSameAddress] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
 
     const initialAddressState = {
         country: 'Philippines',
@@ -30,51 +30,69 @@ export default function EditDentistPage() {
         permanentAddress: { ...initialAddressState }
     });
 
-    // Password validation only matters if they try to change it
     const [passwordCriteria, setPasswordCriteria] = useState({
         length: false, uppercase: false, lowercase: false, number: false
     });
     const [passwordsMatch, setPasswordsMatch] = useState(true); 
     const [showPasswordRules, setShowPasswordRules] = useState(false);
 
-    // --- 1. FETCH DATA ON MOUNT ---
+    // --- 1. FETCH DATA ON LOAD ---
     useEffect(() => {
         const fetchDentist = async () => {
+            console.log("Fetching dentist with ID:", id); // DEBUG LOG 1
+
             try {
                 const response = await fetch(`http://localhost:5000/api/dentist/${id}`);
-                const data = await response.json();
                 
-                if (response.ok) {
-                    // Populate Form
-                    setFormData({
-                        firstName: data.name.first,
-                        middleName: data.name.middle || '',
-                        lastName: data.name.last,
-                        birthdate: data.birthdate ? data.birthdate.split('T')[0] : '',
-                        email: data.email,
-                        phone: data.contactNumber.replace('+63', ''), // Remove prefix for input
-                        licenseNumber: data.licenseNumber,
-                        specialization: data.specialization,
-                        password: '', // Leave blank initially
-                        confirmPassword: '',
-                        currentAddress: data.currentAddress || initialAddressState,
-                        permanentAddress: data.permanentAddress || initialAddressState
-                    });
-                    setProfileImage(data.profileImage);
-                } else {
-                    alert("Failed to fetch dentist data");
-                    navigate('/owner/manage-dentists');
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data");
                 }
+
+                const data = await response.json();
+                console.log("Fetched Data:", data); // DEBUG LOG 2 - Check console if data appears
+
+                // PRE-FILL FORM with Safety Checks (?. and || '')
+                setFormData({
+                    firstName: data.name?.first || '',
+                    middleName: data.name?.middle || '',
+                    lastName: data.name?.last || '',
+                    
+                    // Format date to YYYY-MM-DD for input type="date"
+                    birthdate: data.birthdate ? new Date(data.birthdate).toISOString().split('T')[0] : '',
+                    
+                    email: data.email || '',
+                    // Remove +63 for display purposes
+                    phone: data.contactNumber ? data.contactNumber.replace('+63', '') : '',
+                    
+                    licenseNumber: data.licenseNumber || '',
+                    specialization: data.specialization || '',
+                    
+                    password: '', // Keep blank for security
+                    confirmPassword: '',
+                    
+                    currentAddress: data.currentAddress || initialAddressState,
+                    permanentAddress: data.permanentAddress || initialAddressState
+                });
+
+                if (data.profileImage) {
+                    setProfileImage(data.profileImage);
+                }
+
             } catch (error) {
-                console.error("Error:", error);
+                console.error("Error loading dentist:", error);
+                alert("Error loading dentist data. Please try again.");
+                navigate('/owner/manage-dentists');
             } finally {
-                setIsLoading(false);
+                setIsLoading(false); // Stop loading
             }
         };
-        fetchDentist();
+
+        if (id) {
+            fetchDentist();
+        }
     }, [id, navigate]);
 
-    // --- FORM HANDLERS ---
+    // --- HANDLERS ---
     const handlePasswordChange = (e) => {
         const val = e.target.value;
         setFormData({ ...formData, password: val });
@@ -117,7 +135,6 @@ export default function EditDentistPage() {
     const handleAddressChange = (type, field, value) => {
         setFormData(prev => {
             const updatedAddress = { ...prev[type], [field]: value };
-            // Cascading reset logic
             if (field === 'region') { updatedAddress.province = ''; updatedAddress.city = ''; updatedAddress.barangay = ''; }
             else if (field === 'province') { updatedAddress.city = ''; updatedAddress.barangay = ''; }
             else if (field === 'city') { updatedAddress.barangay = ''; }
@@ -139,16 +156,11 @@ export default function EditDentistPage() {
         }
     };
 
-    // --- 2. SUBMIT HANDLER (UPDATE) ---
+    // --- SUBMIT (UPDATE) ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // Basic validation: Password match (if password is entered)
-        if (formData.password && (!passwordsMatch || !Object.values(passwordCriteria).every(Boolean))) {
-            alert("Please check password requirements and matching.");
-            return;
-        }
-
+        // Prepare Data
         const finalData = {
             ...formData,
             phone: `+63${formData.phone}`,
@@ -157,7 +169,7 @@ export default function EditDentistPage() {
 
         try {
             const response = await fetch(`http://localhost:5000/api/dentist/${id}`, {
-                method: 'PUT', // PUT for update
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(finalData),
             });
@@ -165,7 +177,8 @@ export default function EditDentistPage() {
             if (response.ok) {
                 setShowSuccessModal(true);
             } else {
-                alert("Failed to update account.");
+                const err = await response.json();
+                alert(err.message || "Failed to update account.");
             }
         } catch (error) {
             console.error("Error:", error);
@@ -178,7 +191,7 @@ export default function EditDentistPage() {
         navigate('/owner/manage-dentists');
     };
 
-    // Address Renderer (Same as Add Page)
+    // Render Address Helper
     const renderAddressFields = (type, title, isDisabled = false) => {
         const address = formData[type];
         const availableProvinces = address.region ? provinces[address.region] || [] : [];
@@ -196,7 +209,7 @@ export default function EditDentistPage() {
                     <div className={styles.formGroup}>
                         <label>REGION</label>
                         <select className={styles.inputField} value={address.region} onChange={(e) => handleAddressChange(type, 'region', e.target.value)} disabled={isDisabled} required>
-                            <option value="" disabled hidden>Select Region</option>
+                            <option value="" disabled>Select Region</option>
                             {regions.map(r => <option key={r.code} value={r.code}>{r.name}</option>)}
                         </select>
                     </div>
@@ -205,14 +218,14 @@ export default function EditDentistPage() {
                     <div className={styles.formGroup}>
                         <label>PROVINCE</label>
                         <select className={styles.inputField} value={address.province} onChange={(e) => handleAddressChange(type, 'province', e.target.value)} disabled={isDisabled || !address.region} required>
-                            <option value="" disabled hidden>Select Province</option>
+                            <option value="" disabled>Select Province</option>
                             {availableProvinces.map(p => <option key={p.code} value={p.code}>{p.name}</option>)}
                         </select>
                     </div>
                     <div className={styles.formGroup}>
                         <label>CITY / MUNICIPALITY</label>
                         <select className={styles.inputField} value={address.city} onChange={(e) => handleAddressChange(type, 'city', e.target.value)} disabled={isDisabled || !address.province} required>
-                            <option value="" disabled hidden>Select City</option>
+                            <option value="" disabled>Select City</option>
                             {availableCities.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
                         </select>
                     </div>
@@ -221,7 +234,7 @@ export default function EditDentistPage() {
                     <div className={styles.formGroup}>
                         <label>BARANGAY</label>
                         <select className={styles.inputField} value={address.barangay} onChange={(e) => handleAddressChange(type, 'barangay', e.target.value)} disabled={isDisabled || !address.city} required>
-                            <option value="" disabled hidden>Select Barangay</option>
+                            <option value="" disabled>Select Barangay</option>
                             {availableBarangays.map(b => <option key={b} value={b}>{b}</option>)}
                         </select>
                     </div>
@@ -240,7 +253,14 @@ export default function EditDentistPage() {
         );
     };
 
-    if (isLoading) return <div className={styles.container}><p>Loading...</p></div>;
+    // --- RENDER LOADING STATE ---
+    if (isLoading) {
+        return (
+            <div className={styles.container} style={{ height: '80vh', alignItems: 'center' }}>
+                <p style={{ color: '#005466', fontWeight: 'bold' }}>Loading dentist information...</p>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.container}>
@@ -256,9 +276,7 @@ export default function EditDentistPage() {
                             {profileImage ? (
                                 <img src={profileImage} alt="Profile" className={styles.previewImage} />
                             ) : (
-                                <div className={styles.uploadPlaceholder}>
-                                    <span>No Image</span>
-                                </div>
+                                <div className={styles.uploadPlaceholder}><span>No Image</span></div>
                             )}
                         </div>
                         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} style={{ display: 'none' }} />
@@ -351,18 +369,10 @@ export default function EditDentistPage() {
                         <div className={styles.passwordRulesContainer}>
                             <p className={styles.rulesLabel}>Password must contain:</p>
                             <ul className={styles.rulesList}>
-                                <li className={passwordCriteria.length ? styles.validRule : styles.invalidRule}>
-                                    <span className={styles.ruleIcon}>{passwordCriteria.length ? '✓' : '○'}</span> 8+ chars
-                                </li>
-                                <li className={passwordCriteria.uppercase ? styles.validRule : styles.invalidRule}>
-                                    <span className={styles.ruleIcon}>{passwordCriteria.uppercase ? '✓' : '○'}</span> Uppercase
-                                </li>
-                                <li className={passwordCriteria.lowercase ? styles.validRule : styles.invalidRule}>
-                                    <span className={styles.ruleIcon}>{passwordCriteria.lowercase ? '✓' : '○'}</span> Lowercase
-                                </li>
-                                <li className={passwordCriteria.number ? styles.validRule : styles.invalidRule}>
-                                    <span className={styles.ruleIcon}>{passwordCriteria.number ? '✓' : '○'}</span> Number
-                                </li>
+                                <li className={passwordCriteria.length ? styles.validRule : styles.invalidRule}><span className={styles.ruleIcon}>{passwordCriteria.length ? '✓' : '○'}</span> 8+ chars</li>
+                                <li className={passwordCriteria.uppercase ? styles.validRule : styles.invalidRule}><span className={styles.ruleIcon}>{passwordCriteria.uppercase ? '✓' : '○'}</span> Uppercase</li>
+                                <li className={passwordCriteria.lowercase ? styles.validRule : styles.invalidRule}><span className={styles.ruleIcon}>{passwordCriteria.lowercase ? '✓' : '○'}</span> Lowercase</li>
+                                <li className={passwordCriteria.number ? styles.validRule : styles.invalidRule}><span className={styles.ruleIcon}>{passwordCriteria.number ? '✓' : '○'}</span> Number</li>
                             </ul>
                         </div>
                     )}
@@ -389,6 +399,7 @@ export default function EditDentistPage() {
                 </form>
             </div>
 
+            {/* --- CUSTOM CARD MODAL --- */}
             {showSuccessModal && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalCard}>
