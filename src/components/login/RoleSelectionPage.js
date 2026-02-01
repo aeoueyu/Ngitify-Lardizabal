@@ -35,7 +35,7 @@ export default function RoleSelectionPage() {
                     {/* OWNER BUTTON */}
                     <button 
                         className={styles['role-btn']} 
-                        onClick={() => handleRoleSelect('Owner')}
+                        onClick={() => navigate('/login', { state: { role: 'owner' } })}
                         onMouseEnter={() => setHoveredRole('Owner')}
                         onMouseLeave={() => setHoveredRole(null)}
                     >
@@ -50,7 +50,7 @@ export default function RoleSelectionPage() {
                     {/* DENTIST BUTTON */}
                     <button 
                         className={styles['role-btn']} 
-                        onClick={() => handleRoleSelect('Dentist')}
+                        onClick={() => navigate('/login', { state: { role: 'dentist' } })}
                         onMouseEnter={() => setHoveredRole('Dentist')}
                         onMouseLeave={() => setHoveredRole(null)}
                     >
@@ -65,22 +65,22 @@ export default function RoleSelectionPage() {
                     {/* STAFF BUTTON */}
                     <button 
                         className={styles['role-btn']} 
-                        onClick={() => handleRoleSelect('Staff')}
+                        onClick={() => navigate('/login', { state: { role: 'secretary' } })}
                         onMouseEnter={() => setHoveredRole('Staff')}
                         onMouseLeave={() => setHoveredRole(null)}
                     >
                         <img 
                             src={hoveredRole === 'Staff' ? staffHover : staffIcon} 
-                            alt="Staff" 
+                            alt="Secretary" 
                             className={styles['role-icon']}
                         />
-                        <span>STAFF</span>
+                        <span>SECRETARY</span>
                     </button>
 
                     {/* PATIENT BUTTON */}
                     <button 
                         className={styles['role-btn']} 
-                        onClick={() => handleRoleSelect('Patient')}
+                        onClick={() => navigate('/login', { state: { role: 'patient' } })}
                         onMouseEnter={() => setHoveredRole('Patient')}
                         onMouseLeave={() => setHoveredRole(null)}
                     >

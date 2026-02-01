@@ -9,6 +9,8 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
+    const selectedRole = location.state?.role || 'owner';
+
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -22,76 +24,36 @@ export default function LoginPage() {
         }
     }, [userRole, navigate]);
 
-    const handleLogin = async () => {
-        // 1. Basic Validation
-        if(!email || !password) {
-            setErrorMessage("Please fill in all fields.");
-            return;
-        }
-
-        // --- HARDCODED ADMIN LOGIC (Start) ---
-        // Dito natin sasaluhin si Admin bago pa tumawag sa backend/database
-        if (email === 'admin@gmail.com') {
-            if (password === 'AdminUser_123') {
-                // Check kung nasa tamang Role siya
-                if (userRole === 'Owner') {
-                    // SUCCESS: Admin is logging in as Owner
-                    navigate('/owner/dashboard');
-                    return; // Stop execution here
-                } else {
-                    // FAIL: Admin trying to login as Dentist/Staff/Patient
-                    // Magpapakita ng generic error para hindi nila alam na admin account ito
-                    setErrorMessage("Invalid email or password.");
-                    return; 
-                }
-            } else {
-                // Wrong password for admin
-                setErrorMessage("Invalid email or password.");
-                return;
-            }
-        }
-        // --- HARDCODED ADMIN LOGIC (End) ---
-
-
-        // 2. REGULAR LOGIN (Para sa ibang users: Dentist, Staff, Patient)
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        
         try {
             const response = await fetch('http://localhost:5000/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     email, 
-                    password, 
-                    role: userRole 
+                    password,
+                    role: selectedRole // PASS THE ROLE TO BACKEND
                 }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                setErrorMessage('');
-                
-                // NO MORE OTP: Diretso na sa Dashboard base sa role
-                switch(userRole) {
-                    case 'Owner': // Kung may iba pang owner sa DB
-                        navigate('/owner/dashboard'); 
-                        break;
-                    case 'Dentist':
-                        navigate('/dentist/dashboard');
-                        break;
-                    case 'Staff':
-                        navigate('/staff/dashboard');
-                        break;
-                    case 'Patient':
-                        navigate('/patient/dashboard');
-                        break;
-                    default:
-                        navigate('/'); 
-                }
+                // Login Success
+                localStorage.setItem('token', data.token);
+                // Redirect based on role
+                if (data.role === 'owner') navigate('/owner/dashboard');
+                else if (data.role === 'dentist') navigate('/dentist/dashboard');
+                else if (data.role === 'secretary') navigate('/secretary/dashboard');
+                else if (data.role === 'patient') navigate('/patient/dashboard');
             } else {
-                setErrorMessage(data.message || 'Invalid email or password.');
+                // Show Error (e.g., "Access denied" or "Invalid email")
+                alert(data.message);
             }
-        } catch (err) {
-            setErrorMessage('Cannot connect to server.');
+        } catch (error) {
+            console.error("Login failed", error);
         }
     };
 

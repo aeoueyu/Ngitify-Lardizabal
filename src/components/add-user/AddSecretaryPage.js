@@ -30,6 +30,13 @@ export default function AddSecretaryPage() {
     // UTILS
     const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const toTitleCase = (str) => str.toLowerCase().replace(/(?:^|\s|-|\.)\S/g, (char) => char.toUpperCase());
+
+    const getMaxDate = () => {
+        const today = new Date();
+        today.setFullYear(today.getFullYear() - 18); // MINIMUM AGE 18
+        return today.toISOString().split('T')[0];
+    };
+
     const getAge = (dateString) => {
         const today = new Date();
         const birthDate = new Date(dateString);
@@ -170,7 +177,8 @@ export default function AddSecretaryPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validateForm()) return;
+        
+        if (!validateForm()) return; // Existing validation
 
         const finalData = { ...formData, phone: `+63${formData.phone}`, profileImage };
 
@@ -180,8 +188,25 @@ export default function AddSecretaryPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(finalData),
             });
-            if (response.ok) setShowSuccessModal(true);
-            else { const data = await response.json(); alert(data.message || "Failed to add secretary"); }
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setShowSuccessModal(true);
+            } else {
+                // HANDLE EMAIL EXISTS ERROR
+                if (response.status === 409 && data.field === 'email') {
+                    setErrors({ email: data.message });
+                    // Auto-scroll to email field
+                    const emailField = document.getElementsByName('email')[0];
+                    if (emailField) {
+                        emailField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        emailField.focus();
+                    }
+                } else {
+                    alert(data.message || "Failed to add secretary");
+                }
+            }
         } catch (error) { console.error("Error:", error); alert("Cannot connect to server."); }
     };
 
