@@ -2,17 +2,19 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import './App.css'; 
 
-// --- COMPONENTS ---
-import LoginPage from './components/login/LoginPage';
-import RoleSelectionPage from './components/login/RoleSelectionPage';
-import ForgotPassPage from './components/security/ForgotPassPage'; // Updated path
-import VerificationCodePage from './components/security/VerificationCodePage'; // Updated path
-import NewPasswordPage from './components/security/NewPasswordPage'; // Updated path
-import NewPasswordRedirectPage from './components/security/NewPasswordRedirectPage'; // Updated path
-import ActivateAccountPage from './components/email-activation/ActivateAccountPage';
+// --- PUBLIC COMPONENTS ---
 import Website from './components/welcome/Website';
+import RoleSelectionPage from './components/login/RoleSelectionPage';
+import LoginPage from './components/login/LoginPage';
+import ForgotPassPage from './components/security/ForgotPassPage';
+import VerificationCodePage from './components/security/VerificationCodePage';
+import NewPasswordPage from './components/security/NewPasswordPage';
+import NewPasswordRedirectPage from './components/security/NewPasswordRedirectPage';
+import ActivateAccountPage from './components/email-activation/ActivateAccountPage';
+
+// --- SHARED COMPONENTS ---
 import Sidebar from './components/sidebar/Sidebar';
-import SettingsPage from './components/settings/SettingsPage'; // Updated path
+import SettingsPage from './components/settings/SettingsPage';
 
 // --- DASHBOARDS ---
 import OwnerDashboard from './components/dashboards/OwnerDashboard';
@@ -36,8 +38,7 @@ import AddPatientPage from './components/add-user/AddPatientPage';
 import EditPatientPage from './components/edit-user/EditPatientPage';
 import ViewPatientPage from './components/view-user/ViewPatientPage';
 
-
-// --- LAYOUTS ---
+// --- LAYOUT ---
 function MainLayout() {
   return (
     <div className='leftnav-div'>
@@ -49,10 +50,10 @@ function MainLayout() {
   );
 }
 
-// Temporary Auth Guard
+// Simple Auth Guard
 function ProtectedRoute({ children }) {
-  const isLoggedIn = true; // TODO: Connect to actual auth state
-  return isLoggedIn ? children : <Navigate to='/login' />;
+  const userId = localStorage.getItem('userId');
+  return userId ? children : <Navigate to='/login' />;
 }
 
 function App() {
@@ -70,7 +71,7 @@ function App() {
         <Route path="/password-reset-success" element={<NewPasswordRedirectPage />} />
         <Route path="/activate-account/:token" element={<ActivateAccountPage />} />
 
-        {/* PROTECTED ROUTES (Sidebar Layout) */}
+        {/* PROTECTED ROUTES */}
         <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             
             {/* OWNER ROUTES */}
@@ -91,23 +92,38 @@ function App() {
             <Route path="/owner/edit-patient/:id" element={<EditPatientPage />} />
             <Route path="/owner/view-patient/:id" element={<ViewPatientPage />} />
 
-            <Route path="/owner/settings" element={<SettingsPage />} />
-
-            {/* DENTIST ROUTES */}
-            <Route path="/dentist/dashboard" element={<DentistDashboard />} />
-            <Route path="/dentist/settings" element={<SettingsPage />} />
+            {/* OWNER SETTINGS (Split Routes) */}
+            <Route path="/owner/settings" element={<Navigate to="/owner/settings/personal" replace />} />
+            <Route path="/owner/settings/personal" element={<SettingsPage section="personal" />} />
+            <Route path="/owner/settings/security" element={<SettingsPage section="security" />} />
 
             {/* SECRETARY ROUTES */}
             <Route path="/secretary/dashboard" element={<SecretaryDashboard />} />
-            <Route path="/secretary/settings" element={<SettingsPage />} />
             <Route path="/secretary/manage-patients" element={<ManagePatients />} />
             <Route path="/secretary/add-patient" element={<AddPatientPage />} />
             <Route path="/secretary/edit-patient/:id" element={<EditPatientPage />} />
             <Route path="/secretary/view-patient/:id" element={<ViewPatientPage />} />
+            
+            {/* SECRETARY SETTINGS */}
+            <Route path="/secretary/settings" element={<Navigate to="/secretary/settings/personal" replace />} />
+            <Route path="/secretary/settings/personal" element={<SettingsPage section="personal" />} />
+            <Route path="/secretary/settings/security" element={<SettingsPage section="security" />} />
+
+            {/* DENTIST ROUTES */}
+            <Route path="/dentist/dashboard" element={<DentistDashboard />} />
+            
+            {/* DENTIST SETTINGS */}
+            <Route path="/dentist/settings" element={<Navigate to="/dentist/settings/personal" replace />} />
+            <Route path="/dentist/settings/personal" element={<SettingsPage section="personal" />} />
+            <Route path="/dentist/settings/security" element={<SettingsPage section="security" />} />
 
             {/* PATIENT ROUTES */}
             <Route path="/patient/dashboard" element={<PatientDashboard />} />
-            <Route path="/patient/settings" element={<SettingsPage />} />
+            
+            {/* PATIENT SETTINGS */}
+            <Route path="/patient/settings" element={<Navigate to="/patient/settings/personal" replace />} />
+            <Route path="/patient/settings/personal" element={<SettingsPage section="personal" />} />
+            <Route path="/patient/settings/security" element={<SettingsPage section="security" />} />
 
         </Route>
 

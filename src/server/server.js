@@ -411,6 +411,28 @@ app.post('/api/change-password', async (req, res) => {
     }
 });
 
+// ... (existing routes)
+
+// --- VERIFY PASSWORD (New Route) ---
+app.post('/api/verify-password', async (req, res) => {
+    try {
+        const { userId, password } = req.body;
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ message: "User not found." });
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (isMatch) {
+            res.json({ success: true });
+        } else {
+            res.status(400).json({ success: false, message: "Incorrect password." });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Server error." });
+    }
+});
+
+// ... (rest of server.js)
+
 // **IMPORTANT**: I-update mo ang User Model (`src/models/User.js`)
 // Dagdagan mo ng fields na: `resetPasswordOtp`, `resetPasswordExpires`, `isPasswordChanged`
 

@@ -88,12 +88,11 @@
 }
 
 /* --- UPDATED ACTIVE STATE (Dark Teal Overlay) --- */
-/* Ito na ang ginagamit sa Dashboard, Settings, AT Parent ng User Mgmt */
 .active {
     background-color: rgba(0, 0, 0, 0.2); /* Darker overlay */
     color: white;
     font-weight: 700;
-    box-shadow: none; /* Tinanggal ko shadow para flat look gaya ng request */
+    box-shadow: none;
 }
 
 .active .icon {
@@ -111,8 +110,6 @@
     display: flex;
     align-items: center;
 }
-
-/* Tinanggal ko na ang .parentActive dahil .active na rin ang gamit natin sa kanya */
 
 .arrow {
     font-size: 10px;
@@ -208,6 +205,7 @@
     border-color: white;
 }
 
+/* --- LOGOUT MODAL STYLES --- */
 .modalOverlay {
     position: fixed;
     top: 0;
@@ -223,7 +221,6 @@
     animation: fadeIn 0.3s ease;
 }
 
-/* 2. Card */
 .modalCard {
     background: white;
     padding: 30px;
@@ -238,7 +235,6 @@
     width: 90%;
 }
 
-/* 3. Icon */
 .modalIcon {
     width: 60px;
     height: 60px;
@@ -247,7 +243,6 @@
     animation: bounceIn 0.5s ease;
 }
 
-/* 4. Texts */
 .modalTitle {
     color: #333;
     font-size: 20px;
@@ -262,7 +257,6 @@
     line-height: 1.5;
 }
 
-/* 5. Action Buttons */
 .modalActions {
     display: flex;
     gap: 15px;
