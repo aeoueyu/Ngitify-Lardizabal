@@ -37,6 +37,9 @@
 .highlight { color: #ea8b89; }
 
 /* Upload Section */
+/* ... (Existing Styles) ... */
+
+/* --- UPLOAD SECTION --- */
 .uploadSection {
     display: flex;
     flex-direction: column;
@@ -45,22 +48,18 @@
 }
 
 .imageWrapper {
-    width: 100px;
-    height: 100px;
-    /* FIX: Force square dimensions */
-    min-width: 100px;
-    min-height: 100px;
-    
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
-    background-color: #f0f4f5;
-    border: 2px dashed #b3ccd1;
+    background-color: #f9f9f9; /* Light background para hindi black */
+    border: 2px dashed #ccc;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     overflow: hidden;
-    transition: all 0.3s ease;
     position: relative;
+    transition: all 0.3s ease;
 }
 
 .imageWrapper:hover {
@@ -72,12 +71,23 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: #005466;
-    font-size: 10px;
-    font-weight: 700;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
 }
 
-.uploadPlaceholder svg { margin-bottom: 5px; }
+.uploadPlaceholder img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 5px;
+    opacity: 0.6;
+}
+
+.uploadPlaceholder span {
+    font-size: 11px;
+    color: #666;
+    font-weight: 600;
+}
 
 .previewImage {
     width: 100%;
@@ -90,6 +100,8 @@
     color: #888;
     margin-top: 10px;
 }
+
+/* ... (Rest of your form styles) ... */
 
 /* Sections */
 .mainSectionTitle {

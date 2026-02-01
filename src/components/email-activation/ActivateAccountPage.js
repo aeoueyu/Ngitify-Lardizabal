@@ -1,101 +1,107 @@
-import React, { useEffect, useState, useRef } from 'react'; // Mag-add ng useRef
+import React, { useEffect, useState, useRef } from 'react'; // <-- Import useRef
 import { useParams, useNavigate } from 'react-router-dom';
-import styles from '../../styles/login/LoginPage.module.css'; // Siguraduhin na tama ang path ng styles mo
+import styles from '../../styles/login/LoginPage.module.css'; 
+import logo from '../../assets/logo-greenpink.svg'; 
+import successIcon from '../../assets/alert-icons/success.svg';
+import errorIcon from '../../assets/alert-icons/warning.svg';
 
 export default function ActivateAccountPage() {
     const { token } = useParams();
     const navigate = useNavigate();
-    const [status, setStatus] = useState('Verifying your account...');
-    const [isSuccess, setIsSuccess] = useState(false);
+    const [status, setStatus] = useState('loading'); // loading, success, error
+    const [message, setMessage] = useState('Activating your account...');
     
-    // ITO ANG SOLUSYON: Ref para ma-track kung natawag na ang API
+    // FIX: Gamitin ito para ma-track kung natatawag na ang API
     const dataFetchedRef = useRef(false);
 
     useEffect(() => {
-        // Kung natawag na, wag na ituloy (Pigil sa double call)
+        // Kung natatawag na ang API dati, wag na ituloy (prevent double call)
         if (dataFetchedRef.current) return;
         dataFetchedRef.current = true;
 
-        const activate = async () => {
+        const activateAccount = async () => {
             try {
                 const response = await fetch('http://localhost:5000/api/activate-account', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token })
+                    body: JSON.stringify({ token }),
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    setStatus('✅ Success! Account activated.');
-                    setIsSuccess(true);
-                    setTimeout(() => navigate('/login'), 3000);
+                    setStatus('success');
+                    setMessage('Your account has been successfully activated!');
                 } else {
-                    // Check natin kung activated na pala kahit error (Optional safety check)
-                    if (data.message && data.message.includes('Invalid') && !isSuccess) {
-                         setStatus('❌ ' + data.message);
-                    } else {
-                         setStatus('❌ ' + data.message);
-                    }
+                    // Check kung "Invalid" baka na-activate na sa unang attempt
+                    // Pero sa logic na ito, safe na tayo dahil sa useRef blocker sa taas
+                    setStatus('error');
+                    setMessage(data.message || 'Activation failed.');
                 }
             } catch (error) {
-                console.error(error);
-                setStatus('❌ Server connection error.');
+                setStatus('error');
+                setMessage('Server connection error.');
             }
         };
 
         if (token) {
-            activate();
+            activateAccount();
+        } else {
+            setStatus('error');
+            setMessage('Invalid activation link.');
         }
-    }, [token, navigate]); // Tinanggal ko ang isSuccess sa dependency para di mag-loop
+    }, [token]);
 
     return (
-        <div style={{ 
-            height: '100vh', 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            fontFamily: 'Arial, sans-serif',
-            backgroundColor: '#f4f6f8'
-        }}>
-            <div style={{
-                background: 'white',
-                padding: '40px',
-                borderRadius: '15px',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                textAlign: 'center',
-                maxWidth: '400px',
-                width: '90%'
-            }}>
+        <div className={styles.container}>
+            <div className={styles.loginCard} style={{ textAlign: 'center', padding: '40px' }}>
+                <img src={logo} alt="NgitiFy Logo" className={styles.logo} style={{ margin: '0 auto 20px' }} />
+                
                 <h2 style={{ color: '#005466', marginBottom: '20px' }}>Account Activation</h2>
-                
-                <p style={{ 
-                    fontSize: '16px', 
-                    marginBottom: '30px', 
-                    color: isSuccess ? 'green' : '#d32f2f',
-                    fontWeight: '600'
-                }}>
-                    {status}
-                </p>
-                
-                {isSuccess && <p style={{color: '#666', fontSize: '14px'}}>Redirecting to login page...</p>}
-                
-                {/* Manual Button kung sakaling hindi mag-redirect o failed */}
-                <button 
-                    onClick={() => navigate('/login')}
-                    style={{
-                        padding: '12px 30px',
-                        backgroundColor: '#005466',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '50px',
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                        marginTop: '10px'
-                    }}
-                >
-                    Go to Login
-                </button>
+
+                {status === 'loading' && <p>Verifying your activation token...</p>}
+
+                {status === 'success' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+                        <img src={successIcon} alt="Success" style={{ width: '60px' }} />
+                        <p style={{ color: 'green', fontWeight: 'bold' }}>{message}</p>
+                        <button 
+                            onClick={() => navigate('/')} 
+                            style={{
+                                padding: '10px 20px',
+                                backgroundColor: '#005466',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                cursor: 'pointer',
+                                marginTop: '10px'
+                            }}
+                        >
+                            Go to Login
+                        </button>
+                    </div>
+                )}
+
+                {status === 'error' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+                        <img src={errorIcon} alt="Error" style={{ width: '60px' }} />
+                        <p style={{ color: 'red', fontWeight: 'bold' }}>{message}</p>
+                        <button 
+                            onClick={() => navigate('/')} 
+                            style={{
+                                padding: '10px 20px',
+                                backgroundColor: '#ccc',
+                                color: '#333',
+                                border: 'none',
+                                borderRadius: '5px',
+                                cursor: 'pointer',
+                                marginTop: '10px'
+                            }}
+                        >
+                            Back to Login
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

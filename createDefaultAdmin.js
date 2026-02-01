@@ -1,38 +1,44 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-// IMPORTANTE: Ito ang path mula sa ROOT folder papunta sa models
+// Siguraduhin na tama ang path papunta sa User model
 const User = require('./src/models/User'); 
 
-// Connection string (kopyahin mo ito mula sa src/server/server.js kung nagbago man)
-const MONGO_URI = 'mongodb+srv://ngitify:123@cluster0.on1ll.mongodb.net/ngitify?retryWrites=true&w=majority&appName=Cluster0';
+// LOCAL Database Connection String
+const MONGO_URI = 'mongodb://127.0.0.1:27017/ngitify';
 
 const createAdmin = async () => {
     try {
-        // Connect sa database
+        // Connect sa Local Database
         await mongoose.connect(MONGO_URI);
-        console.log('✅ Connected to MongoDB');
+        console.log('✅ Connected to Local MongoDB');
 
         const email = 'admin@gmail.com';
         const rawPassword = 'AdminUser_123';
-        const role = 'owner'; // Lowercase 'owner'
+        const role = 'owner'; // Important: Lowercase
 
-        // 1. Hash password
+        // 1. Hash ang password
         const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
-        // 2. Check if admin exists
+        // 2. Hanapin kung may existing user na
         let user = await User.findOne({ email });
 
         if (user) {
+            // Update existing user
             console.log('🔄 Updating existing admin account...');
             user.password = hashedPassword;
             user.role = role;
             user.isVerified = true;
-            // Siguraduhin na may pangalan para hindi mag-error sa dashboard
-            user.name = { first: 'Admin', last: 'User' }; 
+            
+            // Siguraduhin na may pangalan para hindi mag-error
+            if (!user.name || !user.name.first) {
+                user.name = { first: 'Admin', last: 'User' };
+            }
+            
             await user.save();
-            console.log('🎉 Admin updated successfully!');
+            console.log('🎉 Admin updated successfully! Pwede ka na mag-login.');
         } else {
+            // Create new user
             console.log('🆕 Creating new admin account...');
             const newAdmin = new User({
                 name: { first: 'Admin', last: 'User' },
@@ -43,7 +49,7 @@ const createAdmin = async () => {
                 isVerified: true
             });
             await newAdmin.save();
-            console.log('🎉 Admin created successfully!');
+            console.log('🎉 Admin created successfully! Pwede ka na mag-login.');
         }
 
         process.exit();

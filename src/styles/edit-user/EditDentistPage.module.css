@@ -306,6 +306,9 @@ select.inputField {
 }
 
 /* Buttons */
+/* ... (Nasa bandang dulo ito ng file) ... */
+
+/* Buttons */
 .buttonGroup {
     display: flex;
     justify-content: flex-end;
@@ -315,43 +318,70 @@ select.inputField {
     border-top: 1px solid #eee;
 }
 
+/* SAVE CHANGES BUTTON */
 .submitBtn {
     background-color: #005466;
     color: white;
     border: none;
     padding: 12px 30px;
-    border-radius: 50px;
+    border-radius: 50px; /* Eto ang nagpapabilog */
     font-weight: 700;
+    font-size: 14px;
     cursor: pointer;
-    transition: all 0.3s;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 84, 102, 0.2); /* Default shadow */
 }
 
 .submitBtn:hover {
     background-color: #337685;
-    transform: translateY(-2px);
+    transform: scale(1.05); /* LUMALAKI */
+    box-shadow: 0 8px 20px rgba(0, 84, 102, 0.3); /* DARKER SHADOW */
 }
 
+/* DISABLED SAVE BUTTON (Fixed Shape) */
 .disabledBtn {
+    /* Kopyahin ang layout styles ng submitBtn */
     background-color: #ccc !important;
+    color: white !important;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 50px; /* FIXED: Para bilog pa rin */
+    font-weight: 700;
+    
+    /* Disabled logic */
     cursor: not-allowed !important;
     transform: none !important;
     box-shadow: none !important;
 }
 
+/* CANCEL BUTTON */
 .cancelBtn {
     background-color: white;
     color: #888;
-    border: 1.5px solid #ddd;
+    border: none;
     padding: 12px 30px;
     border-radius: 50px;
     font-weight: 700;
+    font-size: 14px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Default Shadow */
 }
 
 .cancelBtn:hover {
     background-color: #f5f5f5;
     color: #444;
+    border-color: #ccc;
+    transform: scale(1.05); 
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
 }
 
 /* --- CUSTOM MODAL STYLES --- */
@@ -363,19 +393,19 @@ select.inputField {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Transparent Dark */
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 2000;
-    backdrop-filter: blur(3px); /* Blur effect */
+    backdrop-filter: blur(3px);
     animation: fadeIn 0.3s ease;
 }
 
-/* 2. White Card */
+/* 2. Card */
 .modalCard {
     background: white;
-    padding: 40px 50px;
+    padding: 30px;
     border-radius: 20px;
     text-align: center;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
@@ -383,35 +413,85 @@ select.inputField {
     flex-direction: column;
     align-items: center;
     animation: scaleUp 0.3s ease;
-    max-width: 400px;
+    max-width: 350px;
     width: 90%;
 }
 
 /* 3. Icon */
 .modalIcon {
-    width: 80px; 
-    height: 80px;
-    margin-bottom: 25px;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 20px;
+    object-fit: contain;
     animation: bounceIn 0.5s ease;
-    /* FIX: Para kung hindi square ang SVG, hindi siya ma-stretch */
-    object-fit: contain; 
 }
 
-/* 4. Title */
+/* 4. Texts */
 .modalTitle {
     color: #333;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
     margin: 0 0 10px 0;
 }
 
-/* 5. Message */
 .modalMessage {
     color: #666;
-    font-size: 14px;
-    margin: 0 0 30px 0;
+    font-size: 13px;
+    margin: 0 0 25px 0;
     line-height: 1.5;
 }
+
+/* 5. Action Buttons */
+.modalActions {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+}
+
+.modalCancelBtn {
+    background-color: #f0f0f0;
+    color: #555;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    flex: 1;
+}
+
+.modalCancelBtn:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(51, 51, 51, 0.3);
+}
+
+.modalSubmitBtn {
+    background-color: #005466; /* Red for danger */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    flex: 1;
+}
+
+.modalSubmitBtn:hover {
+    background-color: #004c5c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 63, 106, 0.168);
+}
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes bounceIn { 0% { transform: scale(0); } 60% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
 
 /* 6. Close Text Link */
 .closeLink {
@@ -421,7 +501,8 @@ select.inputField {
     cursor: pointer;
     margin: 0;
     padding-bottom: 2px;
-    border-bottom: 2px solid transparent; 
+    border: 2px solid transparent;
+    background-color: white;
     transition: all 0.2s ease;
 }
 

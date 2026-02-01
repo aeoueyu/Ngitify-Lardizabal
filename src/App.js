@@ -64,6 +64,7 @@ function App() {
         <Route path="/verification-code" element={<VerificationCodePage />} />
         <Route path="/new-password" element={<NewPasswordPage />} />
         <Route path="/new-password-redirect" element={<NewPasswordRedirectPage />} />
+        <Route path="/activate-account/:token" element={<ActivateAccountPage />} />
 
 
         {/* ================= PROTECTED ROUTES (May Sidebar) ================= */}
@@ -89,8 +90,6 @@ function App() {
 
             <Route path="/owner/manage-patients" element={<ManagePatients />} />
             <Route path="owner/add-patient" element={<AddPatientPage/>} />
-
-            <Route path="/activate-account/:token" element={<ActivateAccountPage />} />
             
             {/* Other Protected Pages */}
             <Route path="/patientprofile" element={<PatientProfilePage />} />
