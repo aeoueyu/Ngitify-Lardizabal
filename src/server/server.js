@@ -1,3 +1,4 @@
+require('dotenv').config(); 
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -15,7 +16,6 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
-// Tinaasan ang limit para sa Profile Picture uploads (50mb)
 app.use(express.json({ limit: '50mb' })); 
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
@@ -24,14 +24,12 @@ mongoose.connect('mongodb://127.0.0.1:27017/ngitify')
 .then(() => console.log('✅ Connected to Local MongoDB'))
 .catch((err) => console.error('❌ Error connecting to MongoDB:', err));
 
-// ==========================================
-// 📧 EMAIL CONFIGURATION (GAMIT ANG APP PASSWORD)
-// ==========================================
+// EMAIL CONFIG
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'garciaaeiounicole@gmail.com',
-        pass: 'czrjavoximyvctqf', // Ang iyong App Password
+        pass: 'czrjavoximyvctqf', 
     },
 });
 
@@ -40,31 +38,34 @@ const transporter = nodemailer.createTransport({
 // --- LOGIN ---
 app.post('/api/login', async (req, res) => {
     try {
-        const { email, password, role } = req.body; 
+        const { email, password, role } = req.body;
+        
         const user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ message: "User not found." });
 
-        // 1. Check kung existing user
-        if (!user) return res.status(400).json({ message: "Invalid email or password." });
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ message: "Invalid credentials." });
 
-        // 2. STRICT ROLE CHECK: Bawal mag-login ang Dentist sa Owner page, etc.
-        if (role && user.role !== role) {
-             return res.status(403).json({ message: "Access denied. You cannot log in here with your account type." });
+        if (user.role !== role) return res.status(403).json({ message: "Unauthorized role access." });
+
+        if (!user.isVerified) {
+            return res.status(403).json({ message: "Please verify your email before logging in." });
         }
 
-        // 3. Password Check
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ message: "Invalid email or password." });
+        if (user.status === 'inactive') {
+            return res.status(403).json({ message: "This account is inactive. Please contact Admin." });
+        }
 
-        // 4. Verification Check (Optional: Enable kung required na)
-        // if (!user.isVerified) return res.status(400).json({ message: "Please verify your email first." });
+        const secretKey = process.env.JWT_SECRET || 'ngitify_secret_key_default';
+        const token = jwt.sign({ id: user._id, role: user.role }, secretKey, { expiresIn: '1h' });
 
-        const token = jwt.sign({ userId: user._id, role: user.role }, 'YOUR_SECRET_KEY', { expiresIn: '1h' });
-        
+        console.log(`[AUDIT] User ${email} logged in at ${new Date().toISOString()}`);
+
         res.json({ 
             token, 
             role: user.role, 
             userId: user._id,
-            isPasswordChanged: user.isPasswordChanged 
+            name: user.name
         });
 
     } catch (error) {
@@ -73,7 +74,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// --- ACTIVATE ACCOUNT ---
+// --- ACTIVATE ACCOUNT (UPDATED) ---
 app.post('/api/activate-account', async (req, res) => {
     try {
         const { token } = req.body;
@@ -82,7 +83,9 @@ app.post('/api/activate-account', async (req, res) => {
         const user = await User.findOne({ activationToken: token });
         if (!user) return res.status(400).json({ message: "Invalid or expired activation link." });
 
+        // FIX: Verify AND Activate status simultaneously
         user.isVerified = true;
+        user.status = 'active'; // Set status to active only when verified
         user.activationToken = undefined; 
         await user.save();
 
@@ -92,7 +95,7 @@ app.post('/api/activate-account', async (req, res) => {
     }
 });
 
-// --- HELPER FUNCTION: SEND EMAIL ---
+// Helper Email Sender
 const sendActivationEmail = async (email, role, tempPassword, activationLink) => {
     const mailOptions = {
         from: '"NgitiFy Admin" <garciaaeiounicole@gmail.com>',
@@ -114,47 +117,37 @@ const sendActivationEmail = async (email, role, tempPassword, activationLink) =>
     await transporter.sendMail(mailOptions);
 };
 
-// --- ADD DENTIST ---
-// --- ADD DENTIST ---
+// --- ADD DENTIST (FIXED ORDER) ---
 app.post('/api/add-dentist', async (req, res) => {
     try {
-        // Tanggalin natin ang destructuring ng specific fields para flexible
-        // Ang req.body ay naglalaman na ng { name: {...}, address: {...} } galing sa frontend
         const { email, licenseNumber, ...otherData } = req.body;
         
-        // 1. Check Email Duplicate
         const existingEmail = await User.findOne({ email });
-        if (existingEmail) {
-            return res.status(409).json({ field: 'email', message: 'Email address is already registered.' });
-        }
+        if (existingEmail) return res.status(409).json({ field: 'email', message: 'Email address is already registered.' });
 
-        // 2. Check License Number Duplicate
         if (licenseNumber) {
             const existingLicense = await User.findOne({ licenseNumber });
-            if (existingLicense) {
-                return res.status(409).json({ field: 'licenseNumber', message: 'License Number is already registered.' });
-            }
+            if (existingLicense) return res.status(409).json({ field: 'licenseNumber', message: 'License Number is already registered.' });
         }
 
-        // Generate Credentials
         const tempPassword = crypto.randomBytes(4).toString('hex'); 
         const hashedPassword = await bcrypt.hash(tempPassword, 10);
         const activationToken = crypto.randomBytes(32).toString('hex');
 
-        // DIRECT PASSING NG DATA (Dahil inayos na natin sa Frontend ang structure)
+        // FIX: ...otherData is now FIRST to prevent overwriting security fields
         const newUser = new User({
+            ...otherData, 
             email,
             licenseNumber,
             password: hashedPassword,
             role: 'dentist',
-            isVerified: false, 
-            activationToken,
-            ...otherData // Ito ang magpapasa ng 'name', 'currentAddress', etc. ng buo
+            isVerified: false, // Ensures unverified
+            status: 'inactive', // Ensures inactive until verified
+            activationToken
         });
         
         await newUser.save();
 
-        // Send Email
         const activationLink = `http://localhost:3000/activate-account/${activationToken}`;
         await sendActivationEmail(email, 'Dentist', tempPassword, activationLink);
         
@@ -167,7 +160,7 @@ app.post('/api/add-dentist', async (req, res) => {
     }
 });
 
-// --- ADD SECRETARY ---
+// --- ADD SECRETARY (FIXED ORDER) ---
 app.post('/api/add-secretary', async (req, res) => {
     try {
         const { email, ...otherData } = req.body;
@@ -180,16 +173,16 @@ app.post('/api/add-secretary', async (req, res) => {
         const activationToken = crypto.randomBytes(32).toString('hex');
 
         const newUser = new User({
+            ...otherData,
             email, 
             password: hashedPassword,
             role: 'secretary',
             isVerified: false, 
-            activationToken,
-            ...otherData
+            status: 'inactive',
+            activationToken
         });
         await newUser.save();
 
-        // Send Email
         const activationLink = `http://localhost:3000/activate-account/${activationToken}`;
         await sendActivationEmail(email, 'Secretary', tempPassword, activationLink);
 
@@ -202,7 +195,7 @@ app.post('/api/add-secretary', async (req, res) => {
     }
 });
 
-// --- ADD PATIENT ---
+// --- ADD PATIENT (FIXED ORDER) ---
 app.post('/api/add-patient', async (req, res) => {
     try {
         const { email, ...otherData } = req.body;
@@ -215,16 +208,16 @@ app.post('/api/add-patient', async (req, res) => {
         const activationToken = crypto.randomBytes(32).toString('hex');
 
         const newUser = new User({
+            ...otherData,
             email, 
             password: hashedPassword,
             role: 'patient',
             isVerified: false, 
-            activationToken,
-            ...otherData
+            status: 'inactive',
+            activationToken
         });
         await newUser.save();
 
-        // Send Email
         const activationLink = `http://localhost:3000/activate-account/${activationToken}`;
         await sendActivationEmail(email, 'Patient', tempPassword, activationLink);
 
@@ -248,7 +241,7 @@ app.get('/api/users', async (req, res) => {
     } catch (error) { res.status(500).json({ message: "Server error." }); }
 });
 
-// --- GENERIC GET SINGLE USER ---
+// --- GET SINGLE USER ---
 app.get('/api/user/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id).select('-password');
@@ -257,16 +250,38 @@ app.get('/api/user/:id', async (req, res) => {
     } catch (error) { res.status(500).json({ message: "Server error." }); }
 });
 
-// --- GENERIC DELETE USER ---
-app.delete('/api/user/:id', async (req, res) => {
+// --- TOGGLE STATUS (Soft Delete) ---
+// --- TOGGLE STATUS (Soft Delete) ---
+app.put('/api/user/toggle-status/:id', async (req, res) => {
     try {
-        await User.findByIdAndDelete(req.params.id);
-        res.json({ message: "User deleted." });
-    } catch (error) { res.status(500).json({ message: "Server error." }); }
+        const { id } = req.params;
+        const { status } = req.body; // 'active' or 'inactive'
+
+        // 1. Kunin muna ang user para ma-check ang verification status
+        const user = await User.findById(id);
+        if (!user) return res.status(404).json({ message: "User not found." });
+
+        // 2. SECURITY CHECK: Bawal i-activate kung hindi pa verified
+        if (status === 'active' && !user.isVerified) {
+            return res.status(400).json({ 
+                message: "Cannot activate user. Email is not yet verified." 
+            });
+        }
+
+        // 3. Update Status
+        user.status = status;
+        await user.save();
+
+        console.log(`[AUDIT] User ${id} status changed to ${status} at ${new Date().toISOString()}`);
+
+        res.json({ message: `User marked as ${status}.`, user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error." });
+    }
 });
 
-// --- GENERIC UPDATE USER ---
-// --- GENERIC UPDATE USER (With Email Re-Activation Logic) ---
+// --- UPDATE USER (Re-activation logic) ---
 app.put('/api/user/:id', async (req, res) => {
     try {
         const { password, email, ...updateData } = req.body;
@@ -287,6 +302,7 @@ app.put('/api/user/:id', async (req, res) => {
             updateData.password = hashedPassword;
             updateData.activationToken = activationToken;
             updateData.isVerified = false;
+            updateData.status = 'inactive'; // Set to inactive upon email change
 
             const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
             const activationLink = `http://localhost:3000/activate-account/${activationToken}`;
@@ -300,32 +316,21 @@ app.put('/api/user/:id', async (req, res) => {
     } catch (error) { res.status(500).json({ message: "Error updating user." }); }
 });
 
-// ... (Nasa taas ang existing codes mo) ...
-
-// ==========================================
-// 🔐 FORGOT PASSWORD & SETTINGS ROUTES
-// ==========================================
-
-// --- 1. SEND OTP (Forgot Password) ---
-// --- 1. SEND OTP (Forgot Password) ---
+// --- FORGOT PASSWORD ---
 app.post('/api/forgot-password', async (req, res) => {
     try {
-        // FIX: Trim email to remove accidental spaces
         const email = req.body.email ? req.body.email.trim() : '';
-        
         const user = await User.findOne({ email });
 
         if (!user) return res.status(404).json({ message: "User not found." });
 
-        // Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const otpExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 Minutes validity
+        const otpExpires = new Date(Date.now() + 15 * 60 * 1000); 
 
         user.resetPasswordOtp = otp;
         user.resetPasswordExpires = otpExpires;
         await user.save();
 
-        // Send Email
         const mailOptions = {
             from: '"NgitiFy Security" <garciaaeiounicole@gmail.com>',
             to: email,
@@ -348,14 +353,14 @@ app.post('/api/forgot-password', async (req, res) => {
     }
 });
 
-// --- 2. VERIFY OTP ---
+// --- VERIFY OTP ---
 app.post('/api/verify-otp', async (req, res) => {
     try {
         const { email, otp } = req.body;
         const user = await User.findOne({ 
             email, 
             resetPasswordOtp: otp, 
-            resetPasswordExpires: { $gt: Date.now() } // Check expiry
+            resetPasswordExpires: { $gt: Date.now() } 
         });
 
         if (!user) return res.status(400).json({ message: "Invalid or expired OTP." });
@@ -366,7 +371,7 @@ app.post('/api/verify-otp', async (req, res) => {
     }
 });
 
-// --- 3. RESET PASSWORD (Forgot Password Flow) ---
+// --- RESET PASSWORD ---
 app.post('/api/reset-password', async (req, res) => {
     try {
         const { email, newPassword } = req.body;
@@ -378,7 +383,7 @@ app.post('/api/reset-password', async (req, res) => {
         user.password = hashedPassword;
         user.resetPasswordOtp = undefined;
         user.resetPasswordExpires = undefined;
-        user.isPasswordChanged = true; // Mark as changed
+        user.isPasswordChanged = true;
         await user.save();
 
         res.json({ message: "Password reset successful." });
@@ -387,7 +392,7 @@ app.post('/api/reset-password', async (req, res) => {
     }
 });
 
-// --- 4. CHANGE PASSWORD (Settings Flow) ---
+// --- CHANGE PASSWORD ---
 app.post('/api/change-password', async (req, res) => {
     try {
         const { userId, currentPassword, newPassword } = req.body;
@@ -395,11 +400,9 @@ app.post('/api/change-password', async (req, res) => {
 
         if (!user) return res.status(404).json({ message: "User not found." });
 
-        // Verify Current Password
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) return res.status(400).json({ message: "Incorrect current password." });
 
-        // Update to New Password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
         user.isPasswordChanged = true;
@@ -411,9 +414,7 @@ app.post('/api/change-password', async (req, res) => {
     }
 });
 
-// ... (existing routes)
-
-// --- VERIFY PASSWORD (New Route) ---
+// --- VERIFY PASSWORD UI CHECK ---
 app.post('/api/verify-password', async (req, res) => {
     try {
         const { userId, password } = req.body;
@@ -430,10 +431,5 @@ app.post('/api/verify-password', async (req, res) => {
         res.status(500).json({ message: "Server error." });
     }
 });
-
-// ... (rest of server.js)
-
-// **IMPORTANT**: I-update mo ang User Model (`src/models/User.js`)
-// Dagdagan mo ng fields na: `resetPasswordOtp`, `resetPasswordExpires`, `isPasswordChanged`
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

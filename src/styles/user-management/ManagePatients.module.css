@@ -49,7 +49,7 @@
     font-size: 13px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 84, 102, 0.2);
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
 }
 
 .addButton:hover {
@@ -342,7 +342,7 @@
 .modalCancelBtn:hover {
     background-color: #e0e0e0;
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(51, 51, 51, 0.3);
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
 }
 
 .modalDeleteBtn {
@@ -361,7 +361,7 @@
 .modalDeleteBtn:hover {
     background-color: #b71c1c;
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(198, 40, 40, 0.3);
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
 }
 
 /* Animations */

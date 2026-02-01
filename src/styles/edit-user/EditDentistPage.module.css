@@ -333,13 +333,13 @@ select.inputField {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 84, 102, 0.2); /* Default shadow */
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2); /* Default shadow */
 }
 
 .submitBtn:hover {
     background-color: #337685;
     transform: scale(1.05); /* LUMALAKI */
-    box-shadow: 0 8px 20px rgba(0, 84, 102, 0.3); /* DARKER SHADOW */
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2); /* DARKER SHADOW */
 }
 
 /* DISABLED SAVE BUTTON (Fixed Shape) */
@@ -373,7 +373,7 @@ select.inputField {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Default Shadow */
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2); /* Default Shadow */
 }
 
 .cancelBtn:hover {
@@ -381,7 +381,7 @@ select.inputField {
     color: #444;
     border-color: #ccc;
     transform: scale(1.05); 
-    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
 }
 
 /* --- CUSTOM MODAL STYLES --- */
@@ -465,7 +465,7 @@ select.inputField {
 .modalCancelBtn:hover {
     background-color: #e0e0e0;
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(51, 51, 51, 0.3);
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
 }
 
 .modalSubmitBtn {
@@ -484,7 +484,7 @@ select.inputField {
 .modalSubmitBtn:hover {
     background-color: #004c5c;
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 63, 106, 0.168);
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
 }
 
 /* Animations */

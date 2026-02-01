@@ -1,41 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../../styles/user-management/ManageDentists.module.css';
-import addIcon from '../../assets/button-icons/add.svg'; 
 import { useNavigate } from 'react-router-dom';
-import warningIcon from '../../assets/alert-icons/warning.svg'; 
+import styles from '../../styles/user-management/ManageDentists.module.css';
+import addIcon from '../../assets/button-icons/add.svg';
+import warningIcon from '../../assets/alert-icons/warning.svg';
 
 export default function ManageDentists() {
     const navigate = useNavigate();
-    
-    // Data States
     const [dentists, setDentists] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
 
     // Modal States
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [dentistToDelete, setDentistToDelete] = useState(null); 
+    const [statusModal, setStatusModal] = useState({ show: false, id: null, status: null });
+    const [alertModal, setAlertModal] = useState({ show: false, message: '' }); // NEW: Alert Modal
 
-    // FETCH DATA
     const fetchDentists = async () => {
         try {
             const response = await fetch('http://localhost:5000/api/users?role=dentist');
             const data = await response.json();
-            
             if (response.ok) {
-                const formattedData = data.map(dentist => ({
-                    id: dentist._id,
-                    name: `Dr. ${dentist.name.first} ${dentist.name.last}`, 
-                    license: dentist.licenseNumber || 'N/A',
-                    email: dentist.email,
-                    phone: dentist.contactNumber,
-                    status: dentist.isVerified ? 'Active' : 'Pending',
-                    image: dentist.profileImage
+                const formattedData = data.map(user => ({
+                    ...user,
+                    name: user.name ? `${user.name.first} ${user.name.last}` : 'Unknown'
                 }));
                 setDentists(formattedData);
             }
         } catch (error) {
-            console.error("Error connecting to server:", error);
+            console.error("Error fetching dentists:", error);
         } finally {
             setLoading(false);
         }
@@ -45,49 +36,47 @@ export default function ManageDentists() {
         fetchDentists();
     }, []);
 
-    // --- DELETE LOGIC ---
-    const initiateDelete = (id) => {
-        setDentistToDelete(id);
-        setShowDeleteModal(true);
-    };
-
-    const confirmDelete = async () => {
-        if (!dentistToDelete) return;
-
-        try {
-            const response = await fetch(`http://localhost:5000/api/user/${dentistToDelete}`, { method: 'DELETE' });
-
-            if (response.ok) {
-                setDentists(dentists.filter(d => d.id !== dentistToDelete));
-                setShowDeleteModal(false);
-                setDentistToDelete(null);
-            } else {
-                alert("Failed to delete user.");
-            }
-        } catch (error) {
-            console.error("Error deleting:", error);
-            alert("Server error.");
-        }
-    };
-
-    const cancelDelete = () => {
-        setShowDeleteModal(false);
-        setDentistToDelete(null);
-    };
-
-    // Filter Logic
     const filteredDentists = dentists.filter(dentist => 
         dentist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        dentist.license.includes(searchTerm)
+        dentist.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (dentist.licenseNumber && dentist.licenseNumber.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
-    // NAVIGATION HANDLERS
-    const handleEdit = (id) => {
-        navigate(`/owner/edit-dentist/${id}`);
+    // --- BUTTON HANDLERS ---
+
+    const handleToggleStatusClick = (id, currentStatus, isVerified) => {
+        // 1. Check if Unverified -> SHOW ALERT MODAL
+        if (currentStatus === 'inactive' && !isVerified) {
+            setAlertModal({ 
+                show: true, 
+                message: "Cannot activate this account. The user has not verified their email yet." 
+            });
+            return; 
+        }
+        // 2. Else -> SHOW CONFIRMATION MODAL
+        setStatusModal({ show: true, id, status: currentStatus });
     };
-    
-    const handleView = (id) => {
-        navigate(`/owner/view-dentist/${id}`);
+
+    const confirmStatusChange = async () => {
+        const { id, status } = statusModal;
+        const newStatus = status === 'active' ? 'inactive' : 'active';
+        
+        try {
+            const res = await fetch(`http://localhost:5000/api/user/toggle-status/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if(res.ok) {
+                fetchDentists(); 
+                setStatusModal({ show: false, id: null, status: null }); 
+            } else {
+                alert("Action failed.");
+            }
+        } catch(error) {
+            console.error("Error:", error);
+        }
     };
 
     return (
@@ -95,20 +84,19 @@ export default function ManageDentists() {
             <div className={styles.headerContainer}>
                 <div className={styles.titleSection}>
                     <h1 className={styles.pageTitle}>Manage <span className={styles.highlight}>Dentists</span></h1>
-                    <p className={styles.subTitle}>View and manage dentist accounts</p>
+                    <p className={styles.subTitle}>View and manage clinic dentists.</p>
                 </div>
-                
                 <button className={styles.addButton} onClick={() => navigate('/owner/add-dentist')}>
-                    <img src={addIcon} alt="Add" className={styles.addIcon} />
-                    ADD DENTIST
+                    <img src={addIcon} className={styles.addIcon} alt="Add" />
+                    Add Dentist
                 </button>
             </div>
 
             <div className={styles.controlsContainer}>
                 <input 
                     type="text" 
-                    placeholder="Search by name or license no..." 
-                    className={styles.searchBar}
+                    className={styles.searchBar} 
+                    placeholder="Search by name, email, or license..." 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -120,62 +108,121 @@ export default function ManageDentists() {
                         <tr>
                             <th>NAME</th>
                             <th>LICENSE NO.</th>
-                            {/* TINANGGAL NA ANG CONTACT INFO COLUMN DITO */}
                             <th>STATUS</th>
                             <th className={styles.actionHeader}>ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan="4" className={styles.noData}>Loading dentists...</td></tr>
+                            <tr><td colSpan="5" style={{textAlign:'center', padding:'20px'}}>Loading...</td></tr>
                         ) : filteredDentists.length > 0 ? (
-                            filteredDentists.map((dentist) => (
-                                <tr key={dentist.id}>
-                                    <td className={styles.nameCell}>
-                                        {dentist.image ? (
-                                            <img src={dentist.image} alt="avatar" className={styles.avatarImage} />
-                                        ) : (
+                            filteredDentists.map((dentist) => {
+                                const isUnverified = !dentist.isVerified;
+                                const isInactive = dentist.status === 'inactive';
+                                const isViewEditDisabled = isUnverified || isInactive;
+
+                                return (
+                                    <tr key={dentist._id} style={{ opacity: isInactive ? 0.6 : 1 }}>
+                                        <td className={styles.nameCell}>
                                             <div className={styles.avatarPlaceholder}>
-                                                {dentist.name.split(' ')[1][0]}
+                                                {dentist.profileImage ? 
+                                                    <img src={dentist.profileImage} alt="Profile" className={styles.avatarImage}/> : 
+                                                    dentist.name.charAt(0)}
                                             </div>
-                                        )}
-                                        {dentist.name}
-                                    </td>
-                                    <td>{dentist.license}</td>
-                                    
-                                    {/* TINANGGAL NA ANG CONTACT INFO CELL DITO */}
-                                    
-                                    <td>
-                                        <span className={`${styles.statusBadge} ${dentist.status === 'Active' ? styles.active : styles.inactive}`}>
-                                            {dentist.status}
-                                        </span>
-                                    </td>
-                                    <td className={styles.actionCell}>
-                                        <button className={styles.viewBtn} onClick={() => handleView(dentist.id)}>VIEW</button>
-                                        <button className={styles.editBtn} onClick={() => handleEdit(dentist.id)}>EDIT</button>
-                                        <button className={styles.deleteBtn} onClick={() => initiateDelete(dentist.id)}>DELETE</button>
-                                    </td>
-                                </tr>
-                            ))
+                                            {dentist.name}
+                                        </td>
+                                        <td>{dentist.licenseNumber || 'N/A'}</td>
+                                        <td>
+                                            <span className={`${styles.statusBadge} ${dentist.status === 'active' ? styles.active : styles.inactive}`}>
+                                                {dentist.status || 'active'}
+                                            </span>
+                                        </td>
+                                        <td className={styles.actionCell}>
+                                            <button 
+                                                className={styles.viewBtn} 
+                                                onClick={() => navigate(`/owner/view-dentist/${dentist._id}`)}
+                                                disabled={isViewEditDisabled} 
+                                                style={{ cursor: isViewEditDisabled ? 'not-allowed' : 'pointer', opacity: isViewEditDisabled ? 0.5 : 1 }}
+                                            >
+                                                View
+                                            </button>
+                                            <button 
+                                                className={styles.editBtn} 
+                                                onClick={() => navigate(`/owner/edit-dentist/${dentist._id}`)}
+                                                disabled={isViewEditDisabled}
+                                                style={{ cursor: isViewEditDisabled ? 'not-allowed' : 'pointer', opacity: isViewEditDisabled ? 0.5 : 1 }}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button 
+                                                className={styles.deleteBtn} 
+                                                onClick={() => handleToggleStatusClick(dentist._id, dentist.status || 'inactive', dentist.isVerified)}
+                                                style={{ 
+                                                    backgroundColor: dentist.status === 'inactive' ? '#e8f5e9' : '#ffebee',
+                                                    color: dentist.status === 'inactive' ? '#2e7d32' : '#c62828',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                {dentist.status === 'inactive' ? 'Activate' : 'Deactivate'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })
                         ) : (
-                            <tr><td colSpan="4" className={styles.noData}>No dentists found.</td></tr>
+                            <tr><td colSpan="5" className={styles.noData}>No dentists found.</td></tr>
                         )}
                     </tbody>
                 </table>
             </div>
 
-            {/* --- DELETE MODAL --- */}
-            {showDeleteModal && (
+            {/* CONFIRMATION MODAL */}
+            {statusModal.show && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalCard}>
                         <img src={warningIcon} alt="Warning" className={styles.modalIcon} />
-                        <h3 className={styles.modalTitle}>Delete User?</h3>
-                        <p className={styles.modalMessage}>Are you sure you want to delete this user? This action cannot be undone.</p>
-                        
+                        <h3 className={styles.modalTitle}>
+                            {statusModal.status === 'active' ? 'Deactivate Dentist?' : 'Activate Dentist?'}
+                        </h3>
+                        <p className={styles.modalMessage}>
+                            Are you sure you want to {statusModal.status === 'active' ? 'deactivate' : 'activate'} this account?
+                        </p>
                         <div className={styles.modalActions}>
-                            <button className={styles.modalCancelBtn} onClick={cancelDelete}>Cancel</button>
-                            <button className={styles.modalDeleteBtn} onClick={confirmDelete}>Yes, Delete</button>
+                            <button className={styles.modalCancelBtn} onClick={() => setStatusModal({ show: false, id: null, status: null })}>Cancel</button>
+                            <button 
+                                className={styles.modalDeleteBtn} 
+                                onClick={confirmStatusChange}
+                                style={{ backgroundColor: statusModal.status === 'active' ? '#c62828' : '#2e7d32' }}
+                            >
+                                Yes, {statusModal.status === 'active' ? 'Deactivate' : 'Activate'}
+                            </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ALERT MODAL (NEW) */}
+            {alertModal.show && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalCard}>
+                        <img src={warningIcon} alt="Warning" className={styles.modalIcon} />
+                        <h3 className={styles.modalTitle}>Cannot Activate</h3>
+                        <p className={styles.modalMessage}>{alertModal.message}</p>
+                        <button 
+                            onClick={() => setAlertModal({ show: false, message: '' })}
+                            style={{ 
+                                marginTop: '20px', 
+                                background: 'none', 
+                                border: 'none', 
+                                color: '#555', 
+                                fontWeight: 'bold', 
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                textDecoration: 'underline'
+                            }}
+                        >
+                            Close
+                        </button>
                     </div>
                 </div>
             )}

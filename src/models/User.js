@@ -9,7 +9,7 @@ const addressSchema = new mongoose.Schema({
     barangay: { type: String },
     houseNumber: { type: String },
     street: { type: String }
-}, { _id: false }); // _id: false para hindi gumawa ng sariling ID ang address
+}, { _id: false }); 
 
 const userSchema = new mongoose.Schema({
     // 1. NESTED NAME OBJECT
@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
     currentAddress: addressSchema,
     permanentAddress: addressSchema,
 
-    // 6. MEDICAL HISTORY (Para sa Patient, pero okay lang na nandito)
+    // 6. MEDICAL HISTORY
     medicalHistory: {
         allergies: [{ type: String }],
         conditions: [{ type: String }]
@@ -59,8 +59,11 @@ const userSchema = new mongoose.Schema({
         name: { type: String },
         relationship: { type: String },
         contactNumber: { type: String }
-    }
+    }, 
 
-}, { timestamps: true }); // Ito ang gagawa ng createdAt at updatedAt
+    // FIX: Default status is now 'inactive' until email verified
+    status: { type: String, enum: ['active', 'inactive'], default: 'inactive' }
+
+}, { timestamps: true }); 
 
 module.exports = mongoose.model('User', userSchema);
