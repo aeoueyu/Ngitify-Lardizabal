@@ -3,7 +3,7 @@ import styles from '../../styles/sidebar/Sidebar.module.css';
 import logo from '../../assets/logo-white.svg'; 
 import { useNavigate, useLocation } from 'react-router-dom';
 
-// Import Icons
+// Import Sidebar Icons
 import dashboardIcon from '../../assets/sidebar-icons/dashboard.svg';
 import usersIcon from '../../assets/sidebar-icons/users.svg';
 import settingsIcon from '../../assets/sidebar-icons/settings.svg';
