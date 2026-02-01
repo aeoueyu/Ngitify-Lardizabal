@@ -19,7 +19,7 @@ export default function ManageDentists() {
     // FETCH DATA
     const fetchDentists = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/dentists');
+            const response = await fetch('http://localhost:5000/api/users?role=dentist');
             const data = await response.json();
             
             if (response.ok) {
@@ -55,9 +55,7 @@ export default function ManageDentists() {
         if (!dentistToDelete) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/dentist/${dentistToDelete}`, {
-                method: 'DELETE',
-            });
+            const response = await fetch(`http://localhost:5000/api/user/${dentistToDelete}`, { method: 'DELETE' });
 
             if (response.ok) {
                 setDentists(dentists.filter(d => d.id !== dentistToDelete));

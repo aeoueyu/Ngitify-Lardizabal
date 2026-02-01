@@ -8,8 +8,6 @@ import HomePage from './components/HomePage';
 import DashboardPage from './components/DashboardPage';
 import PatientProfilePage from './components/PatientProfilePage';
 import SettingsPage from './components/SettingsPage';
-import OTP from './components/OTP';
-import EmailVerificationPage from './components/EmailVerificationPage';
 import Sidebar from './components/sidebar/Sidebar';
 import ForgotPassPage from './components/ForgotPassPage';
 import VerificationCodePage from './components/VerificationCodePage';
@@ -62,8 +60,6 @@ function App() {
         <Route path="/" element={<Website />} />
         <Route path="/role-selection" element={<RoleSelectionPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/email-verification" element={<EmailVerificationPage />} />
-        <Route path="/otp" element={<OTP />} />
         <Route path="/forgot-password" element={<ForgotPassPage />} />
         <Route path="/verification-code" element={<VerificationCodePage />} />
         <Route path="/new-password" element={<NewPasswordPage />} />

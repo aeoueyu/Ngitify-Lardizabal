@@ -35,8 +35,16 @@ export default function Sidebar() {
     };
 
     const confirmLogout = () => {
+        // 1. Clear Local Storage / Session
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('userId'); // Kung meron man nito
+
+        // 2. Close Modal
         setShowLogoutModal(false);
-        navigate('/login'); // Proceed to logout
+
+        // 3. Redirect to Login
+        navigate('/login', { replace: true }); // replace: true para hindi na makabalik gamit ang back button
     };
 
     const cancelLogout = () => {
