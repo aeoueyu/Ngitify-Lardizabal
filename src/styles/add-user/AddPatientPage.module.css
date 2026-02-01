@@ -432,6 +432,79 @@ select.inputField {
     color: #337685;
 }
 
+/* ... (Existing styles above) ... */
+
+/* --- ADDITIONAL STYLES FOR PATIENT & GUARDIAN --- */
+
+/* Guardian Alert Box (Yellow Box) */
+.guardianAlert {
+    background-color: #fff8e1;
+    border: 1px solid #ffe082;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    animation: fadeIn 0.3s ease;
+}
+
+.guardianTitle {
+    color: #f57f17;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Checkbox Grid System (Medical History) */
+.checkboxGroupLabel {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.checkboxGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Responsive Grid */
+    gap: 12px;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+}
+
+.checkboxItem {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.checkboxItem:hover {
+    color: #005466;
+}
+
+.checkboxInput {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    accent-color: #005466; /* Teal color check */
+    cursor: pointer;
+}
+
+/* Minor Alert Text (Under Birthdate) */
+.minorAlertText {
+    color: #f57f17;
+    font-size: 12px;
+    margin-top: 6px;
+    font-weight: 600;
+    display: block;
+}
+
 /* Animations */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }

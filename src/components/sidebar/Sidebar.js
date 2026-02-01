@@ -85,10 +85,10 @@ export default function Sidebar() {
                                 Dentists
                             </li>
                             <li 
-                                className={isActive('/owner/manage-staff') ? styles.subActive : ''}
-                                onClick={(e) => { e.stopPropagation(); navigate('/owner/manage-staff'); }}
+                                className={isActive('/owner/manage-secretaries') ? styles.subActive : ''}
+                                onClick={(e) => { e.stopPropagation(); navigate('/owner/manage-secretaries'); }}
                             >
-                                Staff
+                                Secretaries
                             </li>
                             <li 
                                 className={isActive('/owner/manage-patients') ? styles.subActive : ''}

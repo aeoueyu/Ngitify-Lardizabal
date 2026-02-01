@@ -159,21 +159,20 @@ app.post('/api/activate-account', async (req, res) => {
 // ... (Sa ilalim ng app.get('/api/dentists' ...)
 
 // DELETE DENTIST
-app.delete('/api/dentist/:id', async (req, res) => {
+// GENERIC DELETE USER (Works for Dentist, Secretary, Patient)
+app.delete('/api/user/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        
-        // Hanapin at Burahin ang user gamit ang ID
         const deletedUser = await User.findByIdAndDelete(id);
 
         if (!deletedUser) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found." });
         }
 
-        res.status(200).json({ message: "User deleted successfully" });
+        res.json({ message: "User deleted successfully." });
     } catch (error) {
         console.error("Error deleting user:", error);
-        res.status(500).json({ message: "Server error deleting user." });
+        res.status(500).json({ message: "Server error during deletion." });
     }
 });
 
@@ -266,6 +265,107 @@ app.put('/api/dentist/:id', async (req, res) => {
     } catch (error) {
         console.error("Error updating:", error);
         res.status(500).json({ message: "Server error updating dentist" });
+    }
+});
+
+// ADD SECRETARY
+app.post('/api/add-secretary', async (req, res) => {
+    try {
+        const { 
+            firstName, middleName, lastName, email, phone, birthdate, 
+            currentAddress, permanentAddress, password, profileImage 
+        } = req.body;
+
+        // Backend Age Validation (18+)
+        const age = new Date().getFullYear() - new Date(birthdate).getFullYear();
+        if (age < 18) return res.status(400).json({ message: 'Secretary must be at least 18 years old.' });
+
+        const userExists = await User.findOne({ email });
+        if (userExists) return res.status(400).json({ message: 'Email already exists.' });
+
+        const activationToken = crypto.randomBytes(32).toString('hex');
+        const activationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newSecretary = new User({
+            name: { first: firstName, middle: middleName, last: lastName },
+            email, contactNumber: phone, birthdate, age,
+            currentAddress, permanentAddress,
+            password: hashedPassword, profileImage,
+            role: 'secretary', // ROLE SET TO SECRETARY
+            isVerified: false, activationToken, activationExpires
+        });
+
+        await newSecretary.save();
+
+        // Send Email (Reuse your mailOptions logic)
+        const activationLink = `http://localhost:3000/activate-account/${activationToken}`;
+        await transporter.sendMail({
+            from: 'NgitiFy Admin <your-email@gmail.com>',
+            to: email,
+            subject: 'Activate your Secretary Account',
+            html: `<h3>Welcome ${firstName}!</h3><p>Click to activate: <a href="${activationLink}">Activate</a></p>`
+        });
+
+        res.status(201).json({ message: 'Secretary added successfully.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
+
+// ADD PATIENT
+app.post('/api/add-patient', async (req, res) => {
+    try {
+        const { 
+            firstName, middleName, lastName, email, phone, birthdate, 
+            currentAddress, permanentAddress, password, profileImage,
+            guardian, medicalHistory // NEW FIELDS
+        } = req.body;
+
+        const userExists = await User.findOne({ email });
+        if (userExists) return res.status(400).json({ message: 'Email already exists.' });
+
+        // Calculate Age
+        const dob = new Date(birthdate);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        if (today < new Date(today.getFullYear(), dob.getMonth(), dob.getDate())) age--;
+
+        // Guardian Validation
+        if (age < 13 && (!guardian || !guardian.name)) {
+            return res.status(400).json({ message: 'Guardian information is required for patients under 13.' });
+        }
+
+        const activationToken = crypto.randomBytes(32).toString('hex');
+        const activationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newPatient = new User({
+            name: { first: firstName, middle: middleName, last: lastName },
+            email, contactNumber: phone, birthdate, age,
+            currentAddress, permanentAddress,
+            password: hashedPassword, profileImage,
+            role: 'patient',
+            guardian: age < 13 ? guardian : {}, // Save guardian only if needed
+            medicalHistory, // Save medical history checklist
+            isVerified: false, activationToken, activationExpires
+        });
+
+        await newPatient.save();
+
+        // Send Email
+        const activationLink = `http://localhost:3000/activate-account/${activationToken}`;
+        await transporter.sendMail({
+            from: 'NgitiFy Admin',
+            to: email,
+            subject: 'Activate Patient Account',
+            html: `<h3>Welcome ${firstName}!</h3><p>Click to activate: <a href="${activationLink}">Activate</a></p>`
+        });
+
+        res.status(201).json({ message: 'Patient added successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error.' });
     }
 });
 // ... (tuloy sa ibang routes)
@@ -427,6 +527,25 @@ app.post('/api/resend-otp', async (req, res) => {
         res.status(200).json({ message: "New OTP sent" });
     } catch (error) {
         res.status(500).json({ message: "Server error." });
+    }
+});
+
+// GET USERS BY ROLE
+app.get('/api/users', async (req, res) => {
+    try {
+        const { role } = req.query; // Kukunin ang ?role=secretary o ?role=patient sa URL
+        
+        let query = {};
+        if (role) {
+            query.role = role;
+        }
+
+        // Kukunin lahat ng user na pasok sa role (ex: lahat ng secretary)
+        const users = await User.find(query).select('-password'); // Exclude password for security
+        res.json(users);
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).json({ message: "Server error fetching users." });
     }
 });
 
