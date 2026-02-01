@@ -1,50 +1,66 @@
 const mongoose = require('mongoose');
 
+// Sub-schema para sa Address para malinis tignan
+const addressSchema = new mongoose.Schema({
+    country: { type: String, default: 'Philippines' },
+    region: { type: String },
+    province: { type: String },
+    city: { type: String },
+    barangay: { type: String },
+    houseNumber: { type: String },
+    street: { type: String }
+}, { _id: false }); // _id: false para hindi gumawa ng sariling ID ang address
+
 const userSchema = new mongoose.Schema({
+    // 1. NESTED NAME OBJECT
     name: {
         first: { type: String, required: true },
-        middle: { type: String },
+        middle: { type: String, default: '' },
         last: { type: String, required: true }
     },
+
+    // 2. CREDENTIALS
     email: { type: String, required: true, unique: true },
-    password: { type: String }, // Not required for patients initially if generated
-    // UPDATE: 'staff' becomes 'secretary'
-    role: { type: String, enum: ['owner', 'dentist', 'secretary', 'patient'], default: 'patient' },
+    password: { type: String, required: true },
+    role: { 
+        type: String, 
+        enum: ['owner', 'dentist', 'secretary', 'patient'], 
+        default: 'patient' 
+    },
+
+    // 3. PERSONAL DETAILS
     contactNumber: { type: String },
-    
-    currentAddress: { type: Object },
-    permanentAddress: { type: Object },
-    
     birthdate: { type: Date },
-    age: { type: Number }, // Helper field
+    profileImage: { type: String }, // Base64 string
     
-    // Dentist/Secretary Specifics
+    // 4. DENTIST SPECIFIC
     licenseNumber: { type: String },
     specialization: { type: String },
-    
-    // PATIENT SPECIFICS
+
+    // 5. NESTED ADDRESS OBJECTS
+    currentAddress: addressSchema,
+    permanentAddress: addressSchema,
+
+    // 6. MEDICAL HISTORY (Para sa Patient, pero okay lang na nandito)
+    medicalHistory: {
+        allergies: [{ type: String }],
+        conditions: [{ type: String }]
+    },
+
+    // 7. SECURITY & VERIFICATION
+    isVerified: { type: Boolean, default: false },
+    activationToken: { type: String },
+    isPasswordChanged: { type: Boolean, default: false },
+    resetPasswordOtp: { type: String },
+    resetPasswordExpires: { type: Date },
+
+    // 8. GUARDIAN (Optional for minors)
     guardian: {
         name: { type: String },
         relationship: { type: String },
         contactNumber: { type: String }
-    },
-    medicalHistory: {
-        allergies: { type: [String] }, // e.g., ['Latex', 'Penicillin']
-        conditions: { type: [String] }, // e.g., ['High Blood Pressure', 'Diabetes']
-        surgeries: { type: String },
-        medications: { type: String },
-        hospitalized: { type: String }, // "Yes - Reason" or "No"
-        pregnant: { type: Boolean } // For female patients
-    },
+    }
 
-    profileImage: { type: String },
+}, { timestamps: true }); // Ito ang gagawa ng createdAt at updatedAt
 
-    // Security
-    isVerified: { type: Boolean, default: false },
-    activationToken: { type: String },
-    activationExpires: { type: Date }
-    
-}, { timestamps: true });
-
-const User = mongoose.model('User', userSchema);
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);

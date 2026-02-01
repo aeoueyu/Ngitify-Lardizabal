@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUpScale { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+.main-container {
+    width: 100%;
+    min-height: 100vh;
+    font-family: 'Lexend Deca', sans-serif;
+    background-color: white;
+    /* Siguraduhing tama ang path ng bg.svg mo */
+    background-image: url('../../assets/bg.svg'); 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.container {
+    z-index: 1;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 50px 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 1s ease-out;
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo {
+    width: 200px;
+    margin-bottom: 20px;
+    animation: fadeUpScale 0.8s ease-out;
+}
+
+.title {
+    color: #005466;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    animation: fadeUpScale 0.8s ease-out 0.2s backwards;
+}
+
+.statusIcon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+}
+
+.message {
+    font-size: 16px;
+    color: #555;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Specific Colors for messages */
+.successMsg { color: #2e7d32; font-weight: 600; }
+.errorMsg { color: #d32f2f; font-weight: 600; }
+
+.actionBtn {
+    margin-top: 20px;
+    padding: 12px 30px;
+    background-color: #005466;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 84, 102, 0.2);
+    width: 100%;
+}
+
+.actionBtn:hover {
+    background-color: #337685;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 84, 102, 0.3);
+}
+
+.actionBtn.secondary {
+    background-color: #ccc;
+    color: #333;
+    box-shadow: none;
+}
+
+.actionBtn.secondary:hover {
+    background-color: #bbb;
+}
