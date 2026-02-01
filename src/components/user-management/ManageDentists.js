@@ -83,6 +83,7 @@ export default function ManageDentists() {
         dentist.license.includes(searchTerm)
     );
 
+    // NAVIGATION HANDLERS
     const handleEdit = (id) => {
         navigate(`/owner/edit-dentist/${id}`);
     };
@@ -121,14 +122,14 @@ export default function ManageDentists() {
                         <tr>
                             <th>NAME</th>
                             <th>LICENSE NO.</th>
-                            <th>CONTACT INFO</th>
+                            {/* TINANGGAL NA ANG CONTACT INFO COLUMN DITO */}
                             <th>STATUS</th>
                             <th className={styles.actionHeader}>ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan="5" className={styles.noData}>Loading dentists...</td></tr>
+                            <tr><td colSpan="4" className={styles.noData}>Loading dentists...</td></tr>
                         ) : filteredDentists.length > 0 ? (
                             filteredDentists.map((dentist) => (
                                 <tr key={dentist.id}>
@@ -143,36 +144,29 @@ export default function ManageDentists() {
                                         {dentist.name}
                                     </td>
                                     <td>{dentist.license}</td>
-                                    <td>
-                                        <div className={styles.contactCell}>
-                                            <span>{dentist.email}</span>
-                                            <span className={styles.phoneText}>{dentist.phone}</span>
-                                        </div>
-                                    </td>
+                                    
+                                    {/* TINANGGAL NA ANG CONTACT INFO CELL DITO */}
+                                    
                                     <td>
                                         <span className={`${styles.statusBadge} ${dentist.status === 'Active' ? styles.active : styles.inactive}`}>
                                             {dentist.status}
                                         </span>
                                     </td>
                                     <td className={styles.actionCell}>
-                                        {/* AAYUSIN NATIN ITO: Dapat may () => arrow function */}
                                         <button className={styles.viewBtn} onClick={() => handleView(dentist.id)}>VIEW</button>
-                                        
-                                        {/* ITO YUNG BINAGO KO */}
                                         <button className={styles.editBtn} onClick={() => handleEdit(dentist.id)}>EDIT</button>
-                                        
                                         <button className={styles.deleteBtn} onClick={() => initiateDelete(dentist.id)}>DELETE</button>
                                     </td>
                                 </tr>
                             ))
                         ) : (
-                            <tr><td colSpan="5" className={styles.noData}>No dentists found.</td></tr>
+                            <tr><td colSpan="4" className={styles.noData}>No dentists found.</td></tr>
                         )}
                     </tbody>
                 </table>
             </div>
 
-            {/* --- DELETE CONFIRMATION MODAL --- */}
+            {/* --- DELETE MODAL --- */}
             {showDeleteModal && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalCard}>

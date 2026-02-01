@@ -129,7 +129,8 @@ app.post('/api/activate-account', async (req, res) => {
         // Hanapin ang user na may ganitong token AT hindi pa expired ang oras
         const user = await User.findOne({
             activationToken: token,
-            activationExpires: { $gt: Date.now() } // "Greater Than" now
+            // UPDATE: Gawing new Date() para sigurado ang comparison
+            activationExpires: { $gt: new Date() } 
         });
 
         if (!user) {
