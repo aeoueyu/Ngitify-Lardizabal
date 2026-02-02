@@ -11,9 +11,8 @@ export default function AddDentistPage() {
     const [isSameAddress, setIsSameAddress] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [errors, setErrors] = useState({}); // Dito mapupunta ang field-specific errors
+    const [errors, setErrors] = useState({}); 
 
-    // ... (Specialization Options & Initial State same as before) ...
     const specializationOptions = [ "General Dentist", "Orthodontist", "Pediatric Dentist (Pedodontist)", "Periodontist", "Endodontist", "Oral & Maxillofacial Surgeon", "Prosthodontist", "Cosmetic Dentist" ];
     const initialAddressState = { country: 'Philippines', region: '', province: '', city: '', barangay: '', houseNumber: '', street: '' };
     
@@ -22,19 +21,50 @@ export default function AddDentistPage() {
         email: '', phone: '', currentAddress: { ...initialAddressState }, permanentAddress: { ...initialAddressState }
     });
 
-    // ... (Helper functions like getAge, toTitleCase same as before) ...
-    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    // --- HELPER FUNCTIONS ---
+    const validateEmail = (email) => {
+        const formatRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!formatRegex.test(email)) return false;
+        const allowedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'live.com'];
+        const domain = email.split('@')[1].toLowerCase();
+        return allowedDomains.includes(domain);
+    };
+
     const toTitleCase = (str) => str.toLowerCase().replace(/(?:^|\s|-|\.)\S/g, (char) => char.toUpperCase());
     const getAge = (d) => { const today=new Date(); const birth=new Date(d); let age=today.getFullYear()-birth.getFullYear(); const m=today.getMonth()-birth.getMonth(); if(m<0||(m===0&&today.getDate()<birth.getDate()))age--; return age; };
     const getMaxDate = () => { const t=new Date(); t.setFullYear(t.getFullYear()-21); return t.toISOString().split('T')[0]; };
 
-    // ... (Handlers handleImageChange, handlePersonalChange, handlePhoneChange same as before) ...
+    // --- REALTIME VALIDATION (ON BLUR) ---
+    const handleBlur = (e) => {
+        const { name, value } = e.target;
+        let newError = "";
+
+        switch (name) {
+            case 'email':
+                if (!value) newError = "Required";
+                else if (!validateEmail(value)) newError = "Invalid email domain (e.g. gmail.com, yahoo.com)";
+                break;
+            case 'phone':
+                if (!value) newError = "Required";
+                else if (value.length !== 10 || value[0] !== '9') newError = "Invalid format (9xxxxxxxxx)";
+                break;
+            case 'licenseNumber':
+                if (!value) newError = "Required";
+                else if (value.length !== 7) newError = "Must be 7 digits";
+                break;
+            default:
+                break;
+        }
+
+        setErrors(prev => ({ ...prev, [name]: newError }));
+    };
+
+    // --- HANDLERS ---
     const handleImageChange = (e) => { const file=e.target.files[0]; if(file){ const r=new FileReader(); r.onloadend=()=>setProfileImage(r.result); r.readAsDataURL(file); }};
     const triggerFileInput = () => fileInputRef.current.click();
     
     const handlePersonalChange = (e) => {
         const { name, value } = e.target;
-        // Clear error when user types
         if (errors[name]) setErrors(prev => { const n={...prev}; delete n[name]; return n; });
 
         if (['firstName', 'middleName', 'lastName'].includes(name)) {
@@ -47,11 +77,16 @@ export default function AddDentistPage() {
     const handlePhoneChange = (e) => {
         const value = e.target.value.replace(/[^0-9]/g, '');
         if (value.length > 10) return;
-        if (errors.phone) setErrors(prev => ({...prev, phone: ''}));
+        if (errors.phone) setErrors(prev => { const n={...prev}; delete n.phone; return n; });
         setFormData({ ...formData, phone: value });
     };
 
-    // ... (Address Handlers same as before) ...
+    const handleLicenseChange = (e) => {
+        const val = e.target.value.replace(/[^0-9]/g, '');
+        if (errors.licenseNumber) setErrors(prev => { const n={...prev}; delete n.licenseNumber; return n; });
+        setFormData({...formData, licenseNumber: val});
+    };
+
     const handleAddressChange = (type, field, value) => {
         const errorKey = `${type==='currentAddress'?'current':'permanent'}_${field}`;
         if(errors[errorKey]) setErrors(prev=>{const n={...prev};delete n[errorKey];return n;});
@@ -64,6 +99,7 @@ export default function AddDentistPage() {
             return {...prev, [type]: updated};
         });
     };
+
     const handleSameAddressToggle = (e) => {
         const checked = e.target.checked; setIsSameAddress(checked);
         if(checked) {
@@ -74,7 +110,7 @@ export default function AddDentistPage() {
         }
     };
 
-    // --- VALIDATION ---
+    // --- FULL FORM VALIDATION ---
     const validateForm = () => {
         let newErrors = {};
         let isValid = true;
@@ -82,9 +118,15 @@ export default function AddDentistPage() {
         required.forEach(f => { if(!formData[f]) { newErrors[f] = "Required"; isValid = false; }});
 
         if(!formData.phone) { newErrors.phone="Required"; isValid=false; }
-        else if(formData.phone.length!==10 || formData.phone[0]!=='9') { newErrors.phone="Invalid format"; isValid=false; }
-        if(formData.email && !validateEmail(formData.email)) { newErrors.email="Invalid email"; isValid=false; }
+        else if(formData.phone.length!==10 || formData.phone[0]!=='9') { newErrors.phone="Invalid format (9xxxxxxxxx)"; isValid=false; }
+        
+        if(formData.email && !validateEmail(formData.email)) { 
+            newErrors.email = "Invalid email domain (e.g. gmail.com, yahoo.com)"; 
+            isValid=false; 
+        }
+        
         if(formData.birthdate && getAge(formData.birthdate)<21) { newErrors.birthdate="Min age 21"; isValid=false; }
+        if(formData.licenseNumber && formData.licenseNumber.length !== 7) { newErrors.licenseNumber="Must be 7 digits"; isValid=false; }
 
         const validateAddr = (addr, prefix) => {
             ['region', 'province', 'city', 'barangay', 'street', 'houseNumber'].forEach(f => {
@@ -96,7 +138,6 @@ export default function AddDentistPage() {
 
         setErrors(newErrors);
         
-        // Auto-scroll to first error
         if (!isValid) {
             const firstKey = Object.keys(newErrors)[0];
             const el = document.getElementsByName(firstKey)[0];
@@ -105,28 +146,18 @@ export default function AddDentistPage() {
         return isValid;
     };
 
-    // --- SUBMIT ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
 
-        // I-CONSTRUCT ANG DATA PARA MAGING NESTED JSON
         const finalData = {
-            // Name Object
-            name: { 
-                first: formData.firstName, 
-                middle: formData.middleName, 
-                last: formData.lastName 
-            },
-            
+            name: { first: formData.firstName, middle: formData.middleName, last: formData.lastName },
             email: formData.email,
             contactNumber: `+63${formData.phone}`,
             birthdate: formData.birthdate,
             licenseNumber: formData.licenseNumber,
             specialization: formData.specialization,
             profileImage: profileImage,
-            
-            // Address Objects (Direkta mula sa state kasi naka-object na sila dun)
             currentAddress: {
                 country: 'Philippines',
                 region: formData.currentAddress.region,
@@ -137,7 +168,6 @@ export default function AddDentistPage() {
                 street: formData.currentAddress.street
             },
             permanentAddress: isSameAddress ? {
-                // Kung Same, kopyahin ang current
                 country: 'Philippines',
                 region: formData.currentAddress.region,
                 province: formData.currentAddress.province,
@@ -146,7 +176,6 @@ export default function AddDentistPage() {
                 houseNumber: formData.currentAddress.houseNumber,
                 street: formData.currentAddress.street
             } : {
-                // Kung Hindi Same, kunin sa permanent state
                 country: 'Philippines',
                 region: formData.permanentAddress.region,
                 province: formData.permanentAddress.province,
@@ -155,12 +184,7 @@ export default function AddDentistPage() {
                 houseNumber: formData.permanentAddress.houseNumber,
                 street: formData.permanentAddress.street
             },
-
-            // Default empty medical history para sa dentist (optional)
-            medicalHistory: {
-                allergies: [],
-                conditions: []
-            }
+            medicalHistory: { allergies: [], conditions: [] }
         };
 
         try {
@@ -175,13 +199,8 @@ export default function AddDentistPage() {
             if (response.ok) {
                 setShowSuccessModal(true);
             } else {
-                // HANDLE DUPLICATE ERRORS HERE
                 if (response.status === 409) {
-                    setErrors(prev => ({
-                        ...prev,
-                        [data.field]: data.message // sets errors.email or errors.licenseNumber
-                    }));
-                    // Scroll to error
+                    setErrors(prev => ({ ...prev, [data.field]: data.message }));
                     const el = document.getElementsByName(data.field)[0];
                     if(el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
                 } else {
@@ -194,7 +213,6 @@ export default function AddDentistPage() {
         }
     };
 
-    // Render Helpers (Copy your existing renderAddressFields)
     const renderAddressFields = (type, title, isDisabled = false) => {
         const address = formData[type];
         const prefix = type === 'currentAddress' ? 'current' : 'permanent';
@@ -225,7 +243,6 @@ export default function AddDentistPage() {
                         {getError('province') && <span className={styles.errorText}>{getError('province')}</span>}
                     </div>
                 </div>
-                {/* ... City, Brgy, Street, HouseNo (Same pattern) ... */}
                 <div className={styles.row}>
                     <div className={styles.formGroup}>
                         <label>CITY / MUNICIPALITY <span style={{color:'red'}}>*</span></label>
@@ -278,21 +295,55 @@ export default function AddDentistPage() {
 
                     <h3 className={styles.mainSectionTitle}>Personal Information</h3>
                     <div className={styles.row}>
-                        <div className={styles.formGroup}><label>FIRST NAME <span style={{color:'red'}}>*</span></label><input className={`${styles.inputField} ${errors.firstName?styles.errorBorder:''}`} name="firstName" value={formData.firstName} onChange={handlePersonalChange} maxLength={50}/>{errors.firstName && <span className={styles.errorText}>{errors.firstName}</span>}</div>
-                        <div className={styles.formGroup}><label>MIDDLE NAME</label><input className={styles.inputField} name="middleName" value={formData.middleName} onChange={handlePersonalChange} maxLength={50}/></div>
-                        <div className={styles.formGroup}><label>LAST NAME <span style={{color:'red'}}>*</span></label><input className={`${styles.inputField} ${errors.lastName?styles.errorBorder:''}`} name="lastName" value={formData.lastName} onChange={handlePersonalChange} maxLength={50}/>{errors.lastName && <span className={styles.errorText}>{errors.lastName}</span>}</div>
+                        <div className={styles.formGroup}>
+                            <label>FIRST NAME <span style={{color:'red'}}>*</span></label>
+                            {/* FIRST NAME (Max 50) */}
+                            <input 
+                                className={`${styles.inputField} ${errors.firstName?styles.errorBorder:''}`} 
+                                name="firstName" 
+                                value={formData.firstName} 
+                                onChange={handlePersonalChange} 
+                                maxLength={50}
+                            />
+                            {errors.firstName && <span className={styles.errorText}>{errors.firstName}</span>}
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>MIDDLE NAME</label>
+                            {/* MIDDLE NAME (Updated to 20) */}
+                            <input 
+                                className={styles.inputField} 
+                                name="middleName" 
+                                value={formData.middleName} 
+                                onChange={handlePersonalChange} 
+                                maxLength={20}
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>LAST NAME <span style={{color:'red'}}>*</span></label>
+                            {/* LAST NAME (Updated to 20) */}
+                            <input 
+                                className={`${styles.inputField} ${errors.lastName?styles.errorBorder:''}`} 
+                                name="lastName" 
+                                value={formData.lastName} 
+                                onChange={handlePersonalChange} 
+                                maxLength={20}
+                            />
+                            {errors.lastName && <span className={styles.errorText}>{errors.lastName}</span>}
+                        </div>
                     </div>
+                    
+                    {/* Rest of the form remains unchanged */}
                     <div className={styles.row}>
                         <div className={styles.formGroup}><label>BIRTHDATE <span style={{color:'red'}}>*</span></label><input type="date" className={`${styles.inputField} ${errors.birthdate?styles.errorBorder:''}`} name="birthdate" value={formData.birthdate} onChange={handlePersonalChange} max={getMaxDate()}/>{errors.birthdate && <span className={styles.errorText}>{errors.birthdate}</span>}</div>
                         
-                        {/* LICENSE NUMBER FIELD WITH ERROR */}
                         <div className={styles.formGroup}>
                             <label>LICENSE NO. <span style={{color:'red'}}>*</span></label>
                             <input 
                                 className={`${styles.inputField} ${errors.licenseNumber ? styles.errorBorder : ''}`} 
                                 name="licenseNumber" 
                                 value={formData.licenseNumber} 
-                                onChange={(e) => { const val = e.target.value.replace(/[^0-9]/g, ''); setFormData({...formData, licenseNumber: val}); }} 
+                                onChange={handleLicenseChange} 
+                                onBlur={handleBlur} 
                                 maxLength={7}
                             />
                             {errors.licenseNumber && <span className={styles.errorText}>{errors.licenseNumber}</span>}
@@ -308,7 +359,6 @@ export default function AddDentistPage() {
                         </div>
                     </div>
                     <div className={styles.row}>
-                        {/* EMAIL FIELD WITH ERROR */}
                         <div className={styles.formGroup}>
                             <label>EMAIL ADDRESS <span style={{color:'red'}}>*</span></label>
                             <input 
@@ -317,11 +367,27 @@ export default function AddDentistPage() {
                                 name="email" 
                                 value={formData.email} 
                                 onChange={handlePersonalChange} 
+                                onBlur={handleBlur} 
                                 maxLength={100}
                             />
                             {errors.email && <span className={styles.errorText}>{errors.email}</span>}
                         </div>
-                        <div className={styles.formGroup}><label>PHONE NUMBER <span style={{color:'red'}}>*</span></label><div className={styles.phoneInputGroup}><span className={styles.phonePrefix}>+63</span><input className={`${styles.phoneField} ${errors.phone?styles.errorBorder:''}`} name="phone" value={formData.phone} onChange={handlePhoneChange} maxLength={10} placeholder="9xxxxxxxxx"/></div>{errors.phone && <span className={styles.errorText}>{errors.phone}</span>}</div>
+                        <div className={styles.formGroup}>
+                            <label>PHONE NUMBER <span style={{color:'red'}}>*</span></label>
+                            <div className={`${styles.phoneInputGroup} ${errors.phone ? styles.errorBorder : ''}`}>
+                                <span className={styles.phonePrefix}>+63</span>
+                                <input 
+                                    className={styles.phoneField} 
+                                    name="phone" 
+                                    value={formData.phone} 
+                                    onChange={handlePhoneChange} 
+                                    onBlur={handleBlur}
+                                    maxLength={10} 
+                                    placeholder="9xxxxxxxxx"
+                                />
+                            </div>
+                            {errors.phone && <span className={styles.errorText}>{errors.phone}</span>}
+                        </div>
                     </div>
 
                     <hr className={styles.divider} />

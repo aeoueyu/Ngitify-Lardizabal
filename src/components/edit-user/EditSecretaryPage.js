@@ -1,73 +1,78 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import styles from '../../styles/edit-user/EditSecretaryPage.module.css';
-import { useNavigate, useParams } from 'react-router-dom';
-import { regions, provinces, cities, barangays } from '../../utils/addressData';
-import successIcon from '../../assets/alert-icons/success.svg';
+import { regions, provinces, cities, barangays } from '../../utils/addressData'; 
 import warningIcon from '../../assets/alert-icons/warning.svg';
+import successIcon from '../../assets/alert-icons/success.svg';
 
 export default function EditSecretaryPage() {
-    const navigate = useNavigate();
     const { id } = useParams();
+    const navigate = useNavigate();
     const fileInputRef = useRef(null);
-    
-    const [isLoading, setIsLoading] = useState(true);
-    const [isSameAddress, setIsSameAddress] = useState(false);
-    
-    // Image States
-    const [profileImage, setProfileImage] = useState(null);
-    const [initialImage, setInitialImage] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // Modals
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [modalMessage, setModalMessage] = useState("Secretary details updated.");
-    
-    const [errors, setErrors] = useState({});
-    const initialAddressState = { country: 'Philippines', region: '', province: '', city: '', barangay: '', houseNumber: '', street: '' };
+    const initialAddressState = { region: '', province: '', city: '', barangay: '', street: '', houseNumber: '' };
 
     const [formData, setFormData] = useState({
-        firstName: '', middleName: '', lastName: '', birthdate: '', email: '', phone: '',
-        currentAddress: { ...initialAddressState }, permanentAddress: { ...initialAddressState }
+        firstName: '', middleName: '', lastName: '', 
+        email: '', phone: '', birthdate: '',
+        currentAddress: { ...initialAddressState },
+        permanentAddress: { ...initialAddressState }
     });
 
-    const [initialData, setInitialData] = useState(null);
+    const [initialData, setInitialData] = useState(null); 
+    const [profileImage, setProfileImage] = useState(null);
+    const [initialImage, setInitialImage] = useState(null);
+    
+    const [isSameAddress, setIsSameAddress] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    // Modals
+    const [showSaveModal, setShowSaveModal] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     // Helpers
-    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const getMaxDate = () => { const t=new Date(); t.setFullYear(t.getFullYear()-18); return t.toISOString().split('T')[0]; };
+    const validateEmailFormat = (email) => {
+        const formatRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!formatRegex.test(email)) return false;
+        const allowedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'live.com'];
+        const domain = email.split('@')[1].toLowerCase();
+        return allowedDomains.includes(domain);
+    };
     const toTitleCase = (str) => str.toLowerCase().replace(/(?:^|\s|-|\.)\S/g, (char) => char.toUpperCase());
-    const getAge = (d) => { const today=new Date(); const birth=new Date(d); let age=today.getFullYear()-birth.getFullYear(); const m=today.getMonth()-birth.getMonth(); if(m<0||(m===0&&today.getDate()<birth.getDate()))age--; return age; };
 
-    // Fetch
+    // --- FETCH DATA ---
     useEffect(() => {
         const fetchSecretary = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/user/${id}`);
-                const data = await response.json();
-                
-                if (response.ok) {
-                    const currentAddr = data.currentAddress || {};
-                    const permAddr = data.permanentAddress || {};
-                    const cleanAddr = (addr) => { const { _id, ...rest } = addr; return JSON.stringify(rest); };
-                    const isSame = cleanAddr(currentAddr) === cleanAddr(permAddr);
-                    setIsSameAddress(isSame);
+                const res = await fetch(`http://localhost:5000/api/user/${id}`);
+                const data = await res.json();
+                if (res.ok) {
+                    const currentAddr = data.currentAddress || initialAddressState;
+                    const permanentAddr = data.permanentAddress || initialAddressState;
+                    const isSame = JSON.stringify(currentAddr) === JSON.stringify(permanentAddr);
 
-                    const processedData = {
-                        firstName: data.name?.first || '',
-                        middleName: data.name?.middle || '',
-                        lastName: data.name?.last || '',
-                        birthdate: data.birthdate ? new Date(data.birthdate).toISOString().split('T')[0] : '',
-                        email: data.email || '',
+                    const loadedData = {
+                        firstName: data.name.first,
+                        middleName: data.name.middle,
+                        lastName: data.name.last,
+                        email: data.email,
                         phone: data.contactNumber ? data.contactNumber.replace('+63', '') : '',
-                        currentAddress: { ...initialAddressState, ...currentAddr },
-                        permanentAddress: { ...initialAddressState, ...permAddr }
+                        birthdate: data.birthdate ? new Date(data.birthdate).toISOString().split('T')[0] : '',
+                        currentAddress: currentAddr,
+                        permanentAddress: permanentAddr
                     };
 
-                    setFormData(processedData);
-                    setInitialData(processedData);
+                    setFormData(loadedData);
+                    setInitialData(loadedData);
                     setProfileImage(data.profileImage);
                     setInitialImage(data.profileImage);
+                    setIsSameAddress(isSame);
                 }
-            } catch (error) { console.error("Error:", error); } finally { setIsLoading(false); }
+            } catch (err) { console.error(err); } 
+            finally { setLoading(false); }
         };
         fetchSecretary();
     }, [id]);
@@ -79,232 +84,352 @@ export default function EditSecretaryPage() {
         return formChanged || imageChanged;
     };
 
-    // Handlers
-    const handleImageChange = (e) => { const file=e.target.files[0]; if(file){ const r=new FileReader(); r.onloadend=()=>setProfileImage(r.result); r.readAsDataURL(file); }};
-    const triggerFileInput = () => fileInputRef.current.click();
-    
+    // --- HANDLERS ---
     const handlePersonalChange = (e) => {
         const { name, value } = e.target;
         if (errors[name]) setErrors(prev => { const n={...prev}; delete n[name]; return n; });
+
         if (['firstName', 'middleName', 'lastName'].includes(name)) {
-            if (value===''||/^[a-zA-Z\s.-]+$/.test(value)) setFormData({...formData, [name]: toTitleCase(value)});
+            if (value === '' || /^[a-zA-Z\s.-]+$/.test(value)) {
+                setFormData(prev => ({ ...prev, [name]: toTitleCase(value) }));
+            }
             return;
         }
-        setFormData({ ...formData, [name]: value });
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handlePhoneChange = (e) => {
         const value = e.target.value.replace(/[^0-9]/g, '');
         if (value.length > 10) return;
-        if (errors.phone) setErrors(prev => ({...prev, phone: ''}));
+        if (errors.phone) setErrors(prev => { const n={...prev}; delete n.phone; return n; });
         setFormData({ ...formData, phone: value });
     };
 
+    const handleBlur = (e) => {
+        const { name, value } = e.target;
+        let newError = "";
+        switch (name) {
+            case 'email': if (value && !validateEmailFormat(value)) newError = "Invalid email domain"; break;
+            case 'phone': if (value && (value.length !== 10 || value[0] !== '9')) newError = "Invalid format"; break;
+            case 'firstName': case 'lastName': if (!value) newError = "Required"; break;
+            case 'birthdate':
+                if(!value) newError = "Required";
+                else {
+                    const t=new Date(); const b=new Date(value); let age=t.getFullYear()-b.getFullYear();
+                    if(t.getMonth()<b.getMonth() || (t.getMonth()===b.getMonth() && t.getDate()<b.getDate())) age--;
+                    if(age<18) newError="Min age 18";
+                }
+                break;
+            default: break;
+        }
+        if (newError) setErrors(prev => ({ ...prev, [name]: newError }));
+    };
+
+    const handleImageChange = (e) => { const f=e.target.files[0]; if(f){ const r=new FileReader(); r.onloadend=()=>setProfileImage(r.result); r.readAsDataURL(f); }};
+
     const handleAddressChange = (type, field, value) => {
+        const prefix = type === 'currentAddress' ? 'current' : 'permanent';
+        const errorKey = `${prefix}_${field}`;
+        if(errors[errorKey]) setErrors(prev=>{const n={...prev};delete n[errorKey];return n;});
         setFormData(prev => {
-            const updated = { ...prev[type], [field]: value };
-            if(field==='region'){updated.province='';updated.city='';updated.barangay='';}
-            else if(field==='province'){updated.city='';updated.barangay='';}
-            else if(field==='city'){updated.barangay='';}
-            if(type==='currentAddress'&&isSameAddress) return {...prev, currentAddress: updated, permanentAddress: updated};
-            return {...prev, [type]: updated};
+            const upd = { ...prev[type], [field]: value };
+            if(field==='region'){upd.province='';upd.city='';upd.barangay='';}
+            else if(field==='province'){upd.city='';upd.barangay='';}
+            else if(field==='city'){upd.barangay='';}
+            const newState = {...prev, [type]: upd};
+            if(isSameAddress && type==='currentAddress') newState.permanentAddress = upd;
+            return newState;
         });
     };
 
     const handleSameAddressToggle = (e) => {
         const checked = e.target.checked; setIsSameAddress(checked);
-        if(checked) setFormData(prev => ({...prev, permanentAddress: {...prev.currentAddress}}));
+        if (checked) { setFormData(prev => ({ ...prev, permanentAddress: prev.currentAddress })); } 
+        else { setFormData(prev => ({ ...prev, permanentAddress: { ...initialAddressState } })); }
     };
 
-    const validateForm = () => {
+    // --- VALIDATION (Gather Errors) ---
+    const getFormErrors = () => {
         let newErrors = {};
-        let isValid = true;
         const required = ['firstName', 'lastName', 'birthdate', 'email'];
-        required.forEach(f => { if(!formData[f]) { newErrors[f] = "Required"; isValid = false; }});
+        required.forEach(f => { if(!formData[f]) newErrors[f] = "Required"; });
 
-        if (!formData.phone) { newErrors.phone = "Required"; isValid = false; }
-        else if (formData.phone.length !== 10 || formData.phone[0] !== '9') { newErrors.phone = "Invalid format"; isValid = false; }
+        if(formData.phone && (formData.phone.length!==10 || formData.phone[0]!=='9')) newErrors.phone="Invalid format";
+        if(!formData.phone) newErrors.phone="Required";
+        if(formData.email && !validateEmailFormat(formData.email)) newErrors.email="Invalid domain";
         
-        if (formData.email && !validateEmail(formData.email)) { newErrors.email = "Invalid email"; isValid = false; }
-        if (formData.birthdate && getAge(formData.birthdate) < 18) { newErrors.birthdate = "Min age 18"; isValid = false; }
+        // Age Check
+        if(formData.birthdate) {
+            const t=new Date(); const b=new Date(formData.birthdate); let age=t.getFullYear()-b.getFullYear();
+            if(t.getMonth()<b.getMonth() || (t.getMonth()===b.getMonth() && t.getDate()<b.getDate())) age--;
+            if(age<18) newErrors.birthdate = "Min age 18";
+        }
 
-        const validateAddr = (addr, prefix) => {
+        const checkAddr = (addr, prefix) => {
             ['region', 'province', 'city', 'barangay', 'street', 'houseNumber'].forEach(f => {
-                if (!addr[f]) { newErrors[`${prefix}_${f}`] = "Required"; isValid = false; }
+                if(!addr[f]) newErrors[`${prefix}_${f}`] = "Required";
             });
         };
-        validateAddr(formData.currentAddress, 'current');
-        if (!isSameAddress) validateAddr(formData.permanentAddress, 'permanent');
+        checkAddr(formData.currentAddress, 'current');
+        if(!isSameAddress) checkAddr(formData.permanentAddress, 'permanent');
 
-        setErrors(newErrors);
-        return isValid;
+        return newErrors;
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!hasChanges()) return;
-        if (!validateForm()) return;
-        setShowConfirmModal(true);
+    // --- SAVE LOGIC ---
+    const handleSaveClick = async () => {
+        const currentErrors = getFormErrors();
+
+        // Check Duplicate Email (Server)
+        if (formData.email && !currentErrors.email) {
+            try {
+                // Pass excludeId to ignore own email
+                const res = await fetch('http://localhost:5000/api/check-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: formData.email, excludeId: id }) 
+                });
+                if (res.status === 409) {
+                    currentErrors.email = "Email already exists";
+                }
+            } catch (error) { console.error("Error checking email:", error); }
+        }
+
+        setErrors(currentErrors);
+
+        if (Object.keys(currentErrors).length > 0) {
+            const firstKey = Object.keys(currentErrors)[0];
+            const el = document.getElementsByName(firstKey)[0];
+            if(el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+            return;
+        }
+
+        setShowSaveModal(true);
     };
 
     const handleConfirmSave = async () => {
-        setShowConfirmModal(false);
-        const finalData = { 
-            ...formData, 
-            name: { first: formData.firstName, middle: formData.middleName, last: formData.lastName },
-            contactNumber: `+63${formData.phone}`, 
-            profileImage,
-            permanentAddress: isSameAddress ? formData.currentAddress : formData.permanentAddress
-        };
-
+        setShowSaveModal(false);
         try {
-            const response = await fetch(`http://localhost:5000/api/user/${id}`, {
+            const updatePayload = {
+                name: { first: formData.firstName, middle: formData.middleName, last: formData.lastName },
+                contactNumber: `+63${formData.phone}`, 
+                birthdate: formData.birthdate,
+                email: formData.email,
+                currentAddress: formData.currentAddress,
+                permanentAddress: isSameAddress ? formData.currentAddress : formData.permanentAddress,
+                profileImage
+            };
+
+            const res = await fetch(`http://localhost:5000/api/user/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(finalData),
+                body: JSON.stringify(updatePayload)
             });
-            const data = await response.json();
 
-            if (response.ok) {
-                if (data.message && data.message.includes("Re-activation")) {
-                    setModalMessage("Email updated! A new activation link has been sent.");
-                } else {
-                    setModalMessage("Secretary details updated successfully.");
-                }
+            const data = await res.json();
+
+            if (res.ok) {
                 setShowSuccessModal(true);
             } else {
-                alert(data.message || "Failed to update.");
+                if (res.status === 409) {
+                    setErrors(prev => ({ ...prev, [data.field]: data.message }));
+                    const el = document.getElementsByName(data.field)[0];
+                    if(el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+                } else alert("Failed to update.");
             }
-        } catch (error) { console.error("Error:", error); }
+        } catch (error) { console.error(error); }
     };
 
-    // Render Helpers (Simplified for brevity, standard address fields)
+    const handleCancelClick = () => {
+        if (hasChanges()) setShowCancelModal(true);
+        else navigate(-1);
+    };
+
+    const handleDiscardChanges = () => navigate(-1);
+
+    // FIX: Using isDisabled and address to match usages inside
     const renderAddressFields = (type, title, isDisabled = false) => {
-        const address = formData[type];
+        const address = formData[type]; // Fixed variable name
         const prefix = type === 'currentAddress' ? 'current' : 'permanent';
-        const availableProvinces = address.region ? provinces[address.region] || [] : [];
-        const availableCities = address.province ? cities[address.province] || [] : [];
-        const availableBarangays = address.city ? barangays[address.city] || [] : [];
+        
+        const availProvinces = address.region ? provinces[address.region] || [] : [];
+        const availCities = address.province ? cities[address.province] || [] : [];
+        const availBarangays = address.city ? barangays[address.city] || [] : [];
+        
         const getError = (field) => errors[`${prefix}_${field}`];
         const getErrorClass = (field) => getError(field) ? styles.errorBorder : '';
 
         return (
-            <div className={styles.addressSection}>
+            <div className={styles.addressBlock}>
                 <h3 className={styles.sectionTitle}>{title}</h3>
                 <div className={styles.row}>
                     <div className={styles.formGroup}>
-                        <label>REGION <span style={{color:'red'}}>*</span></label>
+                        <label>Region <span style={{color:'red'}}>*</span></label>
                         <select name={`${prefix}_region`} className={`${styles.inputField} ${getErrorClass('region')}`} value={address.region} onChange={(e)=>handleAddressChange(type,'region',e.target.value)} disabled={isDisabled}>
                             <option value="" hidden>Select Region</option>
                             {regions.map(r=><option key={r.code} value={r.code}>{r.name}</option>)}
                         </select>
+                        {getError('region') && <span className={styles.errorText}>{getError('region')}</span>}
                     </div>
                     <div className={styles.formGroup}>
-                        <label>PROVINCE <span style={{color:'red'}}>*</span></label>
+                        <label>Province <span style={{color:'red'}}>*</span></label>
                         <select name={`${prefix}_province`} className={`${styles.inputField} ${getErrorClass('province')}`} value={address.province} onChange={(e)=>handleAddressChange(type,'province',e.target.value)} disabled={isDisabled || !address.region}>
                             <option value="" hidden>Select Province</option>
-                            {availableProvinces.map(p=><option key={p.code} value={p.code}>{p.name}</option>)}
+                            {availProvinces.map(p=><option key={p.code} value={p.code}>{p.name}</option>)}
                         </select>
+                        {getError('province') && <span className={styles.errorText}>{getError('province')}</span>}
                     </div>
                 </div>
                 <div className={styles.row}>
                     <div className={styles.formGroup}>
-                        <label>CITY / MUNICIPALITY <span style={{color:'red'}}>*</span></label>
+                        <label>City / Municipality <span style={{color:'red'}}>*</span></label>
                         <select name={`${prefix}_city`} className={`${styles.inputField} ${getErrorClass('city')}`} value={address.city} onChange={(e)=>handleAddressChange(type,'city',e.target.value)} disabled={isDisabled || !address.province}>
                             <option value="" hidden>Select City</option>
-                            {availableCities.map(c=><option key={c.code} value={c.code}>{c.name}</option>)}
+                            {availCities.map(c=><option key={c.code} value={c.code}>{c.name}</option>)}
                         </select>
+                        {getError('city') && <span className={styles.errorText}>{getError('city')}</span>}
                     </div>
                     <div className={styles.formGroup}>
-                        <label>BARANGAY <span style={{color:'red'}}>*</span></label>
+                        <label>Barangay <span style={{color:'red'}}>*</span></label>
                         <select name={`${prefix}_barangay`} className={`${styles.inputField} ${getErrorClass('barangay')}`} value={address.barangay} onChange={(e)=>handleAddressChange(type,'barangay',e.target.value)} disabled={isDisabled || !address.city}>
                             <option value="" hidden>Select Barangay</option>
-                            {availableBarangays.map(b=><option key={b} value={b}>{b}</option>)}
+                            {availBarangays.map(b=><option key={b} value={b}>{b}</option>)}
                         </select>
+                        {getError('barangay') && <span className={styles.errorText}>{getError('barangay')}</span>}
                     </div>
                 </div>
-                 <div className={styles.row}>
+                <div className={styles.row}>
                     <div className={styles.formGroup}>
-                        <label>STREET <span style={{color:'red'}}>*</span></label>
-                        <input name={`${prefix}_street`} className={`${styles.inputField} ${getErrorClass('street')}`} value={address.street} onChange={(e)=>handleAddressChange(type,'street',e.target.value)} disabled={isDisabled} maxLength={100}/>
+                        <label>Street <span style={{color:'red'}}>*</span></label>
+                        <input name={`${prefix}_street`} className={`${styles.inputField} ${getErrorClass('street')}`} value={address.street} onChange={(e)=>handleAddressChange(type,'street',e.target.value)} disabled={isDisabled} />
+                        {getError('street') && <span className={styles.errorText}>{getError('street')}</span>}
                     </div>
                     <div className={styles.formGroup}>
-                        <label>HOUSE NO. <span style={{color:'red'}}>*</span></label>
-                        <input name={`${prefix}_houseNumber`} className={`${styles.inputField} ${getErrorClass('houseNumber')}`} value={address.houseNumber} onChange={(e)=>handleAddressChange(type,'houseNumber',e.target.value)} disabled={isDisabled} maxLength={20}/>
+                        <label>House No. <span style={{color:'red'}}>*</span></label>
+                        <input name={`${prefix}_houseNumber`} className={`${styles.inputField} ${getErrorClass('houseNumber')}`} value={address.houseNumber} onChange={(e)=>handleAddressChange(type,'houseNumber',e.target.value)} disabled={isDisabled} />
+                        {getError('houseNumber') && <span className={styles.errorText}>{getError('houseNumber')}</span>}
                     </div>
                 </div>
             </div>
         );
     };
 
-    if (isLoading) return <div className={styles.container}><p>Loading...</p></div>;
-    const isFormDirty = hasChanges();
+    if (loading) return <div className={styles.container}>Loading...</div>;
 
     return (
         <div className={styles.container}>
             <div className={styles.formCard}>
                 <div className={styles.header}>
-                    <h2>Edit <span className={styles.highlight}>Secretary</span></h2>
-                    <p>Update secretary account details.</p>
+                    <h2>Edit Secretary</h2>
+                    <p>Update secretary's personal and professional information.</p>
                 </div>
 
-                <form onSubmit={handleSubmit} noValidate>
-                    <div className={styles.uploadSection}>
-                        <div className={styles.imageWrapper} onClick={triggerFileInput}>
-                            {profileImage ? <img src={profileImage} alt="Profile" className={styles.previewImage} /> : <div className={styles.uploadPlaceholder}><span>No Image</span></div>}
+                <div className={styles.uploadSection}>
+                    <div className={styles.imageWrapper} onClick={() => fileInputRef.current.click()} style={{cursor: 'pointer'}}>
+                        {profileImage ? <img src={profileImage} alt="Profile" className={styles.previewImage} /> : <div className={styles.uploadPlaceholder}>Click to Upload</div>}
+                    </div>
+                    <input type="file" ref={fileInputRef} style={{display:'none'}} onChange={handleImageChange} accept="image/*" />
+                </div>
+
+                <div className={styles.mainSectionTitle}>Personal Information</div>
+                <div className={styles.row}>
+                    <div className={styles.formGroup}>
+                        <label>First Name (Max 50) <span style={{color:'red'}}>*</span></label>
+                        <input 
+                            className={`${styles.inputField} ${errors.firstName?styles.errorBorder:''}`} 
+                            name="firstName" 
+                            value={formData.firstName} 
+                            onChange={handlePersonalChange} 
+                            onBlur={handleBlur}
+                            maxLength={50}
+                        />
+                        {errors.firstName && <span className={styles.errorText}>{errors.firstName}</span>}
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label>Middle Name (Max 20)</label>
+                        <input 
+                            className={styles.inputField} 
+                            name="middleName" 
+                            value={formData.middleName} 
+                            onChange={handlePersonalChange} 
+                            maxLength={20}
+                        />
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label>Last Name (Max 20) <span style={{color:'red'}}>*</span></label>
+                        <input 
+                            className={`${styles.inputField} ${errors.lastName?styles.errorBorder:''}`} 
+                            name="lastName" 
+                            value={formData.lastName} 
+                            onChange={handlePersonalChange} 
+                            onBlur={handleBlur}
+                            maxLength={20}
+                        />
+                        {errors.lastName && <span className={styles.errorText}>{errors.lastName}</span>}
+                    </div>
+                </div>
+
+                <div className={styles.row}>
+                    <div className={styles.formGroup}>
+                        <label>Birthdate (18+ only) <span style={{color:'red'}}>*</span></label>
+                        <input 
+                            type="date" 
+                            className={`${styles.inputField} ${errors.birthdate?styles.errorBorder:''}`} 
+                            name="birthdate" 
+                            value={formData.birthdate} 
+                            onChange={handlePersonalChange} 
+                            onBlur={handleBlur}
+                            max={getMaxDate()} 
+                        />
+                        {errors.birthdate && <span className={styles.errorText}>{errors.birthdate}</span>}
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label>Phone Number <span style={{color:'red'}}>*</span></label>
+                        <div className={`${styles.phoneInputGroup} ${errors.phone?styles.errorBorder:''}`}>
+                            <span className={styles.phonePrefix}>+63</span>
+                            <input 
+                                className={styles.phoneField} 
+                                name="phone" 
+                                value={formData.phone} 
+                                onChange={handlePhoneChange} 
+                                onBlur={handleBlur}
+                                maxLength={10} 
+                                placeholder="9xxxxxxxxx"
+                            />
                         </div>
-                        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} style={{ display: 'none' }} />
+                        {errors.phone && <span className={styles.errorText}>{errors.phone}</span>}
                     </div>
+                </div>
 
-                    <h3 className={styles.mainSectionTitle}>Personal Information</h3>
-                    <div className={styles.row}>
-                        <div className={styles.formGroup}><label>FIRST NAME</label><input className={styles.inputField} name="firstName" value={formData.firstName} onChange={handlePersonalChange}/></div>
-                        <div className={styles.formGroup}><label>MIDDLE NAME</label><input className={styles.inputField} name="middleName" value={formData.middleName} onChange={handlePersonalChange}/></div>
-                        <div className={styles.formGroup}><label>LAST NAME</label><input className={styles.inputField} name="lastName" value={formData.lastName} onChange={handlePersonalChange}/></div>
+                <div className={styles.row}>
+                    <div className={styles.formGroup}>
+                        <label>Email Address <span style={{color:'red'}}>*</span></label>
+                        <input 
+                            className={`${styles.inputField} ${errors.email?styles.errorBorder:''}`} 
+                            name="email" 
+                            value={formData.email} 
+                            onChange={handlePersonalChange} 
+                            onBlur={handleBlur} 
+                        />
+                        {errors.email && <span className={styles.errorText}>{errors.email}</span>}
                     </div>
-                    <div className={styles.row}>
-                        <div className={styles.formGroup}><label>BIRTHDATE</label><input type="date" className={styles.inputField} name="birthdate" value={formData.birthdate} onChange={handlePersonalChange}/></div>
-                        <div className={styles.formGroup}><label>EMAIL (Changing resets account)</label><input type="email" className={styles.inputField} name="email" value={formData.email} onChange={handlePersonalChange}/></div>
-                    </div>
-                    <div className={styles.row}>
-                        <div className={styles.formGroup}><label>PHONE</label><div className={styles.phoneInputGroup}><span className={styles.phonePrefix}>+63</span><input className={styles.phoneField} name="phone" value={formData.phone} onChange={handlePhoneChange}/></div></div>
-                    </div>
+                </div>
 
-                    <hr className={styles.divider} />
-                    {renderAddressFields('currentAddress', 'Current Address')}
-                    <div className={styles.permanentHeader}><h3 className={styles.sectionTitle}>Permanent Address</h3><div className={styles.checkboxContainer}><input type="checkbox" id="sameAddress" checked={isSameAddress} onChange={handleSameAddressToggle} /><label htmlFor="sameAddress">Same as Current</label></div></div>
-                    {isSameAddress ? <div className={styles.disabledOverlay}>{renderAddressFields('permanentAddress', '', true)}</div> : renderAddressFields('permanentAddress', '')}
+                <hr className={styles.divider} />
+                {renderAddressFields('currentAddress', 'Current Address')}
+                <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center' }}><input type="checkbox" id="sameAddress" checked={isSameAddress} onChange={handleSameAddressToggle} style={{ width: '18px', height: '18px', marginRight: '10px', accentColor: '#005466' }} /><label htmlFor="sameAddress" style={{ fontSize: '14px', color: '#555', fontWeight: '500', cursor: 'pointer' }}>Permanent address is same as current address</label></div>
+                {renderAddressFields('permanentAddress', 'Permanent Address', isSameAddress)}
 
-                    <div className={styles.buttonGroup}>
-                        <button type="button" className={styles.cancelBtn} onClick={() => navigate('/owner/manage-secretaries')}>CANCEL</button>
-                        <button type="submit" className={isFormDirty ? styles.submitBtn : styles.disabledBtn} disabled={!isFormDirty}>SAVE CHANGES</button>
-                    </div>
-                </form>
+                <div className={styles.buttonGroup}>
+                    <button className={`${styles.actionBtn} ${styles.backBtn}`} onClick={handleCancelClick}>Cancel</button>
+                    <button className={`${styles.actionBtn} ${styles.editBtn} ${!hasChanges() ? styles.disabledBtn : ''}`} onClick={handleSaveClick} disabled={!hasChanges()}>Save Changes</button>
+                </div>
             </div>
 
-            {showConfirmModal && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalCard}>
-                        <h3 className={styles.modalTitle}>Save Changes?</h3>
-                        <p className={styles.modalMessage}>Are you sure you want to save changes?</p>
-                        <div className={styles.modalActions}>
-                            <button className={styles.modalCancelBtn} onClick={() => setShowConfirmModal(false)}>Cancel</button>
-                            <button className={styles.modalSubmitBtn} onClick={handleConfirmSave}>Yes, Save</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {showSuccessModal && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalCard}>
-                        <img src={successIcon} alt="Success" className={styles.modalIcon} />
-                        <h3 className={styles.modalTitle}>Success!</h3>
-                        <p className={styles.modalMessage}>{modalMessage}</p>
-                        <button className={styles.closeLink} onClick={() => navigate('/owner/manage-secretaries')}>Back to List</button>
-                    </div>
-                </div>
-            )}
+            {showSaveModal && (<div className={styles.modalOverlay}><div className={styles.modalCard}><img src={warningIcon} className={styles.modalIcon} /><h3>Save Changes?</h3><p>Update secretary's information?</p><div className={styles.modalActions}><button className={styles.modalCancelBtn} onClick={() => setShowSaveModal(false)}>No</button><button className={styles.modalDeleteBtn} onClick={handleConfirmSave} style={{backgroundColor: '#005466'}}>Yes, Save</button></div></div></div>)}
+            {showCancelModal && (<div className={styles.modalOverlay}><div className={styles.modalCard}><img src={warningIcon} className={styles.modalIcon} /><h3>Discard Changes?</h3><p>Unsaved changes will be lost.</p><div className={styles.modalActions}><button className={styles.modalCancelBtn} onClick={() => setShowCancelModal(false)}>No</button><button className={styles.modalDeleteBtn} onClick={handleDiscardChanges} style={{backgroundColor: '#c62828'}}>Yes, Discard</button></div></div></div>)}
+            {showSuccessModal && (<div className={styles.modalOverlay}><div className={styles.modalCard}><img src={successIcon} className={styles.modalIcon} /><h3>Success!</h3><button className={styles.closeLink} onClick={() => navigate(-1)}>Back to Profile</button></div></div>)}
         </div>
     );
 }

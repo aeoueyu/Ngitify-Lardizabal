@@ -8,15 +8,13 @@ export default function AddSecretaryPage() {
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
     
-    // States
     const [isSameAddress, setIsSameAddress] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [errors, setErrors] = useState({}); // Field-specific errors
+    const [errors, setErrors] = useState({}); 
 
-    // Initial State
-    const initialAddressState = {
-        country: 'Philippines', region: '', province: '', city: '', barangay: '', houseNumber: '', street: ''
+    const initialAddressState = { 
+        country: 'Philippines', region: '', province: '', city: '', barangay: '', houseNumber: '', street: '' 
     };
 
     const [formData, setFormData] = useState({
@@ -26,19 +24,53 @@ export default function AddSecretaryPage() {
         permanentAddress: { ...initialAddressState }
     });
 
-    // Helpers
-    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    // --- HELPERS ---
+    const validateEmailFormat = (email) => {
+        const formatRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!formatRegex.test(email)) return false;
+        const allowedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'live.com'];
+        const domain = email.split('@')[1].toLowerCase();
+        return allowedDomains.includes(domain);
+    };
+
     const toTitleCase = (str) => str.toLowerCase().replace(/(?:^|\s|-|\.)\S/g, (char) => char.toUpperCase());
-    const getAge = (d) => { const today=new Date(); const birth=new Date(d); let age=today.getFullYear()-birth.getFullYear(); const m=today.getMonth()-birth.getMonth(); if(m<0||(m===0&&today.getDate()<birth.getDate()))age--; return age; };
     const getMaxDate = () => { const t=new Date(); t.setFullYear(t.getFullYear()-18); return t.toISOString().split('T')[0]; };
 
-    // Handlers
-    const handleImageChange = (e) => { const file=e.target.files[0]; if(file){ const r=new FileReader(); r.onloadend=()=>setProfileImage(r.result); r.readAsDataURL(file); }};
+    // --- REALTIME VALIDATION (ON BLUR) ---
+    const handleBlur = (e) => {
+        const { name, value } = e.target;
+        let newError = "";
+
+        switch (name) {
+            case 'email':
+                if (!value) newError = "Required";
+                else if (!validateEmailFormat(value)) newError = "Invalid email domain (e.g. gmail.com)";
+                break;
+            case 'phone':
+                if (!value) newError = "Required";
+                else if (value.length !== 10 || value[0] !== '9') newError = "Invalid format (9xxxxxxxxx)";
+                break;
+            case 'firstName':
+            case 'lastName':
+            case 'birthdate':
+                if (!value) newError = "Required";
+                break;
+            default: break;
+        }
+        setErrors(prev => ({ ...prev, [name]: newError }));
+    };
+
+    // --- HANDLERS ---
+    const handleImageChange = (e) => { 
+        const file=e.target.files[0]; 
+        if(file){ const r=new FileReader(); r.onloadend=()=>setProfileImage(r.result); r.readAsDataURL(file); }
+    };
     const triggerFileInput = () => fileInputRef.current.click();
 
     const handlePersonalChange = (e) => {
         const { name, value } = e.target;
         if (errors[name]) setErrors(prev => { const n={...prev}; delete n[name]; return n; });
+
         if (['firstName', 'middleName', 'lastName'].includes(name)) {
             if (value===''||/^[a-zA-Z\s.-]+$/.test(value)) setFormData({...formData, [name]: toTitleCase(value)});
             return;
@@ -49,7 +81,7 @@ export default function AddSecretaryPage() {
     const handlePhoneChange = (e) => {
         const value = e.target.value.replace(/[^0-9]/g, '');
         if (value.length > 10) return;
-        if (errors.phone) setErrors(prev => ({...prev, phone: ''}));
+        if (errors.phone) setErrors(prev => { const n={...prev}; delete n.phone; return n; });
         setFormData({ ...formData, phone: value });
     };
 
@@ -76,45 +108,79 @@ export default function AddSecretaryPage() {
         }
     };
 
-    const validateForm = () => {
+    // --- GET FORM ERRORS (Synchronous) ---
+    const getFormErrors = () => {
         let newErrors = {};
-        let isValid = true;
-        const required = ['firstName', 'lastName', 'birthdate', 'email'];
-        required.forEach(f => { if(!formData[f]) { newErrors[f] = "Required"; isValid = false; }});
+        const required = ['firstName', 'lastName', 'birthdate', 'email', 'phone'];
+        required.forEach(f => { if(!formData[f]) newErrors[f] = "Required"; });
 
-        if(!formData.phone) { newErrors.phone="Required"; isValid=false; }
-        else if(formData.phone.length!==10 || formData.phone[0]!=='9') { newErrors.phone="Invalid format"; isValid=false; }
+        if(formData.phone && (formData.phone.length!==10 || formData.phone[0]!=='9')) { newErrors.phone="Invalid format"; }
+        if(formData.email && !validateEmailFormat(formData.email)) { newErrors.email = "Invalid domain"; }
         
-        if(formData.email && !validateEmail(formData.email)) { newErrors.email="Invalid email"; isValid=false; }
-        if(formData.birthdate && getAge(formData.birthdate)<18) { newErrors.birthdate="Min age 18"; isValid=false; }
+        // Age Check
+        const today = new Date();
+        const birth = new Date(formData.birthdate);
+        let age = today.getFullYear() - birth.getFullYear();
+        if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) age--;
+        if(formData.birthdate && age < 18) { newErrors.birthdate = "Min age 18"; }
 
+        // Address
         const validateAddr = (addr, prefix) => {
             ['region', 'province', 'city', 'barangay', 'street', 'houseNumber'].forEach(f => {
-                if(!addr[f]) { newErrors[`${prefix}_${f}`]="Required"; isValid=false; }
+                if(!addr[f]) newErrors[`${prefix}_${f}`] = "Required"; 
             });
         };
         validateAddr(formData.currentAddress, 'current');
         if(!isSameAddress) validateAddr(formData.permanentAddress, 'permanent');
 
-        setErrors(newErrors);
-        
-        if (!isValid) {
-            const firstKey = Object.keys(newErrors)[0];
-            const el = document.getElementsByName(firstKey)[0];
-            if(el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
-        }
-        return isValid;
+        return newErrors;
     };
 
+    // --- SUBMIT WITH EMAIL CHECK ---
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validateForm()) return;
+        
+        // 1. Get Client-Side Errors
+        const currentErrors = getFormErrors();
 
+        // 2. Check Duplicate Email (Server-Side)
+        // Only run if email is not empty and has valid format
+        if (formData.email && !currentErrors.email) {
+            try {
+                const res = await fetch('http://localhost:5000/api/check-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: formData.email })
+                });
+                if (res.status === 409) {
+                    currentErrors.email = "Email already exists";
+                }
+            } catch (error) {
+                console.error("Error checking email:", error);
+            }
+        }
+
+        // 3. Update Errors State
+        setErrors(currentErrors);
+
+        // 4. Stop if any errors found
+        if (Object.keys(currentErrors).length > 0) {
+            const firstKey = Object.keys(currentErrors)[0];
+            const el = document.getElementsByName(firstKey)[0];
+            if(el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+            return;
+        }
+
+        // 5. Submit Data
         const finalData = {
-            ...formData,
             name: { first: formData.firstName, middle: formData.middleName, last: formData.lastName },
+            email: formData.email,
             contactNumber: `+63${formData.phone}`,
-            profileImage 
+            birthdate: formData.birthdate,
+            role: 'secretary',
+            profileImage: profileImage,
+            currentAddress: formData.currentAddress,
+            permanentAddress: isSameAddress ? formData.currentAddress : formData.permanentAddress
         };
 
         try {
@@ -129,6 +195,7 @@ export default function AddSecretaryPage() {
             if (response.ok) {
                 setShowSuccessModal(true);
             } else {
+                // Fallback for race conditions
                 if (response.status === 409) {
                     setErrors(prev => ({ ...prev, [data.field]: data.message }));
                     const el = document.getElementsByName(data.field)[0];
@@ -143,13 +210,12 @@ export default function AddSecretaryPage() {
         }
     };
 
-    // Helper for address fields (Standardized)
     const renderAddressFields = (type, title, isDisabled = false) => {
         const address = formData[type];
         const prefix = type === 'currentAddress' ? 'current' : 'permanent';
-        const availableProvinces = address.region ? provinces[address.region] || [] : [];
-        const availableCities = address.province ? cities[address.province] || [] : [];
-        const availableBarangays = address.city ? barangays[address.city] || [] : [];
+        const availProvinces = address.region ? provinces[address.region] || [] : [];
+        const availCities = address.province ? cities[address.province] || [] : [];
+        const availBarangays = address.city ? barangays[address.city] || [] : [];
         const getError = (field) => errors[`${prefix}_${field}`];
         const getErrorClass = (field) => getError(field) ? styles.errorBorder : '';
 
@@ -169,7 +235,7 @@ export default function AddSecretaryPage() {
                         <label>PROVINCE <span style={{color:'red'}}>*</span></label>
                         <select name={`${prefix}_province`} className={`${styles.inputField} ${getErrorClass('province')}`} value={address.province} onChange={(e)=>handleAddressChange(type,'province',e.target.value)} disabled={isDisabled || !address.region}>
                             <option value="" hidden>Select Province</option>
-                            {availableProvinces.map(p=><option key={p.code} value={p.code}>{p.name}</option>)}
+                            {availProvinces.map(p=><option key={p.code} value={p.code}>{p.name}</option>)}
                         </select>
                         {getError('province') && <span className={styles.errorText}>{getError('province')}</span>}
                     </div>
@@ -179,7 +245,7 @@ export default function AddSecretaryPage() {
                         <label>CITY / MUNICIPALITY <span style={{color:'red'}}>*</span></label>
                         <select name={`${prefix}_city`} className={`${styles.inputField} ${getErrorClass('city')}`} value={address.city} onChange={(e)=>handleAddressChange(type,'city',e.target.value)} disabled={isDisabled || !address.province}>
                             <option value="" hidden>Select City</option>
-                            {availableCities.map(c=><option key={c.code} value={c.code}>{c.name}</option>)}
+                            {availCities.map(c=><option key={c.code} value={c.code}>{c.name}</option>)}
                         </select>
                         {getError('city') && <span className={styles.errorText}>{getError('city')}</span>}
                     </div>
@@ -187,7 +253,7 @@ export default function AddSecretaryPage() {
                         <label>BARANGAY <span style={{color:'red'}}>*</span></label>
                         <select name={`${prefix}_barangay`} className={`${styles.inputField} ${getErrorClass('barangay')}`} value={address.barangay} onChange={(e)=>handleAddressChange(type,'barangay',e.target.value)} disabled={isDisabled || !address.city}>
                             <option value="" hidden>Select Barangay</option>
-                            {availableBarangays.map(b=><option key={b} value={b}>{b}</option>)}
+                            {availBarangays.map(b=><option key={b} value={b}>{b}</option>)}
                         </select>
                         {getError('barangay') && <span className={styles.errorText}>{getError('barangay')}</span>}
                     </div>
@@ -213,7 +279,7 @@ export default function AddSecretaryPage() {
             <div className={styles.formCard}>
                 <div className={styles.header}>
                     <h2>Add New <span className={styles.highlight}>Secretary</span></h2>
-                    <p>Enter the secretary's personal details below.</p>
+                    <p>Enter the secretary's personal and professional details below.</p>
                 </div>
 
                 <form onSubmit={handleSubmit} noValidate>
@@ -225,17 +291,91 @@ export default function AddSecretaryPage() {
                     </div>
 
                     <h3 className={styles.mainSectionTitle}>Personal Information</h3>
+                    
                     <div className={styles.row}>
-                        <div className={styles.formGroup}><label>FIRST NAME <span style={{color:'red'}}>*</span></label><input className={`${styles.inputField} ${errors.firstName?styles.errorBorder:''}`} name="firstName" value={formData.firstName} onChange={handlePersonalChange} maxLength={50}/>{errors.firstName && <span className={styles.errorText}>{errors.firstName}</span>}</div>
-                        <div className={styles.formGroup}><label>MIDDLE NAME</label><input className={styles.inputField} name="middleName" value={formData.middleName} onChange={handlePersonalChange} maxLength={50}/></div>
-                        <div className={styles.formGroup}><label>LAST NAME <span style={{color:'red'}}>*</span></label><input className={`${styles.inputField} ${errors.lastName?styles.errorBorder:''}`} name="lastName" value={formData.lastName} onChange={handlePersonalChange} maxLength={50}/>{errors.lastName && <span className={styles.errorText}>{errors.lastName}</span>}</div>
+                        <div className={styles.formGroup}>
+                            <label>FIRST NAME <span style={{color:'red'}}>*</span></label>
+                            <input 
+                                className={`${styles.inputField} ${errors.firstName?styles.errorBorder:''}`} 
+                                name="firstName" 
+                                value={formData.firstName} 
+                                onChange={handlePersonalChange} 
+                                onBlur={handleBlur}
+                                maxLength={50}
+                            />
+                            {errors.firstName && <span className={styles.errorText}>{errors.firstName}</span>}
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>MIDDLE NAME</label>
+                            <input 
+                                className={styles.inputField} 
+                                name="middleName" 
+                                value={formData.middleName} 
+                                onChange={handlePersonalChange} 
+                                maxLength={20}
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>LAST NAME <span style={{color:'red'}}>*</span></label>
+                            <input 
+                                className={`${styles.inputField} ${errors.lastName?styles.errorBorder:''}`} 
+                                name="lastName" 
+                                value={formData.lastName} 
+                                onChange={handlePersonalChange} 
+                                onBlur={handleBlur}
+                                maxLength={20}
+                            />
+                            {errors.lastName && <span className={styles.errorText}>{errors.lastName}</span>}
+                        </div>
                     </div>
+                    
                     <div className={styles.row}>
-                        <div className={styles.formGroup}><label>BIRTHDATE <span style={{color:'red'}}>*</span></label><input type="date" className={`${styles.inputField} ${errors.birthdate?styles.errorBorder:''}`} name="birthdate" value={formData.birthdate} onChange={handlePersonalChange} max={getMaxDate()}/>{errors.birthdate && <span className={styles.errorText}>{errors.birthdate}</span>}</div>
-                        <div className={styles.formGroup}><label>EMAIL ADDRESS <span style={{color:'red'}}>*</span></label><input type="email" className={`${styles.inputField} ${errors.email ? styles.errorBorder : ''}`} name="email" value={formData.email} onChange={handlePersonalChange} maxLength={100}/>{errors.email && <span className={styles.errorText}>{errors.email}</span>}</div>
+                        <div className={styles.formGroup}>
+                            <label>BIRTHDATE <span style={{color:'red'}}>*</span></label>
+                            <input 
+                                type="date" 
+                                className={`${styles.inputField} ${errors.birthdate?styles.errorBorder:''}`} 
+                                name="birthdate" 
+                                value={formData.birthdate} 
+                                onChange={handlePersonalChange} 
+                                onBlur={handleBlur}
+                                max={getMaxDate()}
+                            />
+                            {errors.birthdate && <span className={styles.errorText}>{errors.birthdate}</span>}
+                        </div>
+                        
+                        <div className={styles.formGroup}>
+                            <label>PHONE NUMBER <span style={{color:'red'}}>*</span></label>
+                            <div className={`${styles.phoneInputGroup} ${errors.phone ? styles.errorBorder : ''}`}>
+                                <span className={styles.phonePrefix}>+63</span>
+                                <input 
+                                    className={styles.phoneField} 
+                                    name="phone" 
+                                    value={formData.phone} 
+                                    onChange={handlePhoneChange} 
+                                    onBlur={handleBlur}
+                                    maxLength={10} 
+                                    placeholder="9xxxxxxxxx"
+                                />
+                            </div>
+                            {errors.phone && <span className={styles.errorText}>{errors.phone}</span>}
+                        </div>
                     </div>
+
                     <div className={styles.row}>
-                        <div className={styles.formGroup}><label>PHONE NUMBER <span style={{color:'red'}}>*</span></label><div className={styles.phoneInputGroup}><span className={styles.phonePrefix}>+63</span><input className={`${styles.phoneField} ${errors.phone?styles.errorBorder:''}`} name="phone" value={formData.phone} onChange={handlePhoneChange} maxLength={10} placeholder="9xxxxxxxxx"/></div>{errors.phone && <span className={styles.errorText}>{errors.phone}</span>}</div>
+                        <div className={styles.formGroup}>
+                            <label>EMAIL ADDRESS <span style={{color:'red'}}>*</span></label>
+                            <input 
+                                type="email" 
+                                className={`${styles.inputField} ${errors.email ? styles.errorBorder : ''}`} 
+                                name="email" 
+                                value={formData.email} 
+                                onChange={handlePersonalChange} 
+                                onBlur={handleBlur} 
+                                maxLength={100}
+                            />
+                            {errors.email && <span className={styles.errorText}>{errors.email}</span>}
+                        </div>
                     </div>
 
                     <hr className={styles.divider} />

@@ -186,35 +186,49 @@ select.inputField {
 .phoneInputGroup {
     display: flex;
     align-items: center;
-    border: 1.5px solid #ddd;
+    border: 1.5px solid #e0e0e0;
     border-radius: 50px;
-    padding: 0 20px;
-    background-color: #fcfcfc;
-    transition: all 0.3s ease;
+    overflow: hidden;
+    transition: all 0.3s;
+    background-color: white; 
 }
 
 .phoneInputGroup:focus-within {
     border-color: #005466;
-    box-shadow: 0 0 0 4px rgba(0, 84, 102, 0.1);
-    background-color: white;
+    box-shadow: 0 0 0 3px rgba(0, 84, 102, 0.1);
 }
 
+/* Phone Group Error State (Container ang mag-iiba ng kulay) */
+.phoneInputGroup.errorBorder {
+    border-color: #dc3545 !important;
+    background-color: #ffe6e6 !important;
+}
+
+/* Prefix (+63) - Transparent background para lumitaw ang pula ng container */
 .phonePrefix {
     color: #555;
-    font-weight: 700;
-    margin-right: 10px;
+    padding: 12px 15px;
     font-size: 14px;
+    font-weight: 600;
+    border-right: 1px solid #e0e0e0;
     user-select: none;
+    background-color: rgba(248, 249, 250, 0.5); /* Semi-transparent */
 }
 
+/* Phone Field - Transparent background para lumitaw ang pula ng container */
 .phoneField {
+    flex: 1;
     border: none;
-    background: transparent;
-    width: 100%;
-    height: 45px;
+    padding: 12px 15px;
+    font-size: 14px;
     outline: none;
     font-family: 'Lexend Deca', sans-serif;
-    font-size: 14px;
+    color: #333;
+    background-color: transparent !important; /* IMPORTANT para makita ang background color */
+}
+
+.phoneField::placeholder {
+    color: #ccc;
 }
 
 /* Password Rules Container */
@@ -269,16 +283,21 @@ select.inputField {
 }
 
 .errorBorder {
-    border: 1px solid #d32f2f !important; /* Force red border */
-    background-color: #fff8f8;
+    border: 1.5px solid #dc3545 !important; /* Red Border */
+    background-color: #ffe6e6 !important;   /* Light Red Background */
+    transition: all 0.2s ease;
 }
 
+/* Error Text Message */
 .errorText {
-    color: #d32f2f;
-    font-size: 12px;
+    color: #dc3545;
+    font-size: 11px;
+    font-weight: 600;
     margin-top: 4px;
-    display: block;
-    font-weight: 500;
+    margin-left: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 /* Address & Checkbox */
@@ -449,6 +468,15 @@ select.inputField {
 /* --- ADDITIONAL STYLES FOR PATIENT & GUARDIAN --- */
 
 /* Guardian Alert Box (Yellow Box) */
+
+.guardianSection {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ffe082;
+    border-radius: 12px;
+    background-color: #fff8e1; /* Light yellow warning bg */
+}
+
 .guardianAlert {
     background-color: #fff8e1;
     border: 1px solid #ffe082;
@@ -468,6 +496,10 @@ select.inputField {
     gap: 10px;
 }
 
+.medicalSection {
+    margin-top: 30px;
+}
+
 /* Checkbox Grid System (Medical History) */
 .checkboxGroupLabel {
     display: block;
@@ -479,11 +511,11 @@ select.inputField {
 
 .checkboxGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Responsive Grid */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive columns */
     gap: 12px;
     background-color: #f8f9fa;
     padding: 15px;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid #eee;
 }
 
@@ -491,9 +523,9 @@ select.inputField {
     display: flex;
     align-items: center;
     font-size: 13px;
-    color: #333;
+    color: #444;
     cursor: pointer;
-    transition: all 0.2s;
+    font-weight: 500;
 }
 
 .checkboxItem:hover {
@@ -503,8 +535,8 @@ select.inputField {
 .checkboxInput {
     width: 16px;
     height: 16px;
-    margin-right: 10px;
-    accent-color: #005466; /* Teal color check */
+    margin-right: 8px;
+    accent-color: #005466; /* Teal color */
     cursor: pointer;
 }
 

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from '../../styles/security/NewPasswordPage.module.css';
 import logo from '../../assets/logo-greenpink.svg';
-import bgElement from '../../assets/bg-element.svg';
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function NewPasswordPage() {

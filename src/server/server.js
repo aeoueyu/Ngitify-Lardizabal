@@ -456,4 +456,30 @@ app.get('/api/audit-logs', async (req, res) => {
     }
 });
 
+// ... (sa loob ng src/server/server.js, bago ang app.listen)
+
+// --- CHECK EMAIL AVAILABILITY ROUTE ---
+app.post('/api/check-email', async (req, res) => {
+    try {
+        const { email, excludeId } = req.body;
+        
+        // Gumawa ng query: Hanapin ang email, pero ibukod ang current user kung nag-eedit (excludeId)
+        const query = { email: email };
+        if (excludeId) {
+            query._id = { $ne: excludeId };
+        }
+
+        const user = await User.findOne(query);
+        
+        if (user) {
+            return res.status(409).json({ message: "Email already exists" });
+        }
+        
+        return res.status(200).json({ message: "Email available" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error checking email" });
+    }
+});
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
