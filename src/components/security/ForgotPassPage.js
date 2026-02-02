@@ -26,8 +26,8 @@ export default function ForgotPassPage() {
 
     return (
         <div className={styles['main-container']}>
-            <img src={logo} alt='Lardizabal Dental Clinic' className={styles['logo']}/>
             <div className={styles['container']}>
+                <img src={logo} alt='Lardizabal Dental Clinic' className={styles['logo']}/>
                 <div className={styles['page-title']}>
                     <p className={styles['forgotpass-title']}>Forgot Password?</p>
                 </div>
