@@ -9,6 +9,7 @@ import usersIcon from '../../assets/sidebar-icons/users.svg';
 import settingsIcon from '../../assets/sidebar-icons/settings.svg';
 import warningIcon from '../../assets/alert-icons/warning.svg'; 
 import patientSideIcon from '../../assets/icons/patient.svg'; 
+import auditIcon from '../../assets/sidebar-icons/audit.svg';
 
 export default function Sidebar() {
     const navigate = useNavigate();
@@ -130,6 +131,18 @@ export default function Sidebar() {
                                     </li>
                                 </ul>
                             </div>
+                            <li 
+                                className={`${styles.navItem} ${isActive('/owner/audit-logs') ? styles.active : ''}`}
+                                onClick={() => navigate('/owner/audit-logs')}
+                            >
+                                <div className={styles.navHeader}>
+                                    <div className={styles.navLabel}>
+                                        {/* Palitan mo ng tamang path sa icon mo */}
+                                        <img src={auditIcon} alt="Audit Logs" className={styles.icon} />
+                                        <span>Audit Logs</span>
+                                    </div>
+                                </div>
+                            </li>
                         </>
                     )}
 

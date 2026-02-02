@@ -21,6 +21,7 @@ import OwnerDashboard from './components/dashboards/OwnerDashboard';
 import DentistDashboard from './components/dashboards/DentistDashboard';
 import SecretaryDashboard from './components/dashboards/SecretaryDashboard';
 import PatientDashboard from './components/dashboards/PatientDashboard';
+import AuditLogsPage from './components/audit-logs/AuditLogsPage';
 
 // --- USER MANAGEMENT ---
 import ManageDentists from './components/user-management/ManageDentists';
@@ -91,6 +92,8 @@ function App() {
             <Route path="/owner/add-patient" element={<AddPatientPage />} />
             <Route path="/owner/edit-patient/:id" element={<EditPatientPage />} />
             <Route path="/owner/view-patient/:id" element={<ViewPatientPage />} />
+
+            <Route path="/owner/audit-logs" element={<AuditLogsPage />} />
 
             {/* OWNER SETTINGS (Split Routes) */}
             <Route path="/owner/settings" element={<Navigate to="/owner/settings/personal" replace />} />

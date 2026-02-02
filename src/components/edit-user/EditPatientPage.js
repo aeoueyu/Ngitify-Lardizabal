@@ -327,7 +327,6 @@ export default function EditPatientPage() {
             {showConfirmModal && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalCard}>
-                        <img src={warningIcon} alt="Warning" className={styles.modalIcon} />
                         <h3 className={styles.modalTitle}>Save Changes?</h3>
                         <p className={styles.modalMessage}>Are you sure you want to save changes?</p>
                         <div className={styles.modalActions}>

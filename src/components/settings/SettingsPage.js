@@ -483,7 +483,7 @@ export default function SettingsPage({ section }) {
             </div>
 
             {/* MODALS */}
-            {showConfirmModal && (<div className={styles.modalOverlay}><div className={styles.modalCard}><img src={warningIcon} alt="Warning" className={styles.modalIcon} /><h3>Save Changes?</h3><p style={{color:'#666'}}>Are you sure you want to update your profile?</p><div className={styles.modalActions}><button className={styles.cancelBtn} onClick={() => setShowConfirmModal(false)}>Cancel</button><button className={styles.saveBtn} onClick={handleSaveInfo}>Yes, Save</button></div></div></div>)}
+            {showConfirmModal && (<div className={styles.modalOverlay}><div className={styles.modalCard}><h3>Save Changes?</h3><p style={{color:'#666'}}>Are you sure you want to update your profile?</p><div className={styles.modalActions}><button className={styles.cancelBtn} onClick={() => setShowConfirmModal(false)}>Cancel</button><button className={styles.saveBtn} onClick={handleSaveInfo}>Yes, Save</button></div></div></div>)}
             {showSuccessModal && (<div className={styles.modalOverlay}><div className={styles.modalCard}><img src={successIcon} alt="Success" className={styles.modalIcon} /><h3>Success!</h3><p style={{color:'#666'}}>{modalMessage}</p><button className={styles.closeLink} onClick={() => setShowSuccessModal(false)}>Close</button></div></div>)}
         </div>
     );

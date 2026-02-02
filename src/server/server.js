@@ -10,6 +10,7 @@ const crypto = require('crypto');
 
 // Import Model
 const User = require('../models/User'); 
+const AuditLog = require('../models/AuditLog'); // Import the new model
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -41,25 +42,31 @@ app.post('/api/login', async (req, res) => {
         const { email, password, role } = req.body;
         
         const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ message: "User not found." });
+        if (!user) return res.status(404).json({ message: "Invalid email and password" });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ message: "Invalid credentials." });
+        if (!isMatch) return res.status(400).json({ message: "Invalid email and password" });
 
-        if (user.role !== role) return res.status(403).json({ message: "Unauthorized role access." });
+        if (user.role !== role) return res.status(403).json({ message: "Invalid email and password" });
 
         if (!user.isVerified) {
-            return res.status(403).json({ message: "Please verify your email before logging in." });
+            return res.status(403).json({ message: "Invalid email and password" });
         }
 
         if (user.status === 'inactive') {
-            return res.status(403).json({ message: "This account is inactive. Please contact Admin." });
+            return res.status(403).json({ message: "Invalid email and password" });
         }
 
         const secretKey = process.env.JWT_SECRET || 'ngitify_secret_key_default';
         const token = jwt.sign({ id: user._id, role: user.role }, secretKey, { expiresIn: '1h' });
 
-        console.log(`[AUDIT] User ${email} logged in at ${new Date().toISOString()}`);
+        // AUDIT LOGGING (SAVED TO DB)
+        await AuditLog.create({
+            action: "LOGIN",
+            user: user.email,
+            role: user.role,
+            details: `User logged in successfully.`
+        });
 
         res.json({ 
             token, 
@@ -272,7 +279,12 @@ app.put('/api/user/toggle-status/:id', async (req, res) => {
         user.status = status;
         await user.save();
 
-        console.log(`[AUDIT] User ${id} status changed to ${status} at ${new Date().toISOString()}`);
+        await AuditLog.create({
+            action: "STATUS_CHANGE",
+            user: "ADMIN", // Or pass the actual admin email from frontend if available
+            role: "owner",
+            details: `Changed status of user ${user.email} to ${status}`
+        });
 
         res.json({ message: `User marked as ${status}.`, user });
     } catch (error) {
@@ -280,6 +292,7 @@ app.put('/api/user/toggle-status/:id', async (req, res) => {
         res.status(500).json({ message: "Server error." });
     }
 });
+
 
 // --- UPDATE USER (Re-activation logic) ---
 app.put('/api/user/:id', async (req, res) => {
@@ -429,6 +442,17 @@ app.post('/api/verify-password', async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ message: "Server error." });
+    }
+});
+
+// --- GET AUDIT LOGS ---
+app.get('/api/audit-logs', async (req, res) => {
+    try {
+        // Sort by newest first
+        const logs = await AuditLog.find().sort({ timestamp: -1 });
+        res.json(logs);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching logs." });
     }
 });
 
