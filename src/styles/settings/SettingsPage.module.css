@@ -176,6 +176,7 @@
 .invalid { color: #ccc; font-size: 12px; }
 .errorText { color: #dc3545; font-size: 12px; font-weight: 600; margin-top: 5px; animation: fadeIn 0.3s ease; }
 
+
 .inputError {
     border-color: #dc3545 !important;
     background-color: #fff8f8 !important;

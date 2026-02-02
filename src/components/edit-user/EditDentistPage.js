@@ -484,10 +484,7 @@ export default function EditDentistPage() {
 
                 <hr className={styles.divider} />
                 {renderAddressFields('currentAddress', 'Current Address')}
-                <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center' }}>
-                    <input type="checkbox" id="sameAddress" checked={isSameAddress} onChange={handleSameAddressToggle} style={{ width: '18px', height: '18px', marginRight: '10px', accentColor: '#005466' }} />
-                    <label htmlFor="sameAddress" style={{ fontSize: '14px', color: '#555', fontWeight: '500', cursor: 'pointer' }}>Permanent address is same as current address</label>
-                </div>
+                <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center'}}><input type="checkbox" id="sameAddress" checked={isSameAddress} onChange={handleSameAddressToggle} style={{ width: '18px', height: '18px', marginRight: '10px', accentColor: '#005466', cursor: 'pointer' }} /><label htmlFor="sameAddress" style={{ fontSize: '14px', color: '#555', fontWeight: '500', cursor: 'pointer' }}>Permanent address is same as current address</label></div>
                 {renderAddressFields('permanentAddress', 'Permanent Address', isSameAddress)}
 
                 <div className={styles.buttonGroup}>

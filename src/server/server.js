@@ -330,11 +330,20 @@ app.put('/api/user/:id', async (req, res) => {
 });
 
 // --- FORGOT PASSWORD ---
+// --- FORGOT PASSWORD (UPDATED) ---
 app.post('/api/forgot-password', async (req, res) => {
     try {
-        const email = req.body.email ? req.body.email.trim() : '';
-        const user = await User.findOne({ email });
+        // Dagdagan ng role ang request body
+        const { email, role } = req.body;
+        const cleanEmail = email ? email.trim() : '';
+        
+        // Hanapin ang user gamit ang email AT role
+        const user = await User.findOne({ 
+            email: cleanEmail, 
+            role: role.toLowerCase() // Siguraduhing lowercase para tugma sa DB
+        });
 
+        // Kung hindi match ang email at role, "User not found" ang error
         if (!user) return res.status(404).json({ message: "User not found." });
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -346,7 +355,7 @@ app.post('/api/forgot-password', async (req, res) => {
 
         const mailOptions = {
             from: '"NgitiFy Security" <garciaaeiounicole@gmail.com>',
-            to: email,
+            to: cleanEmail,
             subject: 'Password Reset Code - NgitiFy',
             html: `
                 <div style="font-family: Arial, sans-serif; padding: 20px;">

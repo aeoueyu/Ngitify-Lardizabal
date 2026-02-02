@@ -326,6 +326,7 @@ select.inputField {
     border-top: 1px solid #eee;
 }
 
+/* SAVE CHANGES BUTTON */
 .submitBtn {
     background-color: #005466;
     color: white;
@@ -448,6 +449,70 @@ select.inputField {
     font-size: 14px;
     margin: 0 0 30px 0;
     line-height: 1.5;
+}
+
+.modalActions {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+}
+
+.modalCancelBtn {
+    background-color: #f0f0f0;
+    color: #555;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    flex: 1;
+}
+
+.modalCancelBtn:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
+}
+
+.modalSubmitBtn {
+    background-color: #005466; /* Red for danger */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    flex: 1;
+}
+
+.modalSubmitBtn:hover {
+    background-color: #004c5c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
+}
+
+.modalDeleteBtn {
+    background-color: #c62828; /* Red for danger */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    flex: 1;
+}
+
+.modalDeleteBtn:hover {
+    background-color: #b71c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
 }
 
 /* 6. Close Text Link */

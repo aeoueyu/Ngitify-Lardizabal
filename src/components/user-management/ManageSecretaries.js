@@ -170,7 +170,6 @@ export default function ManageSecretaries() {
             {statusModal.show && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalCard}>
-                        <img src={warningIcon} alt="Warning" className={styles.modalIcon} />
                         <h3 className={styles.modalTitle}>
                             {statusModal.status === 'active' ? 'Deactivate Secretary?' : 'Activate Secretary?'}
                         </h3>

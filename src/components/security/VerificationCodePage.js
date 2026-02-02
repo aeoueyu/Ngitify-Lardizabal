@@ -62,8 +62,8 @@ export default function VerificationCodePage() {
 
     return (
         <div className={styles['main-container']}>
-            <img src={logo} alt='Logo' className={styles['logo']}/>
             <div className={styles['container']}>
+                <img src={logo} alt='Logo' className={styles['logo']}/>
                 <div className={styles['page-title']}><p className={styles['verify-title']}>Verify email address</p></div>
                 <div className={styles['page-header']}><p>Enter 6-digit code sent to <strong>{userEmail}</strong></p></div>
                 

@@ -18,7 +18,8 @@ export default function EditPatientPage() {
     const [initialData, setInitialData] = useState(null);
     const [initialImage, setInitialImage] = useState(null);
 
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showSaveModal, setShowSaveModal] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -51,6 +52,12 @@ export default function EditPatientPage() {
         const allowedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'live.com'];
         const domain = email.split('@')[1].toLowerCase();
         return allowedDomains.includes(domain);
+    };
+
+    const handleSameAddressToggle = (e) => {
+        const checked = e.target.checked; setIsSameAddress(checked);
+        if (checked) { setFormData(prev => ({ ...prev, permanentAddress: prev.currentAddress })); } 
+        else { setFormData(prev => ({ ...prev, permanentAddress: { ...initialAddressState } })); }
     };
 
     useEffect(() => {
@@ -114,6 +121,15 @@ export default function EditPatientPage() {
         if(val.length>10) return;
         if(errors.phone) setErrors(prev=>{const n={...prev};delete n.phone;return n;});
         setFormData({...formData, phone: val});
+    };
+
+    const handleDiscardChanges = () => {
+        navigate(-1);
+    };
+
+    const handleCancelClick = () => {
+        if (hasChanges()) setShowCancelModal(true);
+        else navigate(-1);
     };
 
     const handleGuardianChange = (e) => {
@@ -209,11 +225,11 @@ export default function EditPatientPage() {
             return;
         }
 
-        setShowConfirmModal(true);
+        setShowSaveModal(true);
     };
 
     const handleConfirmSave = async () => {
-        setShowConfirmModal(false);
+        setShowSaveModal(false);
         const finalData = {
             name: { first: formData.firstName, middle: formData.middleName, last: formData.lastName },
             email: formData.email,
@@ -378,17 +394,50 @@ export default function EditPatientPage() {
 
                 <hr className={styles.divider}/>
                 {renderAddressFields('currentAddress', 'Current Address')}
-                <div style={{margin:'20px 0', display:'flex', alignItems:'center'}}><input type="checkbox" checked={isSameAddress} onChange={(e)=>{setIsSameAddress(e.target.checked); if(e.target.checked) setFormData(p=>({...p, permanentAddress: p.currentAddress}))}}/><label style={{marginLeft:'10px'}}>Same as Current</label></div>
+                <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center'}}><input type="checkbox" id="sameAddress" checked={isSameAddress} onChange={handleSameAddressToggle} style={{ width: '18px', height: '18px', marginRight: '10px', accentColor: '#005466', cursor: 'pointer' }} /><label htmlFor="sameAddress" style={{ fontSize: '14px', color: '#555', fontWeight: '500', cursor: 'pointer' }}>Permanent address is same as current address</label></div>
                 {renderAddressFields('permanentAddress', 'Permanent Address', isSameAddress)}
 
                 <div className={styles.buttonGroup}>
-                    <button className={`${styles.actionBtn} ${styles.backBtn}`} onClick={()=>navigate(-1)}>Cancel</button>
-                    <button className={`${styles.actionBtn} ${styles.editBtn} ${!hasChanges()?styles.disabledBtn:''}`} onClick={handleSaveClick} disabled={!hasChanges()}>Save Changes</button>
+                    <button className={`${styles.actionBtn} ${styles.cancelBtn}`} onClick={handleCancelClick}>Cancel</button>
+                    <button className={`${styles.actionBtn} ${styles.submitBtn} ${!hasChanges()?styles.disabledBtn:''}`} onClick={handleSaveClick} disabled={!hasChanges()}>Save Changes</button>
                 </div>
             </div>
             
-            {showConfirmModal && <div className={styles.modalOverlay}><div className={styles.modalCard}><img src={warningIcon} className={styles.modalIcon}/><h3>Save Changes?</h3><div className={styles.modalActions}><button className={styles.modalCancelBtn} onClick={()=>setShowConfirmModal(false)}>No</button><button className={styles.modalDeleteBtn} style={{backgroundColor:'#005466'}} onClick={handleConfirmSave}>Yes</button></div></div></div>}
-            {showSuccessModal && <div className={styles.modalOverlay}><div className={styles.modalCard}><img src={successIcon} className={styles.modalIcon}/><h3>Success!</h3><button className={styles.closeLink} onClick={()=>navigate(-1)}>Back</button></div></div>}
+            {showSaveModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalCard}>
+                        <h3 className={styles.modalTitle}>Save Changes?</h3>
+                        <p className={styles.modalMessage}>Are you sure you want to update this patient's information?</p>
+                        <div className={styles.modalActions}>
+                            <button className={styles.modalCancelBtn} onClick={() => setShowSaveModal(false)}>No, Keep Editing</button>
+                            <button className={styles.modalDeleteBtn} onClick={handleConfirmSave} style={{backgroundColor: '#005466'}}>Yes, Save</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showCancelModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalCard}>
+                        <img src={warningIcon} alt="Warning" className={styles.modalIcon} />
+                        <h3 className={styles.modalTitle}>Discard Changes?</h3>
+                        <p className={styles.modalMessage}>You have unsaved changes. Are you sure you want to discard them?</p>
+                        <div className={styles.modalActions}>
+                            <button className={styles.modalCancelBtn} onClick={() => setShowCancelModal(false)}>No, Keep Editing</button>
+                            <button className={styles.modalDeleteBtn} onClick={handleDiscardChanges} style={{backgroundColor: '#c62828'}}>Yes, Discard</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showSuccessModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalCard}>
+                        <img src={successIcon} alt="Success" className={styles.modalIcon} />
+                        <h3 className={styles.modalTitle}>Success!</h3>
+                        <p className={styles.modalMessage}>Patient profile updated successfully.</p>
+                        <button className={styles.closeLink} onClick={() => navigate(-1)}>Back to Profile</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

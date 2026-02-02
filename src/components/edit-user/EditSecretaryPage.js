@@ -418,18 +418,50 @@ export default function EditSecretaryPage() {
 
                 <hr className={styles.divider} />
                 {renderAddressFields('currentAddress', 'Current Address')}
-                <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center' }}><input type="checkbox" id="sameAddress" checked={isSameAddress} onChange={handleSameAddressToggle} style={{ width: '18px', height: '18px', marginRight: '10px', accentColor: '#005466' }} /><label htmlFor="sameAddress" style={{ fontSize: '14px', color: '#555', fontWeight: '500', cursor: 'pointer' }}>Permanent address is same as current address</label></div>
+                <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center' }}><input type="checkbox" id="sameAddress" checked={isSameAddress} onChange={handleSameAddressToggle} style={{ width: '18px', height: '18px', marginRight: '10px', accentColor: '#005466', cursor: 'pointer' }} /><label htmlFor="sameAddress" style={{ fontSize: '14px', color: '#555', fontWeight: '500', cursor: 'pointer' }}>Permanent address is same as current address</label></div>
                 {renderAddressFields('permanentAddress', 'Permanent Address', isSameAddress)}
 
                 <div className={styles.buttonGroup}>
-                    <button className={`${styles.actionBtn} ${styles.backBtn}`} onClick={handleCancelClick}>Cancel</button>
-                    <button className={`${styles.actionBtn} ${styles.editBtn} ${!hasChanges() ? styles.disabledBtn : ''}`} onClick={handleSaveClick} disabled={!hasChanges()}>Save Changes</button>
+                    <button className={`${styles.actionBtn} ${styles.cancelBtn}`} onClick={handleCancelClick}>Cancel</button>
+                    <button className={`${styles.actionBtn} ${styles.submitBtn} ${!hasChanges() ? styles.disabledBtn : ''}`} onClick={handleSaveClick} disabled={!hasChanges()}>Save Changes</button>
                 </div>
             </div>
 
-            {showSaveModal && (<div className={styles.modalOverlay}><div className={styles.modalCard}><img src={warningIcon} className={styles.modalIcon} /><h3>Save Changes?</h3><p>Update secretary's information?</p><div className={styles.modalActions}><button className={styles.modalCancelBtn} onClick={() => setShowSaveModal(false)}>No</button><button className={styles.modalDeleteBtn} onClick={handleConfirmSave} style={{backgroundColor: '#005466'}}>Yes, Save</button></div></div></div>)}
-            {showCancelModal && (<div className={styles.modalOverlay}><div className={styles.modalCard}><img src={warningIcon} className={styles.modalIcon} /><h3>Discard Changes?</h3><p>Unsaved changes will be lost.</p><div className={styles.modalActions}><button className={styles.modalCancelBtn} onClick={() => setShowCancelModal(false)}>No</button><button className={styles.modalDeleteBtn} onClick={handleDiscardChanges} style={{backgroundColor: '#c62828'}}>Yes, Discard</button></div></div></div>)}
-            {showSuccessModal && (<div className={styles.modalOverlay}><div className={styles.modalCard}><img src={successIcon} className={styles.modalIcon} /><h3>Success!</h3><button className={styles.closeLink} onClick={() => navigate(-1)}>Back to Profile</button></div></div>)}
+            {showSaveModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalCard}>
+                        <h3 className={styles.modalTitle}>Save Changes?</h3>
+                        <p className={styles.modalMessage}>Are you sure you want to update this secretary's information?</p>
+                        <div className={styles.modalActions}>
+                            <button className={styles.modalCancelBtn} onClick={() => setShowSaveModal(false)}>No, Keep Editing</button>
+                            <button className={styles.modalDeleteBtn} onClick={handleConfirmSave} style={{backgroundColor: '#005466'}}>Yes, Save</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showCancelModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalCard}>
+                        <img src={warningIcon} alt="Warning" className={styles.modalIcon} />
+                        <h3 className={styles.modalTitle}>Discard Changes?</h3>
+                        <p className={styles.modalMessage}>You have unsaved changes. Are you sure you want to discard them?</p>
+                        <div className={styles.modalActions}>
+                            <button className={styles.modalCancelBtn} onClick={() => setShowCancelModal(false)}>No, Keep Editing</button>
+                            <button className={styles.modalDeleteBtn} onClick={handleDiscardChanges} style={{backgroundColor: '#c62828'}}>Yes, Discard</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showSuccessModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalCard}>
+                        <img src={successIcon} alt="Success" className={styles.modalIcon} />
+                        <h3 className={styles.modalTitle}>Success!</h3>
+                        <p className={styles.modalMessage}>Secretary profile updated successfully.</p>
+                        <button className={styles.closeLink} onClick={() => navigate(-1)}>Back to Profile</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

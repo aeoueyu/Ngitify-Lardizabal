@@ -101,7 +101,7 @@ export default function LoginPage() {
                         required
                     />
                     <span 
-                        onClick={() => navigate('/forgot-password')} 
+                        onClick={() => navigate('/forgot-password', { state: { userRole } })} 
                         className={styles['forgotpass-link']}
                         style={{cursor: 'pointer'}}
                     >
