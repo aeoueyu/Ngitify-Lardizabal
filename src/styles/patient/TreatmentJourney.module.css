@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container { font-family: 'Lexend Deca', sans-serif; padding: 0 20px 40px 20px; }
+.header { margin-bottom: 30px; }
+.title { color: #444; font-size: 24px; margin: 0; }
+.subtitle { color: #888; font-size: 14px; margin: 5px 0 0 0; }
+
+.splitView { display: flex; gap: 20px; }
+.visualCard, .timelineCard { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); flex: 1; }
+
+/* Visual Side */
+.imageComparison { display: flex; align-items: center; gap: 10px; margin: 20px 0; }
+.imgBox { flex: 1; text-align: center; font-size: 12px; color: #888; }
+.arrow { font-size: 24px; color: #ccc; }
+.goalText { text-align: center; color: #005466; font-weight: 700; background: #e0f7fa; padding: 10px; border-radius: 10px; }
+
+/* Timeline Side */
+.timeline { border-left: 3px solid #f0f0f0; padding-left: 20px; display: flex; flex-direction: column; gap: 30px; }
+.step { position: relative; }
+.marker { position: absolute; left: -28px; top: 5px; width: 14px; height: 14px; border-radius: 50%; background: #ccc; border: 3px solid white; box-shadow: 0 0 0 2px #eee; }
+.content h4 { margin: 5px 0; font-size: 15px; color: #333; }
+.date { font-size: 12px; color: #888; }
+.statusTag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; }
+
+/* Status Colors */
+.done .marker { background: #2e7d32; box-shadow: 0 0 0 2px #a5d6a7; }
+.done .statusTag { background: #e8f5e9; color: #2e7d32; }
+
+.upcoming .marker { background: #005466; box-shadow: 0 0 0 2px #b2ebf2; }
+.upcoming .statusTag { background: #e0f7fa; color: #006064; }
+
+.locked .marker { background: #ddd; }
+.locked .statusTag { background: #f5f5f5; color: #999; }
+.locked h4 { color: #aaa; }
+
+@media (max-width: 768px) { .splitView { flex-direction: column; } }

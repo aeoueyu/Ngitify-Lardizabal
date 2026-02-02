@@ -8,8 +8,22 @@ import dashboardIcon from '../../assets/sidebar-icons/dashboard.svg';
 import usersIcon from '../../assets/sidebar-icons/users.svg';
 import settingsIcon from '../../assets/sidebar-icons/settings.svg';
 import warningIcon from '../../assets/alert-icons/warning.svg'; 
-import patientSideIcon from '../../assets/icons/patient.svg'; 
+import patientSideIcon from '../../assets/sidebar-icons/patient2.svg'; 
 import auditIcon from '../../assets/sidebar-icons/audit.svg';
+
+// Dentist Icons
+import financeIcon from '../../assets/sidebar-icons/finance.svg';
+import recordIcon from '../../assets/sidebar-icons/patient-record.svg';
+import scheduleIcon from '../../assets/sidebar-icons/schedule.svg';
+
+import billingIcon from '../../assets/sidebar-icons/finance.svg'; // Or finance.svg
+import folderIcon from '../../assets/sidebar-icons/folder.svg';
+
+import cameraIcon from '../../assets/sidebar-icons/camera.svg'; // Placeholder if none
+import roadmapIcon from '../../assets/sidebar-icons/roadmap.svg'; // Placeholder if none
+
+// NEW ICON (Ensure you have this!)
+import clinicIcon from '../../assets/sidebar-icons/clinic.svg'; // If wala pa, use users.svg temporarily
 
 export default function Sidebar() {
     const navigate = useNavigate();
@@ -17,59 +31,19 @@ export default function Sidebar() {
     
     const userRole = localStorage.getItem('role') || 'patient'; 
 
-    // Dropdown States
     const [isUserMgmtOpen, setIsUserMgmtOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-    // --- HELPER FOR ACTIVE STATE ---
-    // Check exact path match
     const isActive = (path) => location.pathname === path;
-    
-    // Check if parent path allows active state (e.g. /owner/manage-dentists makes User Mgmt active)
     const isUserMgmtActive = location.pathname.includes('/owner/manage');
     const isSettingsActive = location.pathname.includes('/settings');
 
-    // Auto-open submenu based on current URL on load
     useEffect(() => {
-        if (isUserMgmtActive) {
-            setIsUserMgmtOpen(true);
-            setIsSettingsOpen(false);
-        } else if (isSettingsActive) {
-            setIsSettingsOpen(true);
-            setIsUserMgmtOpen(false);
-        } else {
-            setIsUserMgmtOpen(false);
-            setIsSettingsOpen(false);
-        }
+        if (isUserMgmtActive) { setIsUserMgmtOpen(true); setIsSettingsOpen(false); }
+        else if (isSettingsActive) { setIsSettingsOpen(true); setIsUserMgmtOpen(false); }
+        else { setIsUserMgmtOpen(false); setIsSettingsOpen(false); }
     }, [location.pathname, isUserMgmtActive, isSettingsActive]);
-
-    // --- NAVIGATION HANDLERS ---
-
-    const handleDashboardClick = () => {
-        // Close others
-        setIsUserMgmtOpen(false);
-        setIsSettingsOpen(false);
-        navigate(`/${userRole}/dashboard`);
-    };
-
-    const handleUserMgmtClick = () => {
-        // 1. Open Dropdown
-        setIsUserMgmtOpen(true);
-        // 2. Close others
-        setIsSettingsOpen(false);
-        // 3. Navigate to DEFAULT tab (Manage Dentists)
-        navigate('/owner/manage-dentists');
-    };
-
-    const handleSettingsClick = () => {
-        // 1. Open Dropdown
-        setIsSettingsOpen(true);
-        // 2. Close others
-        setIsUserMgmtOpen(false);
-        // 3. Navigate to DEFAULT tab (Personal Info)
-        navigate(`/${userRole}/settings/personal`);
-    };
 
     const handleLogout = () => {
         localStorage.clear();
@@ -85,118 +59,132 @@ export default function Sidebar() {
 
                 <ul className={styles.navMenu}>
                     
-                    {/* 1. DASHBOARD */}
-                    <li 
-                        className={`${styles.navItem} ${isActive(`/${userRole}/dashboard`) ? styles.active : ''}`}
-                        onClick={handleDashboardClick}
-                    >
+                    {/* DASHBOARD */}
+                    <li className={`${styles.navItem} ${isActive(`/${userRole}/dashboard`) ? styles.active : ''}`} onClick={() => navigate(`/${userRole}/dashboard`)}>
                         <img src={dashboardIcon} alt="Dashboard" className={styles.icon} />
                         <span>Dashboard</span>
                     </li>
 
-                    {/* 2. USER MANAGEMENT (Owner Only) */}
+                    {/* OWNER MENU */}
                     {userRole === 'owner' && (
                         <>
-                            <li 
-                                className={`${styles.navItem} ${isUserMgmtActive ? styles.active : ''}`}
-                                onClick={handleUserMgmtClick}
-                            >
+                            {/* Management Section */}
+                            <li className={`${styles.navItem} ${isUserMgmtActive ? styles.active : ''}`} onClick={() => { setIsUserMgmtOpen(!isUserMgmtOpen); setIsSettingsOpen(false); }}>
                                 <div className={styles.navHeader}>
-                                    <div className={styles.navLabel}>
-                                        <img src={usersIcon} alt="Users" className={styles.icon} />
-                                        <span>User Management</span>
-                                    </div>
+                                    <div className={styles.navLabel}><img src={usersIcon} alt="Users" className={styles.icon} /><span>User Management</span></div>
                                     <span className={`${styles.arrow} ${isUserMgmtOpen ? styles.rotate : ''}`}>▼</span>
                                 </div>
                             </li>
                             <div className={`${styles.subMenuContainer} ${isUserMgmtOpen ? styles.show : ''}`}>
                                 <ul className={styles.subMenu}>
-                                    <li 
-                                        onClick={(e) => { e.stopPropagation(); navigate('/owner/manage-dentists'); }} 
-                                        className={isActive('/owner/manage-dentists') ? styles.subActive : ''}
-                                    >
-                                        Dentists
-                                    </li>
-                                    <li 
-                                        onClick={(e) => { e.stopPropagation(); navigate('/owner/manage-secretaries'); }} 
-                                        className={isActive('/owner/manage-secretaries') ? styles.subActive : ''}
-                                    >
-                                        Secretaries
-                                    </li>
-                                    <li 
-                                        onClick={(e) => { e.stopPropagation(); navigate('/owner/manage-patients'); }} 
-                                        className={isActive('/owner/manage-patients') ? styles.subActive : ''}
-                                    >
-                                        Patients
-                                    </li>
+                                    <li onClick={() => navigate('/owner/manage-dentists')} className={isActive('/owner/manage-dentists') ? styles.subActive : ''}>Dentists</li>
+                                    <li onClick={() => navigate('/owner/manage-secretaries')} className={isActive('/owner/manage-secretaries') ? styles.subActive : ''}>Secretaries</li>
+                                    <li onClick={() => navigate('/owner/manage-patients')} className={isActive('/owner/manage-patients') ? styles.subActive : ''}>Patients</li>
                                 </ul>
                             </div>
-                            <li 
-                                className={`${styles.navItem} ${isActive('/owner/audit-logs') ? styles.active : ''}`}
-                                onClick={() => navigate('/owner/audit-logs')}
-                            >
-                                <div className={styles.navHeader}>
-                                    <div className={styles.navLabel}>
-                                        {/* Palitan mo ng tamang path sa icon mo */}
-                                        <img src={auditIcon} alt="Audit Logs" className={styles.icon} />
-                                        <span>Audit Logs</span>
-                                    </div>
-                                </div>
+
+                            <li className={`${styles.navItem} ${isActive('/owner/clinic-records') ? styles.active : ''}`} onClick={() => navigate('/owner/clinic-records')}>
+                                <img src={clinicIcon || usersIcon} alt="Clinic Records" className={styles.icon} />
+                                <span>Clinic Records</span>
+                            </li>
+
+                            <li className={`${styles.navItem} ${isActive('/owner/audit-logs') ? styles.active : ''}`} onClick={() => navigate('/owner/audit-logs')}>
+                                <img src={auditIcon} alt="Audit" className={styles.icon} />
+                                <span>Audit Logs</span>
+                            </li>
+
+                            {/* MY PRACTICE (Dentist Features for Owner) */}
+                            <div className={styles.sectionDivider}>MY PRACTICE</div>
+
+                            <li className={`${styles.navItem} ${isActive('/dentist/schedule') ? styles.active : ''}`} onClick={() => navigate('/dentist/schedule')}>
+                                <img src={scheduleIcon} alt="Schedule" className={styles.icon} />
+                                <span>My Schedule</span>
+                            </li>
+                            <li className={`${styles.navItem} ${isActive('/dentist/patient-records') ? styles.active : ''}`} onClick={() => navigate('/dentist/patient-records')}>
+                                <img src={recordIcon} alt="Records" className={styles.icon} />
+                                <span>My Patients</span>
+                            </li>
+                            <li className={`${styles.navItem} ${isActive('/dentist/financials') ? styles.active : ''}`} onClick={() => navigate('/dentist/financials')}>
+                                <img src={financeIcon} alt="Finance" className={styles.icon} />
+                                <span>My Earnings</span>
                             </li>
                         </>
                     )}
 
-                    {/* 3. PATIENT MANAGEMENT (Secretary Only) */}
-                    {userRole === 'secretary' && (
-                        <li 
-                            className={`${styles.navItem} ${location.pathname.includes('patient') ? styles.active : ''}`}
-                            onClick={() => navigate('/secretary/manage-patients')}
-                        >
-                            <img src={patientSideIcon} alt="Patients" className={styles.icon} style={{ filter: 'brightness(0) invert(1)' }} />
-                            <span>Patient Management</span>
-                        </li>
+                    {/* DENTIST MENU */}
+                    {userRole === 'dentist' && (
+                        <>
+                            <li className={`${styles.navItem} ${isActive('/dentist/patient-records') ? styles.active : ''}`} onClick={() => navigate('/dentist/patient-records')}>
+                                <img src={recordIcon} alt="Records" className={styles.icon} /><span>Patient Records</span>
+                            </li>
+                            <li className={`${styles.navItem} ${isActive('/dentist/schedule') ? styles.active : ''}`} onClick={() => navigate('/dentist/schedule')}>
+                                <img src={scheduleIcon} alt="Schedule" className={styles.icon} /><span>Schedule</span>
+                            </li>
+                            <li className={`${styles.navItem} ${isActive('/dentist/financials') ? styles.active : ''}`} onClick={() => navigate('/dentist/financials')}>
+                                <img src={financeIcon} alt="Finance" className={styles.icon} /><span>My Earnings</span>
+                            </li>
+                        </>
                     )}
 
-                    {/* 4. SETTINGS (All Roles) */}
-                    <li 
-                        className={`${styles.navItem} ${isSettingsActive ? styles.active : ''}`}
-                        onClick={handleSettingsClick}
-                    >
+                    {/* SECRETARY MENU */}
+                    {userRole === 'secretary' && (
+                        <>
+                            <li className={`${styles.navItem} ${isActive('/secretary/manage-patients') ? styles.active : ''}`} onClick={() => navigate('/secretary/manage-patients')}>
+                                <img src={patientSideIcon} alt="Patients" className={styles.icon} />
+                                <span>Patient Registration</span> {/* Renamed for clarity */}
+                            </li>
+
+                            <li className={`${styles.navItem} ${isActive('/secretary/billing') ? styles.active : ''}`} onClick={() => navigate('/secretary/billing')}>
+                                <img src={billingIcon || financeIcon} alt="Billing" className={styles.icon} />
+                                <span>Billing & Payments</span>
+                            </li>
+
+                            <li className={`${styles.navItem} ${isActive('/secretary/document-management') ? styles.active : ''}`} onClick={() => navigate('/secretary/document-management')}>
+                                <img src={folderIcon || usersIcon} alt="Docs" className={styles.icon} />
+                                <span>Documents</span>
+                            </li>
+                        </>
+                    )}
+
+                    {/* PATIENT MENU */}
+                    {userRole === 'patient' && (
+                        <>
+                            <li className={`${styles.navItem} ${isActive('/patient/aipost-op') ? styles.active : ''}`} onClick={() => navigate('/patient/aipost-op')}>
+                                <img src={cameraIcon || dashboardIcon} alt="AI Check" className={styles.icon} />
+                                <span>AI Post-Op</span>
+                            </li>
+                            <li className={`${styles.navItem} ${isActive('/patient/treatment-journey') ? styles.active : ''}`} onClick={() => navigate('/patient/treatment-journey')}>
+                                <img src={roadmapIcon || dashboardIcon} alt="Roadmap" className={styles.icon} />
+                                <span>My Journey</span>
+                            </li>
+                            <li className={`${styles.navItem} ${isActive('/patient/my-finances') ? styles.active : ''}`} onClick={() => navigate('/patient/my-finances')}>
+                                <img src={billingIcon} alt="Finance" className={styles.icon} />
+                                <span>My Finances</span>
+                            </li>
+                        </>
+                    )}
+
+                    {/* SETTINGS (All Roles) */}
+                    <li className={`${styles.navItem} ${isSettingsActive ? styles.active : ''}`} onClick={() => { setIsSettingsOpen(!isSettingsOpen); setIsUserMgmtOpen(false); }}>
                         <div className={styles.navHeader}>
-                            <div className={styles.navLabel}>
-                                <img src={settingsIcon} alt="Settings" className={styles.icon} />
-                                <span>Settings</span>
-                            </div>
+                            <div className={styles.navLabel}><img src={settingsIcon} alt="Settings" className={styles.icon} /><span>Settings</span></div>
                             <span className={`${styles.arrow} ${isSettingsOpen ? styles.rotate : ''}`}>▼</span>
                         </div>
                     </li>
                     <div className={`${styles.subMenuContainer} ${isSettingsOpen ? styles.show : ''}`}>
                         <ul className={styles.subMenu}>
-                            <li 
-                                onClick={(e) => { e.stopPropagation(); navigate(`/${userRole}/settings/personal`); }} 
-                                className={isActive(`/${userRole}/settings/personal`) ? styles.subActive : ''}
-                            >
-                                Personal Information
-                            </li>
-                            <li 
-                                onClick={(e) => { e.stopPropagation(); navigate(`/${userRole}/settings/security`); }} 
-                                className={isActive(`/${userRole}/settings/security`) ? styles.subActive : ''}
-                            >
-                                Password & Security
-                            </li>
+                            <li onClick={() => navigate(`/${userRole}/settings/personal`)} className={isActive(`/${userRole}/settings/personal`) ? styles.subActive : ''}>Personal Information</li>
+                            <li onClick={() => navigate(`/${userRole}/settings/security`)} className={isActive(`/${userRole}/settings/security`) ? styles.subActive : ''}>Password & Security</li>
                         </ul>
                     </div>
 
                 </ul>
 
                 <div className={styles.logoutSection}>
-                    <button className={styles.logoutBtn} onClick={() => setShowLogoutModal(true)}>
-                        LOGOUT
-                    </button>
+                    <button className={styles.logoutBtn} onClick={() => setShowLogoutModal(true)}>LOGOUT</button>
                 </div>
             </div>
 
-            {/* Logout Modal */}
             {showLogoutModal && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalCard}>

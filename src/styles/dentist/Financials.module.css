@@ -1,0 +1,73 @@
+.container { 
+    padding: 40px; 
+    width: 100%; 
+    background-color: #fdf3f3; 
+    min-height: 100vh; 
+    font-family: 'Lexend Deca', sans-serif; 
+    box-sizing: border-box; 
+}
+
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
+.title { color: #005466; margin: 0; font-size: 26px; font-weight: 800; }
+.subtitle { color: #4d8794; font-size: 14px; margin-top: 4px; }
+
+.exportBtn { 
+    background: white; 
+    color: #005466; 
+    border: 2px solid #005466; 
+    padding: 10px 20px; 
+    border-radius: 12px; 
+    font-weight: 700; 
+    cursor: pointer; 
+    transition: 0.3s;
+}
+.exportBtn:hover { background: #005466; color: white; }
+
+/* STATS ROW */
+.statsRow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+.statCard { 
+    background: white; 
+    padding: 25px; 
+    border-radius: 20px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02); 
+    border-bottom: 4px solid #005466; 
+}
+.statCard label { color: #b3ccd1; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+.statCard h2 { margin: 10px 0; color: #005466; font-size: 30px; }
+.trend { font-size: 11px; color: #99bbc2; font-weight: 600; }
+
+/* MAIN GRID */
+.mainGrid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
+.tableSection {
+    background: white;
+    padding: 25px;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+}
+
+.table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+.table th { text-align: left; color: #b3ccd1; font-size: 11px; text-transform: uppercase; padding: 15px 10px; border-bottom: 1.5px solid #f0f7f8; }
+.table td { padding: 18px 10px; border-bottom: 1px solid #f9fbfc; font-size: 14px; color: #003b47; }
+
+.serviceCol strong { display: block; font-weight: 700; color: #003b47; }
+
+.amountBadge { 
+    background: #fdf3f3; 
+    color: #ea8b89; 
+    padding: 8px 14px; 
+    border-radius: 10px; 
+    font-weight: 800; 
+    font-size: 13px; 
+    display: inline-block;
+}
+
+/* SIDE PANEL INSIGHTS */
+.sidePanel { display: flex; flex-direction: column; gap: 25px; }
+.insightCard, .infoBox { background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+
+.chartPlaceholder { height: 120px; display: flex; align-items: flex-end; justify-content: space-around; gap: 10px; padding-bottom: 25px; border-bottom: 1px solid #f0f7f8; margin-top: 20px; }
+.barItem { width: 30px; background: #005466; border-radius: 6px 6px 0 0; position: relative; transition: 0.3s; }
+.barItem:hover { background: #ea8b89; }
+.barItem span { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #99bbc2; font-weight: 700; }
+
+.infoRow { display: flex; justify-content: space-between; font-size: 13px; margin-top: 15px; }

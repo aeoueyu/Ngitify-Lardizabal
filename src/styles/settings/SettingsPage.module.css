@@ -5,7 +5,7 @@
     width: 100%;
 }
 
-/* --- HEADER STYLE (Matches Manage Pages) --- */
+/* --- HEADER STYLE --- */
 .headerContainer {
     display: flex;
     justify-content: space-between;
@@ -41,9 +41,38 @@
     max-width: 900px;
     background: white;
     padding: 40px;
-    border-radius: 20px; /* Fully rounded now since tabs are gone */
+    border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     min-height: 400px;
+}
+
+/* --- HEADER WITH EDIT BUTTON --- */
+.tabHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.editToggleBtn {
+    background-color: #005466;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.editToggleBtn:hover {
+    background-color: #337685;
+    transform: translateY(-2px);
 }
 
 /* --- FORM ELEMENTS --- */
@@ -76,6 +105,7 @@
     font-size: 14px;
     transition: all 0.3s;
     font-family: 'Lexend Deca', sans-serif;
+    background-color: white;
 }
 
 .inputField:focus {
@@ -84,6 +114,76 @@
 
 .inputField:disabled {
     background-color: #f9fbfc; color: #888; cursor: not-allowed; border-color: #eee;
+}
+
+/* --- ERROR STYLING --- */
+.errorBorder {
+    border: 1.5px solid #dc3545 !important;
+    background-color: #ffe6e6 !important; /* RED BACKGROUND */
+    transition: all 0.2s ease;
+}
+
+.errorText {
+    color: #dc3545;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 4px;
+    margin-left: 2px;
+}
+
+/* --- PHONE INPUT GROUP FIXES --- */
+.phoneInputGroup {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s;
+    background-color: white;
+}
+
+.phoneInputGroup.errorBorder {
+    border-color: #dc3545 !important;
+    background-color: #ffe6e6 !important;
+}
+
+.phoneInputGroup:focus-within {
+    border-color: #005466;
+    box-shadow: 0 0 0 3px rgba(0, 84, 102, 0.1);
+}
+
+.phonePrefix {
+    background-color: rgba(248, 249, 250, 0.5);
+    color: #555;
+    padding: 12px 15px;
+    font-size: 14px;
+    font-weight: 600;
+    border-right: 1px solid #e0e0e0;
+    user-select: none;
+}
+
+.phoneField {
+    flex: 1;
+    border: none;
+    padding: 12px 15px;
+    font-size: 14px;
+    outline: none;
+    font-family: 'Lexend Deca', sans-serif;
+    color: #333;
+    background-color: transparent !important;
+}
+
+/* DISABLED STATE FOR PHONE GROUP */
+.disabledGroup {
+    background-color: #f9fbfc !important;
+    border-color: #eee !important;
+    cursor: not-allowed;
+}
+
+.disabledGroup .phoneField, 
+.disabledGroup .phonePrefix {
+    color: #888;
+    background-color: transparent !important;
 }
 
 /* --- CHECKBOX STYLES --- */
@@ -174,8 +274,6 @@
 .checkColumn { display: flex; flex-direction: column; gap: 5px; }
 .valid { color: #2e7d32; font-size: 12px; font-weight: 600; }
 .invalid { color: #ccc; font-size: 12px; }
-.errorText { color: #dc3545; font-size: 12px; font-weight: 600; margin-top: 5px; animation: fadeIn 0.3s ease; }
-
 
 .inputError {
     border-color: #dc3545 !important;
@@ -191,11 +289,51 @@
 .modalCard {
     background: white; padding: 30px; border-radius: 15px;
     text-align: center; width: 400px; animation: scaleUp 0.3s ease;
+    display: flex; flex-direction: column; align-items: center;
 }
 .modalIcon { width: 60px; margin-bottom: 15px; animation: bounceIn 0.5s ease;}
-.modalActions { margin-top: 20px; display: flex; justify-content: center; gap: 10px; }
+.modalActions { margin-top: 20px; display: flex; justify-content: center; gap: 10px; width: 100%;}
+
+.modalDeleteBtn {
+    flex: 1;
+    background-color: #005466; /* Standard Action Color */
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modalDeleteBtn:hover {
+    background-color: #337685;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 84, 102, 0.2);
+}
+
+.modalCancelBtn {
+    flex: 1;
+    background-color: #f0f0f0;
+    color: #555;
+    border: none;
+    padding: 12px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
 .closeLink { background: none; border: none; color: #005466; font-weight: 700; cursor: pointer; margin-top: 10px; }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes bounceIn { 0% { transform: scale(0); } 60% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+        gap: 15px;
+    }
+}

@@ -17,10 +17,6 @@ import Sidebar from './components/sidebar/Sidebar';
 import SettingsPage from './components/settings/SettingsPage';
 
 // --- DASHBOARDS ---
-import OwnerDashboard from './components/dashboards/OwnerDashboard';
-import DentistDashboard from './components/dashboards/DentistDashboard';
-import SecretaryDashboard from './components/dashboards/SecretaryDashboard';
-import PatientDashboard from './components/dashboards/PatientDashboard';
 import AuditLogsPage from './components/audit-logs/AuditLogsPage';
 
 // --- USER MANAGEMENT ---
@@ -38,6 +34,28 @@ import ManagePatients from './components/user-management/ManagePatients';
 import AddPatientPage from './components/add-user/AddPatientPage';
 import EditPatientPage from './components/edit-user/EditPatientPage';
 import ViewPatientPage from './components/view-user/ViewPatientPage';
+
+//DENTIST
+import DentistDashboard from './components/dentist/DentistDashboard';
+import PatientRecords from './components/dentist/PatientRecords';
+import Financials from './components/dentist/Financials';
+import Schedule from './components/dentist/Schedule';
+
+
+//owner
+import OwnerDashboard from './components/owner/OwnerDashboard';
+import ClinicRecords from './components/owner/ClinicRecords';
+
+//sec
+import SecretaryDashboard from './components/secretary/SecretaryDashboard';
+import Billing from './components/secretary/Billing';
+import DocumentManagement from './components/secretary/DocumentManagement';
+
+//patient
+import PatientDashboard from './components/patient/PatientDashboard';
+import AIPostOp from './components/patient/AIPostOp';
+import MyFinances from './components/patient/MyFinances';
+import TreatmentJourney from './components/patient/TreatmentJourney';
 
 // --- LAYOUT ---
 function MainLayout() {
@@ -95,6 +113,8 @@ function App() {
 
             <Route path="/owner/audit-logs" element={<AuditLogsPage />} />
 
+            <Route path="/owner/clinic-records" element={<ClinicRecords />} />
+
             {/* OWNER SETTINGS (Split Routes) */}
             <Route path="/owner/settings" element={<Navigate to="/owner/settings/personal" replace />} />
             <Route path="/owner/settings/personal" element={<SettingsPage section="personal" />} />
@@ -106,6 +126,8 @@ function App() {
             <Route path="/secretary/add-patient" element={<AddPatientPage />} />
             <Route path="/secretary/edit-patient/:id" element={<EditPatientPage />} />
             <Route path="/secretary/view-patient/:id" element={<ViewPatientPage />} />
+            <Route path="/secretary/billing/" element={<Billing />} />
+            <Route path="/secretary/document-management" element={<DocumentManagement />} />
             
             {/* SECRETARY SETTINGS */}
             <Route path="/secretary/settings" element={<Navigate to="/secretary/settings/personal" replace />} />
@@ -114,6 +136,9 @@ function App() {
 
             {/* DENTIST ROUTES */}
             <Route path="/dentist/dashboard" element={<DentistDashboard />} />
+            <Route path="/dentist/patient-records" element={<PatientRecords />} />
+            <Route path="/dentist/financials" element={<Financials />} />
+            <Route path="/dentist/schedule" element={<Schedule />} />
             
             {/* DENTIST SETTINGS */}
             <Route path="/dentist/settings" element={<Navigate to="/dentist/settings/personal" replace />} />
@@ -122,6 +147,9 @@ function App() {
 
             {/* PATIENT ROUTES */}
             <Route path="/patient/dashboard" element={<PatientDashboard />} />
+            <Route path="/patient/aipost-op" element={<AIPostOp />} />
+            <Route path="/patient/my-finances" element={<MyFinances />} />
+            <Route path="/patient/treatment-journey" element={<TreatmentJourney />} />
             
             {/* PATIENT SETTINGS */}
             <Route path="/patient/settings" element={<Navigate to="/patient/settings/personal" replace />} />

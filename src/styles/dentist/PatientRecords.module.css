@@ -1,0 +1,261 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container { font-family: 'Lexend Deca', sans-serif; padding: 0 20px 40px 20px; }
+
+/* --- HEADER --- */
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.title { color: #444; font-size: 24px; font-weight: 700; margin: 0; }
+.subtitle { color: #888; font-size: 14px; margin: 5px 0 0 0; }
+.addBtn { background-color: #005466; color: white; border: none; padding: 10px 25px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+.addBtn:hover { background-color: #003d4a; }
+
+/* Patient Badge */
+.patientBadge { display: flex; align-items: center; gap: 15px; background: #e0f7fa; padding: 10px 20px; border-radius: 50px; color: #006064; border: 1px solid #b2ebf2; }
+.pAvatar { width: 40px; height: 40px; background: #0097a7; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+.pInfo h3 { margin: 0; font-size: 16px; white-space: nowrap; }
+.pInfo span { font-size: 12px; opacity: 0.9; }
+
+/* --- GRID LAYOUT --- */
+.mainGrid { display: flex; gap: 25px; min-height: 550px; height: calc(100vh - 180px); }
+
+/* --- LEFT SIDE: LIST CARD --- */
+.listCard { 
+    width: 320px; 
+    background: white; 
+    border-radius: 15px; 
+    padding: 20px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+    display: flex;
+    flex-direction: column;
+}
+
+.listHeader { margin-bottom: 20px; flex-shrink: 0; }
+.searchBar { width: 100%; padding: 12px 15px; border: 1px solid #e0e0e0; border-radius: 10px; outline: none; font-family: inherit; background-color: #f9f9f9; }
+.searchBar:focus { border-color: #005466; background-color: white; }
+
+.patientList { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    overflow-y: auto; /* Scrollable list */
+    padding-right: 5px; /* Space for scrollbar */
+}
+
+.patientItem { 
+    padding: 15px; 
+    border: 1px solid #eee; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    transition: all 0.2s;
+    background-color: white;
+}
+
+.patientItem strong {
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Para di sumabog pag mahaba pangalan */
+    max-width: 140px;
+}
+
+.patientItem span { font-size: 12px; color: #888; background: #f5f5f5; padding: 4px 8px; border-radius: 6px; }
+
+.patientItem:hover { background-color: #f0f8ff; border-color: #b3e5fc; transform: translateX(2px); }
+.activeItem { background-color: #e0f7fa !important; border-color: #00acc1 !important; }
+.activeItem strong { color: #006064; }
+
+/* --- RIGHT SIDE: CONTENT AREA --- */
+.contentArea { 
+    flex: 1; 
+    background: white; 
+    border-radius: 15px; 
+    padding: 30px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; /* Important for inner scrolling */
+}
+
+/* --- TABS (Fixed Equal Size) --- */
+.tabMenu { 
+    display: flex; 
+    width: 100%; 
+    border-bottom: 2px solid #f0f0f0; 
+    margin-bottom: 25px; 
+    flex-shrink: 0;
+}
+
+.tabMenu button { 
+    flex: 1; /* EQUAL WIDTH */
+    background: none; 
+    border: none; 
+    padding: 15px 10px; 
+    color: #888; 
+    font-family: 'Lexend Deca', sans-serif; 
+    cursor: pointer; 
+    font-size: 14px; 
+    font-weight: 600;
+    transition: all 0.2s;
+    text-align: center;
+    border-bottom: 3px solid transparent;
+}
+
+.tabMenu button:hover { color: #005466; background-color: #f9fbfc; }
+.activeTab { color: #005466 !important; border-bottom-color: #005466 !important; background-color: #f0fcfc; }
+
+/* --- CONTENT SCROLLABLE AREA --- */
+.tabContent {
+    overflow-y: auto;
+    padding-right: 10px;
+    flex: 1;
+}
+
+/* --- ALERT BOX --- */
+.alertBox { 
+    background: #ffebee; 
+    color: #c62828; 
+    padding: 15px 20px; 
+    border-radius: 10px; 
+    margin-bottom: 25px; 
+    font-size: 14px; 
+    border: 1px solid #ffcdd2; 
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* --- ODONTOGRAM (Fixed Spacing) --- */
+.chartingView { text-align: center; }
+
+.sectionHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.sectionHeader h3 { margin: 0; color: #444; font-size: 18px; }
+
+.legend { display: flex; gap: 15px; font-size: 12px; font-weight: 600; background: #f5f5f5; padding: 8px 15px; border-radius: 20px; }
+
+.mouthGrid { 
+    background-color: #f8f9fa; 
+    padding: 40px 20px; 
+    border-radius: 15px; 
+    border: 1px solid #eee; 
+    margin: 20px 0;
+    overflow-x: auto; /* SCROLL KAPAG MALIIT ANG SCREEN */
+    white-space: nowrap; /* Prevent wrapping */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 600px; /* Ensure minimum width so teeth don't shrink too much */
+}
+
+.archRow { 
+    display: flex; 
+    justify-content: center; 
+    gap: 8px; /* Consistent gap between teeth */
+    margin-bottom: 15px; 
+}
+
+.gap { 
+    width: 30px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    color: #ccc; 
+    font-weight: bold; 
+    user-select: none;
+}
+
+.toothContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0; /* PREVENT SQUISHING */
+}
+
+.toothBox { 
+    width: 40px; /* Fixed Width */
+    height: 55px; /* Fixed Height */
+    background: white; 
+    border: 2px solid #e0e0e0; 
+    border-radius: 8px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer; 
+    transition: transform 0.2s, border-color 0.2s; 
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.toothBox:hover { transform: translateY(-4px); border-color: #005466; box-shadow: 0 5px 12px rgba(0,0,0,0.1); }
+
+.toothNum { font-size: 10px; color: #999; margin-bottom: 5px; font-weight: 700; }
+.toothShape { width: 22px; height: 22px; background: #f0f0f0; border-radius: 4px; }
+
+/* Issue Styles */
+.toothIssue { background-color: #ffebee; border-color: #ef5350; }
+.toothIssue .toothShape { background-color: #ef5350; }
+
+.diagnosisBox { 
+    background: #fff; border: 1px solid #eee; padding: 20px; border-radius: 12px; text-align: left; margin-top: 20px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.diagnosisBox h4 { margin: 0 0 10px 0; color: #005466; font-size: 15px; }
+.diagnosisBox p { margin: 5px 0; font-size: 13px; color: #555; }
+
+/* --- AI VIEW --- */
+.aiView { text-align: center; }
+.aiBadge { background: linear-gradient(135deg, #6200ea, #b388ff); color: white; padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; box-shadow: 0 3px 8px rgba(98, 0, 234, 0.3); }
+
+.xrayPlaceholder { 
+    width: 100%; height: 350px; background: #1a1a1a; color: #666; 
+    display: flex; align-items: center; justify-content: center; 
+    border-radius: 12px; margin: 25px 0; position: relative; 
+    border: 3px solid #333;
+    font-family: monospace;
+    letter-spacing: 2px;
+}
+
+.aiBox { position: absolute; width: 60px; height: 60px; border: 3px solid; box-shadow: 0 0 15px rgba(255,255,255,0.2); animation: pulse 2s infinite; }
+.aiBox span { 
+    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 8px;
+    background: rgba(0,0,0,0.9); color: white; font-size: 11px; padding: 4px 8px; border-radius: 4px; white-space: nowrap; 
+}
+
+.aiFindings { text-align: left; background: #f4f6f8; padding: 20px; border-radius: 12px; }
+.aiFindings p { margin: 8px 0; font-size: 14px; color: #333; }
+
+/* --- HISTORY LIST (Spacious) --- */
+.historyList { list-style: none; padding: 0; margin: 0; }
+.historyList li { 
+    display: flex; justify-content: space-between; align-items: center; 
+    padding: 20px; border-bottom: 1px solid #f0f0f0; 
+    transition: background 0.2s;
+}
+.historyList li:hover { background-color: #fafafa; }
+.historyList li:last-child { border-bottom: none; }
+
+.hDate { font-weight: 700; color: #005466; width: 120px; font-size: 14px; }
+.hDetail { flex: 1; padding: 0 20px; }
+.hDetail h4 { margin: 0 0 5px 0; color: #333; font-size: 15px; }
+.hDetail p { margin: 0; font-size: 13px; color: #666; line-height: 1.4; }
+.doneBadge { 
+    background: #e8f5e9; color: #2e7d32; padding: 6px 12px; 
+    border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+    70% { opacity: 1; box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+    100% { opacity: 0.6; box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .mainGrid { flex-direction: column; height: auto; }
+    .listCard { width: 100%; height: 300px; }
+    .contentArea { height: auto; min-height: 500px; }
+}

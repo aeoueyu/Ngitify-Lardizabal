@@ -47,10 +47,46 @@ export default function SettingsPage({ section }) {
     const [currentPassError, setCurrentPassError] = useState(false); 
     const [matchError, setMatchError] = useState(false); 
     const [serverError, setServerError] = useState('');
+    const [errors, setErrors] = useState({}); // Field-specific errors
 
     const [validations, setValidations] = useState({
         length: false, upper: false, lower: false, number: false, special: false
     });
+
+    // OPTIONS (Same as AddDentist)
+    const specializationOptions = [
+        "General Dentist", "Orthodontist", "Pediatric Dentist (Pedodontist)", 
+        "Periodontist", "Endodontist", "Oral & Maxillofacial Surgeon", 
+        "Prosthodontist", "Cosmetic Dentist"
+    ];
+
+    // --- HELPERS (MATCHING ADD DENTIST) ---
+    const toTitleCase = (str) => str.toLowerCase().replace(/(?:^|\s|-|\.)\S/g, (char) => char.toUpperCase());
+    
+    const validateEmail = (email) => {
+        const formatRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!formatRegex.test(email)) return false;
+        const allowedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'live.com'];
+        const domain = email.split('@')[1].toLowerCase();
+        return allowedDomains.includes(domain);
+    };
+
+    const getMaxDate = () => { 
+        // Logic: 18+ for general users (Secretary/Patient), 21+ for Dentist
+        const minAge = userRole === 'dentist' ? 21 : 18;
+        const t = new Date(); 
+        t.setFullYear(t.getFullYear() - minAge); 
+        return t.toISOString().split('T')[0]; 
+    };
+
+    const getAge = (d) => { 
+        const today = new Date(); 
+        const birth = new Date(d); 
+        let age = today.getFullYear() - birth.getFullYear(); 
+        const m = today.getMonth() - birth.getMonth(); 
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--; 
+        return age; 
+    };
 
     // --- FETCH DATA ---
     useEffect(() => {
@@ -62,8 +98,6 @@ export default function SettingsPage({ section }) {
                     const currentAddr = data.currentAddress || initialAddressState;
                     const permanentAddr = data.permanentAddress || initialAddressState;
                     
-                    // Check if addresses are effectively the same to set checkbox
-                    // We compare key fields (region, province, city, barangay, street, houseNumber)
                     const isSame = JSON.stringify(currentAddr) === JSON.stringify(permanentAddr);
 
                     const loadedData = {
@@ -95,9 +129,9 @@ export default function SettingsPage({ section }) {
     // --- PERSONAL INFO HELPERS ---
     const handleEditToggle = () => {
         if (isEditing) {
-            setFormData(initialData); // Revert on cancel
+            setFormData(initialData); // Revert
             setProfileImage(initialImage);
-            // Re-evaluate isSameAddress based on initialData
+            setErrors({}); // Clear errors
             const isSame = JSON.stringify(initialData.currentAddress) === JSON.stringify(initialData.permanentAddress);
             setIsSameAddress(isSame);
         }
@@ -114,26 +148,76 @@ export default function SettingsPage({ section }) {
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        
+        // Clear error on type
+        if (errors[name]) setErrors(prev => { const n={...prev}; delete n[name]; return n; });
+
+        // Name Validation (Title Case)
+        if (['firstName', 'middleName', 'lastName'].includes(name)) {
+            if (value === '' || /^[a-zA-Z\s.-]+$/.test(value)) {
+                setFormData(prev => ({ ...prev, [name]: toTitleCase(value) }));
+            }
+            return;
+        }
+        
+        // Phone Validation (Numbers Only)
+        if (name === 'phone') {
+            const numericValue = value.replace(/[^0-9]/g, '');
+            if (numericValue.length <= 10) setFormData(prev => ({ ...prev, [name]: numericValue }));
+            return;
+        }
+
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const hasChanges = () => {
         return JSON.stringify(formData) !== JSON.stringify(initialData) || profileImage !== initialImage;
     };
 
+    // --- REAL-TIME VALIDATION (ON BLUR) ---
+    const handleBlur = (e) => {
+        const { name, value } = e.target;
+        let newError = "";
+
+        if (activeTab === 'personal') {
+            switch (name) {
+                case 'email': 
+                    // Email is read-only but keep logic for consistency
+                    if (!value) newError = "Required";
+                    else if (!validateEmail(value)) newError = "Invalid email domain"; 
+                    break;
+                case 'phone': 
+                    if (!value) newError = "Required";
+                    else if (value.length !== 10 || value[0] !== '9') newError = "Invalid format"; 
+                    break;
+                case 'firstName': 
+                case 'lastName': 
+                case 'birthdate': 
+                    if (!value) newError = "Required"; 
+                    break;
+                default: break;
+            }
+        }
+        
+        if (newError) setErrors(prev => ({ ...prev, [name]: newError }));
+    };
+
     // --- ADDRESS HANDLERS ---
     const handleAddressChange = (type, field, value) => {
+        const prefix = type === 'currentAddress' ? 'current' : 'permanent';
+        const errorKey = `${prefix}_${field}`;
+        if(errors[errorKey]) setErrors(prev=>{const n={...prev};delete n[errorKey];return n;});
+
         setFormData(prev => {
             const updatedAddr = { ...prev[type], [field]: value };
             
-            // Reset lower levels if higher level changes
             if (field === 'region') { updatedAddr.province = ''; updatedAddr.city = ''; updatedAddr.barangay = ''; }
             else if (field === 'province') { updatedAddr.city = ''; updatedAddr.barangay = ''; }
             else if (field === 'city') { updatedAddr.barangay = ''; }
             
             const newState = { ...prev, [type]: updatedAddr };
 
-            // If same address is checked and we are modifying current, update permanent too
             if (isSameAddress && type === 'currentAddress') {
                 newState.permanentAddress = updatedAddr;
             }
@@ -142,54 +226,140 @@ export default function SettingsPage({ section }) {
     };
 
     const handleSameAddressToggle = () => {
-        if (!isEditing) return; // Only allow toggle in edit mode
-        
+        if (!isEditing) return;
         const newStatus = !isSameAddress;
         setIsSameAddress(newStatus);
-        
         if (newStatus) {
-            // Copy current to permanent
             setFormData(prev => ({ ...prev, permanentAddress: prev.currentAddress }));
+            // Clear permanent address errors
+            setErrors(prev=>{const n={...prev}; Object.keys(n).forEach(k=>{if(k.startsWith('permanent_'))delete n[k];}); return n;});
+        } else {
+            setFormData(prev => ({ ...prev, permanentAddress: { ...initialAddressState } })); 
         }
     };
 
+    // --- FULL VALIDATION ---
+    const validatePersonalForm = () => {
+        let newErrors = {};
+        let isValid = true;
+        const required = ['firstName', 'lastName', 'birthdate', 'email'];
+        required.forEach(f => { if(!formData[f]) { newErrors[f] = "Required"; isValid = false; }});
+
+        if (!formData.phone) { newErrors.phone = "Required"; isValid = false; }
+        else if (formData.phone.length !== 10 || formData.phone[0] !== '9') { newErrors.phone = "Invalid format"; isValid = false; }
+
+        // Specialization Required for Dentists
+        if (userRole === 'dentist' && !formData.specialization) {
+            newErrors.specialization = "Required";
+            isValid = false;
+        }
+
+        // Age Check based on Role
+        const minAge = userRole === 'dentist' ? 21 : 18;
+        if(formData.birthdate && getAge(formData.birthdate) < minAge) { 
+            newErrors.birthdate = `Min age ${minAge}`; 
+            isValid = false; 
+        }
+
+        const validateAddr = (addr, prefix) => {
+            ['region', 'province', 'city', 'barangay', 'street', 'houseNumber'].forEach(f => {
+                if(!addr[f]) { newErrors[`${prefix}_${f}`]="Required"; isValid=false; }
+            });
+        };
+        validateAddr(formData.currentAddress, 'current');
+        if(!isSameAddress) validateAddr(formData.permanentAddress, 'permanent');
+
+        setErrors(newErrors);
+        
+        // Auto-Scroll to First Error
+        if (!isValid) {
+            const firstKey = Object.keys(newErrors)[0];
+            const el = document.getElementsByName(firstKey)[0];
+            if(el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+        }
+        return isValid;
+    };
+
     const handleSaveInfo = async () => {
+        if (activeTab === 'personal') {
+            if (!validatePersonalForm()) return;
+            
+            // Server Email Check (Should not happen if disabled, but good practice)
+            if (formData.email && formData.email !== initialData.email) {
+                try {
+                    const res = await fetch('http://localhost:5000/api/check-email', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: formData.email, excludeId: userId }) 
+                    });
+                    if (res.status === 409) {
+                        setErrors(prev => ({ ...prev, email: "Email already exists" }));
+                        return;
+                    }
+                } catch (e) { console.error(e); }
+            }
+            setShowConfirmModal(true);
+        } else {
+            // ... Security validation logic
+            setShowConfirmModal(true);
+        }
+    };
+
+    const confirmUpdate = async () => {
         setShowConfirmModal(false);
         try {
-            const updatePayload = {
-                name: { first: formData.firstName, middle: formData.middleName, last: formData.lastName },
-                contactNumber: `+63${formData.phone}`,
-                birthdate: formData.birthdate,
-                specialization: formData.specialization,
-                currentAddress: formData.currentAddress,
-                permanentAddress: isSameAddress ? formData.currentAddress : formData.permanentAddress, 
-                profileImage: profileImage
-            };
-
-            const res = await fetch(`http://localhost:5000/api/user/${userId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatePayload)
-            });
-
-            if (res.ok) {
-                // Update initial data to reflect saved state
-                const savedData = {
-                    ...formData,
-                    permanentAddress: isSameAddress ? formData.currentAddress : formData.permanentAddress
+            if (activeTab === 'personal') {
+                const updatePayload = {
+                    name: { first: formData.firstName, middle: formData.middleName, last: formData.lastName },
+                    contactNumber: `+63${formData.phone}`, 
+                    birthdate: formData.birthdate,
+                    // licenseNumber not updated as it's read-only
+                    specialization: formData.specialization,
+                    currentAddress: formData.currentAddress,
+                    permanentAddress: isSameAddress ? formData.currentAddress : formData.permanentAddress,
+                    profileImage
                 };
-                setInitialData(savedData);
-                setInitialImage(profileImage);
-                setIsEditing(false);
-                setModalMessage("Profile updated successfully.");
-                setShowSuccessModal(true);
+
+                const res = await fetch(`http://localhost:5000/api/user/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatePayload)
+                });
+
+                if (res.ok) {
+                    setModalMessage("Profile updated successfully!");
+                    setShowSuccessModal(true);
+                    setInitialData(formData); 
+                    setInitialImage(profileImage);
+                    setIsEditing(false); // EXIT EDIT MODE
+                } else {
+                    const d = await res.json();
+                    alert(d.message || "Failed to update.");
+                }
+
             } else {
-                alert("Failed to update.");
+                // Password Update
+                const res = await fetch('http://localhost:5000/api/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, currentPassword: passData.current, newPassword: passData.new })
+                });
+                const d = await res.json();
+                if (res.ok) {
+                    setModalMessage("Password changed successfully.");
+                    setShowSuccessModal(true);
+                    setPassData({ current: '', new: '', confirm: '' });
+                    setCurrentPassVerified(false);
+                    setIsTempPassword(false);
+                    setValidations({ length: false, upper: false, lower: false, number: false, special: false });
+                } else {
+                    setServerError(d.message || "Failed.");
+                }
             }
         } catch (error) { console.error(error); }
     };
 
-    // --- PASSWORD LOGIC ---
+    // --- PASSWORD LOGIC (UNCHANGED) ---
     const handleVerifyCurrent = async () => {
         if (!passData.current) return;
         try {
@@ -199,14 +369,8 @@ export default function SettingsPage({ section }) {
                 body: JSON.stringify({ userId, password: passData.current })
             });
             const data = await res.json();
-
-            if (data.success) {
-                setCurrentPassVerified(true);
-                setCurrentPassError(false);
-            } else {
-                setCurrentPassVerified(false);
-                setCurrentPassError(true);
-            }
+            if (data.success) { setCurrentPassVerified(true); setCurrentPassError(false); } 
+            else { setCurrentPassVerified(false); setCurrentPassError(true); }
         } catch (err) { console.error(err); }
     };
 
@@ -215,11 +379,7 @@ export default function SettingsPage({ section }) {
         setPassData(prev => ({ ...prev, [name]: value }));
         setServerError('');
 
-        if (name === 'current') {
-            setCurrentPassVerified(false);
-            setCurrentPassError(false);
-        }
-
+        if (name === 'current') { setCurrentPassVerified(false); setCurrentPassError(false); }
         if (name === 'new') {
             setValidations({
                 length: value.length >= 8,
@@ -228,11 +388,9 @@ export default function SettingsPage({ section }) {
                 number: /[0-9]/.test(value),
                 special: /[!@#$%^&*(),.?":{}|<>]/.test(value),
             });
-            
             if (passData.confirm && value !== passData.confirm) setMatchError(true);
             else setMatchError(false);
         }
-
         if (name === 'confirm') {
             if (value !== passData.new) setMatchError(true);
             else setMatchError(false);
@@ -248,87 +406,78 @@ export default function SettingsPage({ section }) {
     const handleSavePassword = async (e) => {
         e.preventDefault();
         if (!isFormValid()) return;
-
-        try {
-            const res = await fetch('http://localhost:5000/api/change-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, currentPassword: passData.current, newPassword: passData.new })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setModalMessage("Password changed successfully.");
-                setShowSuccessModal(true);
-                setPassData({ current: '', new: '', confirm: '' });
-                setCurrentPassVerified(false);
-                setIsTempPassword(false);
-                setValidations({ length: false, upper: false, lower: false, number: false, special: false });
-            } else {
-                setServerError(data.message || "Failed to change password.");
-            }
-        } catch (err) { setServerError("Server error."); }
+        setShowConfirmModal(true); // Re-use confirm modal for password too
     };
 
-    // --- RENDER ADDRESS HELPERS (Reusable) ---
+    // --- RENDER ADDRESS HELPERS ---
     const renderAddressFields = (type, title, disabledOverride = false) => {
         const addr = formData[type];
-        const isDisabled = !isEditing || disabledOverride; 
+        const prefix = type === 'currentAddress' ? 'current' : 'permanent';
+        const isDisabled = !isEditing || disabledOverride;
         
-        // Data for dropdowns
         const availProvinces = addr.region ? provinces[addr.region] || [] : [];
         const availCities = addr.province ? cities[addr.province] || [] : [];
         const availBarangays = addr.city ? barangays[addr.city] || [] : [];
+        
+        const getError = (field) => errors[`${prefix}_${field}`];
+        const getErrorClass = (field) => getError(field) ? styles.errorBorder : '';
 
         return (
-            <>
+            <div className={styles.addressBlock}>
                 <h3 className={styles.sectionTitle}>{title}</h3>
                 <div className={styles.row}>
                     <div className={styles.formGroup}>
-                        <label>Region</label>
-                        <select className={styles.inputField} value={addr.region} onChange={(e) => handleAddressChange(type, 'region', e.target.value)} disabled={isDisabled}>
+                        <label>Region <span style={{color:'red'}}>*</span></label>
+                        <select name={`${prefix}_region`} className={`${styles.inputField} ${getErrorClass('region')}`} value={addr.region} onChange={(e) => handleAddressChange(type, 'region', e.target.value)} disabled={isDisabled}>
                             <option value="" hidden>Select Region</option>
                             {regions.map(r => <option key={r.code} value={r.code}>{r.name}</option>)}
                         </select>
+                        {getError('region') && <span className={styles.errorText}>{getError('region')}</span>}
                     </div>
                     <div className={styles.formGroup}>
-                        <label>Province</label>
-                        <select className={styles.inputField} value={addr.province} onChange={(e) => handleAddressChange(type, 'province', e.target.value)} disabled={isDisabled || !addr.region}>
+                        <label>Province <span style={{color:'red'}}>*</span></label>
+                        <select name={`${prefix}_province`} className={`${styles.inputField} ${getErrorClass('province')}`} value={addr.province} onChange={(e) => handleAddressChange(type, 'province', e.target.value)} disabled={isDisabled || !addr.region}>
                             <option value="" hidden>Select Province</option>
                             {availProvinces.map(p => <option key={p.code} value={p.code}>{p.name}</option>)}
                         </select>
+                        {getError('province') && <span className={styles.errorText}>{getError('province')}</span>}
                     </div>
                 </div>
                 <div className={styles.row}>
                     <div className={styles.formGroup}>
-                        <label>City / Municipality</label>
-                        <select className={styles.inputField} value={addr.city} onChange={(e) => handleAddressChange(type, 'city', e.target.value)} disabled={isDisabled || !addr.province}>
+                        <label>City / Municipality <span style={{color:'red'}}>*</span></label>
+                        <select name={`${prefix}_city`} className={`${styles.inputField} ${getErrorClass('city')}`} value={addr.city} onChange={(e) => handleAddressChange(type, 'city', e.target.value)} disabled={isDisabled || !addr.province}>
                             <option value="" hidden>Select City</option>
                             {availCities.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
                         </select>
+                        {getError('city') && <span className={styles.errorText}>{getError('city')}</span>}
                     </div>
                     <div className={styles.formGroup}>
-                        <label>Barangay</label>
-                        <select className={styles.inputField} value={addr.barangay} onChange={(e) => handleAddressChange(type, 'barangay', e.target.value)} disabled={isDisabled || !addr.city}>
+                        <label>Barangay <span style={{color:'red'}}>*</span></label>
+                        <select name={`${prefix}_barangay`} className={`${styles.inputField} ${getErrorClass('barangay')}`} value={addr.barangay} onChange={(e) => handleAddressChange(type, 'barangay', e.target.value)} disabled={isDisabled || !addr.city}>
                             <option value="" hidden>Select Barangay</option>
                             {availBarangays.map(b => <option key={b} value={b}>{b}</option>)}
                         </select>
+                        {getError('barangay') && <span className={styles.errorText}>{getError('barangay')}</span>}
                     </div>
                 </div>
                 <div className={styles.row}>
                     <div className={styles.formGroup}>
-                        <label>Street</label>
-                        <input className={styles.inputField} value={addr.street} onChange={(e) => handleAddressChange(type, 'street', e.target.value)} disabled={isDisabled} />
+                        <label>Street <span style={{color:'red'}}>*</span></label>
+                        <input name={`${prefix}_street`} className={`${styles.inputField} ${getErrorClass('street')}`} value={addr.street} onChange={(e) => handleAddressChange(type, 'street', e.target.value)} disabled={isDisabled} />
+                        {getError('street') && <span className={styles.errorText}>{getError('street')}</span>}
                     </div>
                     <div className={styles.formGroup}>
-                        <label>House No.</label>
-                        <input className={styles.inputField} value={addr.houseNumber} onChange={(e) => handleAddressChange(type, 'houseNumber', e.target.value)} disabled={isDisabled} />
+                        <label>House No. <span style={{color:'red'}}>*</span></label>
+                        <input name={`${prefix}_houseNumber`} className={`${styles.inputField} ${getErrorClass('houseNumber')}`} value={addr.houseNumber} onChange={(e) => handleAddressChange(type, 'houseNumber', e.target.value)} disabled={isDisabled} />
+                        {getError('houseNumber') && <span className={styles.errorText}>{getError('houseNumber')}</span>}
                     </div>
                 </div>
-            </>
+            </div>
         );
     };
 
-    if (isLoading) return <div className={styles.container}>Loading...</div>;
+    if (isLoading) return <div>Loading...</div>;
 
     const { title, subtitle } = activeTab === 'security' 
         ? { title: <>Password & <span className={styles.highlight}>Security</span></>, subtitle: "Update your password and secure your account." }
@@ -346,40 +495,140 @@ export default function SettingsPage({ section }) {
             <div className={styles.formCard}>
                 {activeTab === 'personal' && (
                     <>
+                        <div className={styles.tabHeader}>
+                            <h3 className={styles.sectionTitle}>Personal Details</h3>
+                            {!isEditing && (
+                                <button className={styles.editToggleBtn} onClick={() => setIsEditing(true)}>EDIT INFORMATION</button>
+                            )}
+                        </div>
+
                         <div className={styles.uploadSection}>
                             <div className={styles.imageWrapper} onClick={() => isEditing && fileInputRef.current.click()} style={{ cursor: isEditing ? 'pointer' : 'default', opacity: isEditing ? 1 : 0.9 }}>
                                 {profileImage ? <img src={profileImage} alt="Profile" className={styles.previewImage} /> : <div className={styles.uploadPlaceholder}>No Image</div>}
                             </div>
-                            <input type="file" ref={fileInputRef} style={{display:'none'}} onChange={handleImageChange} accept="image/*" />
+                            <input type="file" ref={fileInputRef} style={{display:'none'}} onChange={handleImageChange} accept="image/*" disabled={!isEditing} />
                             {isEditing && <p className={styles.uploadHint}>Click image to change</p>}
                         </div>
 
-                        <h3 className={styles.mainSectionTitle}>Personal Details</h3>
                         <div className={styles.row}>
-                            <div className={styles.formGroup}><label>First Name</label><input className={styles.inputField} name="firstName" value={formData.firstName} onChange={handleChange} disabled={!isEditing} /></div>
-                            <div className={styles.formGroup}><label>Middle Name</label><input className={styles.inputField} name="middleName" value={formData.middleName} onChange={handleChange} disabled={!isEditing} /></div>
-                            <div className={styles.formGroup}><label>Last Name</label><input className={styles.inputField} name="lastName" value={formData.lastName} onChange={handleChange} disabled={!isEditing} /></div>
+                            <div className={styles.formGroup}>
+                                <label>First Name (Max 50) <span style={{color:'red'}}>*</span></label>
+                                <input 
+                                    className={`${styles.inputField} ${errors.firstName ? styles.errorBorder : ''}`} 
+                                    name="firstName" 
+                                    value={formData.firstName} 
+                                    onChange={handleChange} 
+                                    onBlur={handleBlur} 
+                                    maxLength={50} 
+                                    disabled={!isEditing}
+                                />
+                                {errors.firstName && <span className={styles.errorText}>{errors.firstName}</span>}
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label>Middle Name (Max 20)</label>
+                                <input 
+                                    className={styles.inputField} 
+                                    name="middleName" 
+                                    value={formData.middleName} 
+                                    onChange={handleChange} 
+                                    maxLength={20} 
+                                    disabled={!isEditing}
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label>Last Name (Max 20) <span style={{color:'red'}}>*</span></label>
+                                <input 
+                                    className={`${styles.inputField} ${errors.lastName ? styles.errorBorder : ''}`} 
+                                    name="lastName" 
+                                    value={formData.lastName} 
+                                    onChange={handleChange} 
+                                    onBlur={handleBlur} 
+                                    maxLength={20} 
+                                    disabled={!isEditing}
+                                />
+                                {errors.lastName && <span className={styles.errorText}>{errors.lastName}</span>}
+                            </div>
                         </div>
+
                         <div className={styles.row}>
-                            <div className={styles.formGroup}><label>Birthdate</label><input type="date" className={styles.inputField} name="birthdate" value={formData.birthdate} onChange={handleChange} disabled={!isEditing} /></div>
-                            <div className={styles.formGroup}><label>Phone (+63)</label><input className={styles.inputField} name="phone" value={formData.phone} onChange={handleChange} maxLength={10} disabled={!isEditing} /></div>
+                            <div className={styles.formGroup}>
+                                <label>Birthdate <span style={{color:'red'}}>*</span></label>
+                                <input 
+                                    type="date" 
+                                    className={`${styles.inputField} ${errors.birthdate ? styles.errorBorder : ''}`} 
+                                    name="birthdate" 
+                                    value={formData.birthdate} 
+                                    onChange={handleChange} 
+                                    onBlur={handleBlur}
+                                    max={getMaxDate()} 
+                                    disabled={!isEditing} 
+                                />
+                                {errors.birthdate && <span className={styles.errorText}>{errors.birthdate}</span>}
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label>Phone (+63) <span style={{color:'red'}}>*</span></label>
+                                <div className={`${styles.phoneInputGroup} ${errors.phone ? styles.errorBorder : ''} ${!isEditing ? styles.disabledGroup : ''}`}>
+                                    <span className={styles.phonePrefix}>+63</span>
+                                    <input 
+                                        className={styles.phoneField} 
+                                        name="phone" 
+                                        value={formData.phone} 
+                                        onChange={handleChange} 
+                                        onBlur={handleBlur}
+                                        maxLength={10} 
+                                        placeholder="9xxxxxxxxx" 
+                                        disabled={!isEditing} 
+                                    />
+                                </div>
+                                {errors.phone && <span className={styles.errorText}>{errors.phone}</span>}
+                            </div>
                         </div>
+
                         <div className={styles.row}>
-                            <div className={styles.formGroup}><label>Email Address</label><input className={styles.inputField} value={formData.email} disabled title="Contact Admin to change email" /></div>
+                            <div className={styles.formGroup}>
+                                <label>Email Address <span style={{color:'red'}}>*</span></label>
+                                <input 
+                                    className={`${styles.inputField} ${errors.email ? styles.errorBorder : ''}`} 
+                                    name="email" 
+                                    value={formData.email} 
+                                    disabled 
+                                    style={{backgroundColor: '#e9ecef', color:'#6c757d', cursor: 'not-allowed'}}
+                                />
+                            </div>
                             {userRole === 'dentist' && (
                                 <>
-                                    <div className={styles.formGroup}><label>Specialization</label><input className={styles.inputField} name="specialization" value={formData.specialization} onChange={handleChange} disabled={!isEditing} /></div>
-                                    <div className={styles.formGroup}><label>License No.</label><input className={styles.inputField} value={formData.licenseNumber} disabled /></div>
+                                    <div className={styles.formGroup}>
+                                        <label>Specialization <span style={{color:'red'}}>*</span></label>
+                                        {/* DROPDOWN SELECT FOR SPECIALIZATION */}
+                                        <select 
+                                            className={`${styles.inputField} ${errors.specialization ? styles.errorBorder : ''}`} 
+                                            name="specialization" 
+                                            value={formData.specialization} 
+                                            onChange={handleChange} 
+                                            disabled={!isEditing}
+                                        >
+                                            <option value="" hidden>Select Specialization</option>
+                                            {specializationOptions.map(o => <option key={o} value={o}>{o}</option>)}
+                                        </select>
+                                        {errors.specialization && <span className={styles.errorText}>{errors.specialization}</span>}
+                                    </div>
+                                    <div className={styles.formGroup}>
+                                        <label>License No.</label>
+                                        <input 
+                                            className={styles.inputField} 
+                                            value={formData.licenseNumber} 
+                                            disabled 
+                                            style={{backgroundColor: '#e9ecef', color:'#6c757d', cursor: 'not-allowed'}}
+                                        />
+                                    </div>
                                 </>
                             )}
                         </div>
 
                         <hr className={styles.divider} />
                         
-                        {/* Current Address */}
                         {renderAddressFields('currentAddress', 'Current Address')}
 
-                        {/* Checkbox for Same Address */}
                         <div className={styles.checkboxContainer}>
                             <input 
                                 type="checkbox" 
@@ -392,19 +641,14 @@ export default function SettingsPage({ section }) {
                             <label htmlFor="sameAddress" className={styles.checkboxLabel}>Permanent address same as current address</label>
                         </div>
 
-                        {/* Permanent Address */}
                         {renderAddressFields('permanentAddress', 'Permanent Address', isSameAddress)}
 
-                        <div className={styles.buttonGroup}>
-                            {!isEditing ? (
-                                <button className={styles.saveBtn} onClick={() => setIsEditing(true)}>EDIT PROFILE</button>
-                            ) : (
-                                <>
-                                    <button className={styles.cancelBtn} onClick={handleEditToggle} style={{marginRight: '15px'}}>CANCEL</button>
-                                    <button className={hasChanges() ? styles.saveBtn : styles.disabledBtn} disabled={!hasChanges()} onClick={() => setShowConfirmModal(true)}>SAVE CHANGES</button>
-                                </>
-                            )}
-                        </div>
+                        {isEditing && (
+                            <div className={styles.buttonGroup}>
+                                <button className={styles.cancelBtn} onClick={handleEditToggle} style={{marginRight: '15px'}}>CANCEL</button>
+                                <button className={hasChanges() ? styles.saveBtn : styles.disabledBtn} disabled={!hasChanges()} onClick={handleSaveInfo}>SAVE CHANGES</button>
+                            </div>
+                        )}
                     </>
                 )}
 
@@ -483,7 +727,7 @@ export default function SettingsPage({ section }) {
             </div>
 
             {/* MODALS */}
-            {showConfirmModal && (<div className={styles.modalOverlay}><div className={styles.modalCard}><h3>Save Changes?</h3><p style={{color:'#666'}}>Are you sure you want to update your profile?</p><div className={styles.modalActions}><button className={styles.cancelBtn} onClick={() => setShowConfirmModal(false)}>Cancel</button><button className={styles.saveBtn} onClick={handleSaveInfo}>Yes, Save</button></div></div></div>)}
+            {showConfirmModal && (<div className={styles.modalOverlay}><div className={styles.modalCard}><h3>Save Changes?</h3><p style={{color:'#666'}}>Are you sure you want to update your profile?</p><div className={styles.modalActions}><button className={styles.cancelBtn} onClick={() => setShowConfirmModal(false)}>Cancel</button><button className={styles.modalDeleteBtn} onClick={confirmUpdate} style={{backgroundColor: '#005466'}}>Yes, Save</button></div></div></div>)}
             {showSuccessModal && (<div className={styles.modalOverlay}><div className={styles.modalCard}><img src={successIcon} alt="Success" className={styles.modalIcon} /><h3>Success!</h3><p style={{color:'#666'}}>{modalMessage}</p><button className={styles.closeLink} onClick={() => setShowSuccessModal(false)}>Close</button></div></div>)}
         </div>
     );
