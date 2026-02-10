@@ -1,44 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from '../../styles/login/LoginPage.module.css';
 import logo from '../../assets/logo-greenpink.svg';
-// import bgElement from '../../assets/bg-element.svg'; 
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const location = useLocation(); // 1. Initialize muna bago gamitin
-
-    // 2. Kunin ang role nang ligtas. 
-    // Default to 'Owner' kung walang laman para hindi mag-crash, 
-    // pero ireredirect din naman ng useEffect sa baba kung invalid.
-    const userRole = location.state?.userRole || location.state?.role;
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-
-    // 3. Redirect pabalik sa Role Selection kung walang role na napili
-    useEffect(() => {
-        if (!userRole) {
-            navigate('/role-selection');
-        }
-    }, [userRole, navigate]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setErrorMessage(""); // Clear previous errors
         
         try {
-            // Convert display role (e.g., "Owner") to backend role (e.g., "owner")
-            const backendRole = userRole ? userRole.toLowerCase() : 'owner';
-
             const response = await fetch('http://localhost:5000/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     email, 
-                    password,
-                    role: backendRole // PASS THE LOWERCASE ROLE TO BACKEND
+                    password
                 }),
             });
 
@@ -65,17 +46,13 @@ export default function LoginPage() {
         }
     };
 
-    // Grammar fix for "a" vs "an"
-    const displayRole = userRole || 'User';
-    const article = displayRole === 'Owner' ? 'an' : 'a';
-
     return (
         <div className={styles['main-container']}>
             <div className={styles['container']}>
                 <img src={logo} alt='Lardizabal Dental Clinic' className={styles['logo']} />
                 
                 <div className={styles['header-text']}>
-                    <h2>Login as <span className={styles['pink-text']}>{displayRole}</span></h2>
+                    <h2>Login to your <span className={styles['pink-text']}>Account</span></h2>
                 </div>
 
                 <div className={styles['form-group']}>
@@ -101,7 +78,7 @@ export default function LoginPage() {
                         required
                     />
                     <span 
-                        onClick={() => navigate('/forgot-password', { state: { userRole } })} 
+                        onClick={() => navigate('/forgot-password')} 
                         className={styles['forgotpass-link']}
                         style={{cursor: 'pointer'}}
                     >
@@ -121,7 +98,7 @@ export default function LoginPage() {
                 </button>
 
                 <div className={styles['change-role']}>
-                    Not {article} {displayRole}? <span onClick={() => navigate('/role-selection')}>Change Role</span>
+                    Don't have an account? <span onClick={() => navigate('/')}>Go back to Home</span>
                 </div>
             </div>
         </div>

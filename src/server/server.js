@@ -30,7 +30,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'garciaaeiounicole@gmail.com',
-        pass: 'czrjavoximyvctqf', 
+        pass: 'oxzmsxgfzhcgcnua'
     },
 });
 
@@ -39,45 +39,25 @@ const transporter = nodemailer.createTransport({
 // --- LOGIN ---
 app.post('/api/login', async (req, res) => {
     try {
-        const { email, password, role } = req.body;
+        const { email, password } = req.body;
         
         const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ message: "Invalid email and password" });
+        if (!user) return res.status(404).json({ message: "Invalid email or password" });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ message: "Invalid email and password" });
-
-        if (user.role !== role) return res.status(403).json({ message: "Invalid email and password" });
+        if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
         if (!user.isVerified) {
-            return res.status(403).json({ message: "Invalid email and password" });
+            return res.status(403).json({ message: "Account not verified. Please check your email." });
         }
 
-        if (user.status === 'inactive') {
-            return res.status(403).json({ message: "Invalid email and password" });
-        }
+        const token = jwt.sign({ id: user._id, role: user.role }, 'your_jwt_secret', { expiresIn: '1h' });
 
-        const secretKey = process.env.JWT_SECRET || 'ngitify_secret_key_default';
-        const token = jwt.sign({ id: user._id, role: user.role }, secretKey, { expiresIn: '1h' });
-
-        // AUDIT LOGGING (SAVED TO DB)
-        await AuditLog.create({
-            action: "LOGIN",
-            user: user.email,
-            role: user.role,
-            details: `User logged in successfully.`
-        });
-
-        res.json({ 
-            token, 
-            role: user.role, 
-            userId: user._id,
-            name: user.name
-        });
+        res.json({ token, role: user.role, userId: user._id });
 
     } catch (error) {
-        console.error("Login Error:", error);
-        res.status(500).json({ message: "Server error." });
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
     }
 });
 
@@ -162,8 +142,8 @@ app.post('/api/add-dentist', async (req, res) => {
         res.status(201).json({ message: 'Dentist added successfully. Email sent.' });
 
     } catch (error) {
-        console.error("Error adding dentist:", error);
-        res.status(500).json({ message: "Server error." });
+        console.error("Error adding dentist or sending email:", error);
+        res.status(500).json({ message: "User created, but failed to send activation email." });
     }
 });
 
@@ -197,8 +177,8 @@ app.post('/api/add-secretary', async (req, res) => {
         res.status(201).json({ message: 'Secretary added successfully. Email sent.' });
 
     } catch (error) {
-        console.error("Error adding secretary:", error);
-        res.status(500).json({ message: "Server error or Email failed." });
+        console.error("Error adding secretary or sending email:", error);
+        res.status(500).json({ message: "User created, but failed to send activation email." });
     }
 });
 
@@ -232,8 +212,8 @@ app.post('/api/add-patient', async (req, res) => {
         res.status(201).json({ message: 'Patient added successfully. Email sent.' });
 
     } catch (error) {
-        console.error("Error adding patient:", error);
-        res.status(500).json({ message: "Server error or Email failed." });
+        console.error("Error adding patient or sending email:", error);
+        res.status(500).json({ message: "User created, but failed to send activation email." });
     }
 });
 
@@ -332,46 +312,35 @@ app.put('/api/user/:id', async (req, res) => {
 // --- FORGOT PASSWORD ---
 // --- FORGOT PASSWORD (UPDATED) ---
 app.post('/api/forgot-password', async (req, res) => {
+    const { email } = req.body;
+
     try {
-        // Dagdagan ng role ang request body
-        const { email, role } = req.body;
-        const cleanEmail = email ? email.trim() : '';
-        
-        // Hanapin ang user gamit ang email AT role
-        const user = await User.findOne({ 
-            email: cleanEmail, 
-            role: role.toLowerCase() // Siguraduhing lowercase para tugma sa DB
-        });
+        const user = await User.findOne({ email });
 
-        // Kung hindi match ang email at role, "User not found" ang error
-        if (!user) return res.status(404).json({ message: "User not found." });
+        if (user) {
+            // User exists, so we generate and send a code
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            user.resetPasswordToken = code;
+            user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+            await user.save();
 
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const otpExpires = new Date(Date.now() + 15 * 60 * 1000); 
+            await transporter.sendMail({
+                from: '"NgitiFy Support" <garciaaeiounicole@gmail.com>',
+                to: user.email,
+                subject: 'Your Password Reset Code',
+                text: `Your password reset code is: ${code}`,
+            });
+        }
 
-        user.resetPasswordOtp = otp;
-        user.resetPasswordExpires = otpExpires;
-        await user.save();
-
-        const mailOptions = {
-            from: '"NgitiFy Security" <garciaaeiounicole@gmail.com>',
-            to: cleanEmail,
-            subject: 'Password Reset Code - NgitiFy',
-            html: `
-                <div style="font-family: Arial, sans-serif; padding: 20px;">
-                    <h2>Password Reset Request</h2>
-                    <p>Your verification code is:</p>
-                    <h1 style="color: #005466; letter-spacing: 5px;">${otp}</h1>
-                    <p>This code expires in 15 minutes.</p>
-                </div>
-            `
-        };
-        await transporter.sendMail(mailOptions);
-        res.json({ message: "OTP sent to email." });
+        // IMPORTANT: Always send a success response, even if the user was not found.
+        // This prevents attackers from guessing which emails are registered.
+        res.status(200).json({ message: 'If your email is registered, you will receive a password reset code.' });
 
     } catch (error) {
-        console.error("Forgot Password Error:", error);
-        res.status(500).json({ message: "Server error." });
+        console.error('Forgot Password Error:', error);
+        // Even in case of an internal error, send a generic success response
+        // to avoid leaking system state information.
+        res.status(200).json({ message: 'If your email is registered, you will receive a password reset code.' });
     }
 });
 

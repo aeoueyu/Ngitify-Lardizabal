@@ -24,7 +24,7 @@ export default function Website() {
                 </div>
 
                 <div className={styles['auth-buttons']}>
-                    <button className={styles['login-btn']} onClick={() => navigate('/role-selection')}>
+                    <button className={styles['login-btn']} onClick={() => navigate('/login')}>
                         LOGIN
                     </button>
                 </div>
