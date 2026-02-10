@@ -1,0 +1,281 @@
+.xrayContainer {
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    font-family: 'Lexend Deca', sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.uploadButton {
+    background-color: #00677F;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+}
+.uploadButton:hover {
+    background-color: #005466;
+}
+.uploadButton img {
+    width: 16px;
+}
+
+.tabMenu {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.tabMenu button {
+    padding: 10px 20px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    color: #666;
+    position: relative;
+    bottom: -2px;
+}
+
+.tabMenu button.activeTab {
+    color: #00677F;
+    border-bottom: 2px solid #00677F;
+}
+
+.tabContent {
+    padding-top: 10px;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.emptyMessage {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #888;
+    padding: 40px 0;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.thumbnail {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+.thumbnail:hover {
+    transform: translateY(-5px);
+}
+.thumbnail img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    display: block;
+}
+.thumbOverlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    color: white;
+    padding: 20px 10px 8px 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.thumbnail:hover .thumbOverlay {
+    opacity: 1;
+}
+.thumbOverlay p {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.thumbOverlay span {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+/* AI View Styles */
+.aiView {
+    padding: 10px;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.sectionHeader h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+.aiBadge {
+    background-color: #e3f2fd;
+    color: #42a5f5;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.xrayPlaceholder {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background-color: #111;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #555;
+    font-size: 16px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+.xrayPlaceholder p {
+    z-index: 1;
+}
+
+.aiBox {
+    position: absolute;
+    border: 2px dashed;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 12px;
+    color: white;
+    background-color: rgba(0,0,0,0.4);
+}
+.aiBox span {
+    background-color: inherit;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.aiFindings {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+}
+.aiFindings p {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #4b5563;
+}
+.aiFindings p:last-child {
+    margin-bottom: 0;
+}
+.aiFindings strong {
+    color: #005466;
+}
+
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    position: relative;
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 80vw;
+    max-height: 90vh;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.closeButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.closeButton img {
+    width: 12px;
+}
+
+.modalImage {
+    max-width: 100%;
+    max-height: 75vh;
+    display: block;
+    margin: 0 auto;
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+.modalFooter h4 {
+    margin: 0;
+    font-size: 16px;
+}
+.deleteButton {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.deleteButton:hover {
+    background-color: #c82333;
+}

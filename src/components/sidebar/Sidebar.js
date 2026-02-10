@@ -68,12 +68,8 @@ export default function Sidebar() {
                     {/* OWNER MENU */}
                     {userRole === 'owner' && (
                         <>
-                            <li className={`${styles.navItem} ${isActive('/patient-management') ? styles.active : ''}`} onClick={() => navigate('/patient-management')}>
-                                <img src={patientSideIcon} alt="Patients" className={styles.icon} />
-                                <span>Patient Management</span>
-                            </li>
-
-                            <li className={`${styles.navItem} ${isActive('/owner/patient-records') ? styles.active : ''}`} onClick={() => navigate('/owner/patient-records')}>
+                            {/* Patient Records - Unified */}
+                            <li className={`${styles.navItem} ${location.pathname.includes('/owner/patient-records') ? styles.active : ''}`} onClick={() => navigate('/owner/patient-records')}>
                                 <img src={recordIcon} alt="Records" className={styles.icon} />
                                 <span>Patient Records</span>
                             </li>
@@ -92,10 +88,6 @@ export default function Sidebar() {
                                 </ul>
                             </div>
 
-                            <li className={`${styles.navItem} ${isActive('/owner/clinic-records') ? styles.active : ''}`} onClick={() => navigate('/owner/clinic-records')}>
-                                <img src={clinicIcon || usersIcon} alt="Clinic Records" className={styles.icon} />
-                                <span>Clinic Records</span>
-                            </li>
 
                             <li className={`${styles.navItem} ${isActive('/owner/audit-logs') ? styles.active : ''}`} onClick={() => navigate('/owner/audit-logs')}>
                                 <img src={auditIcon} alt="Audit" className={styles.icon} />
@@ -108,10 +100,6 @@ export default function Sidebar() {
                             <li className={`${styles.navItem} ${isActive('/dentist/schedule') ? styles.active : ''}`} onClick={() => navigate('/dentist/schedule')}>
                                 <img src={scheduleIcon} alt="Schedule" className={styles.icon} />
                                 <span>My Schedule</span>
-                            </li>
-                            <li className={`${styles.navItem} ${isActive('/dentist/patient-records') ? styles.active : ''}`} onClick={() => navigate('/dentist/patient-records')}>
-                                <img src={recordIcon} alt="Records" className={styles.icon} />
-                                <span>My Patients</span>
                             </li>
                             <li className={`${styles.navItem} ${isActive('/dentist/financials') ? styles.active : ''}`} onClick={() => navigate('/dentist/financials')}>
                                 <img src={financeIcon} alt="Finance" className={styles.icon} />

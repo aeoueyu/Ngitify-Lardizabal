@@ -1,77 +1,83 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from '../../styles/owner/PatientRecords.module.css';
 
 export default function PatientRecords() {
-    const [patients, setPatients] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const navigate = useNavigate();
 
-    // Mock data for now
-    const mockPatients = [
-        { _id: '1', firstName: 'Juan', lastName: 'Dela Cruz', email: 'juan.delacruz@example.com', contactNumber: '09171234567', dateOfBirth: '1990-05-15' },
-        { _id: '2', firstName: 'Maria', lastName: 'Clara', email: 'maria.clara@example.com', contactNumber: '09287654321', dateOfBirth: '1992-08-22' },
-        { _id: '3', firstName: 'Andres', lastName: 'Bonifacio', email: 'andres.b@example.com', contactNumber: '09998887766', dateOfBirth: '1985-11-30' },
+    // MOCK DATA matching PatientProfilePage for layout testing
+    const allPatients = [
+        { id: 1, name: 'John Doe', branch: 'Parañaque', lastVisit: '2023-10-15', status: 'active' },
+        { id: 2, name: 'Jane Smith', branch: 'Las Piñas', lastVisit: '2023-11-01', status: 'active' },
     ];
 
-    useEffect(() => {
-        // In the future, we will fetch from an API
-        setPatients(mockPatients);
-    }, []);
-
-    const filteredPatients = patients.filter(p => 
-        p.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = allPatients.filter(p => 
+        (p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (p.id && p.id.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (p.branch && p.branch.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     return (
         <div className={styles.container}>
-            <div className={styles.header}>
-                <div className={styles.titleSection}>
-                    <h1 className={styles.pageTitle}>Patient Records</h1>
-                    <p className={styles.subTitle}>Manage all patient profiles in the system.</p>
+            <header className={styles.header}>
+                <div>
+                    <h1 className={styles.title}>Patient Records</h1>
+                    <p className={styles.subtitle}>Centralized EMR database across all branches.</p>
                 </div>
-                <button className={styles.addButton}>+ Add New Patient</button>
-            </div>
-            <div className={styles.controls}>
-                <input 
-                    type="text" 
-                    placeholder="Search by name or email..."
-                    className={styles.searchInput}
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                />
-            </div>
-            <div className={styles.tableContainer}>
-                <table className={styles.patientTable}>
+            </header>
+
+            <div className={styles.contentCard}>
+                <div className={styles.controls}>
+                    <input 
+                        type="text" 
+                        placeholder="Search patient name, ID, or branch..." 
+                        className={styles.searchBar} 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <div className={styles.filterBadge}>Total Records: {allPatients.length}</div>
+                </div>
+
+                <table className={styles.recordTable}>
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Contact Number</th>
-                            <th>Date of Birth</th>
-                            <th className={styles.actionsHeader}>Actions</th>
+                            <th>Patient Name</th>
+                            <th>ID</th>
+                            <th>Branch</th>
+                            <th>Last Visit</th>
+                            <th>Status</th>
+                            <th style={{textAlign: 'center'}}>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredPatients.map(patient => (
-                            <tr key={patient._id}>
-                                <td>
-                                    <div className={styles.nameCell}>
-                                        <div className={styles.avatarPlaceholder}>
-                                            {patient.firstName.charAt(0)}{patient.lastName.charAt(0)}
-                                        </div>
-                                        <span>{patient.firstName} {patient.lastName}</span>
-                                    </div>
-                                </td>
-                                <td>{patient.email}</td>
-                                <td>{patient.contactNumber}</td>
-                                <td>{new Date(patient.dateOfBirth).toLocaleDateString()}</td>
-                                <td className={styles.actions}>
-                                    <button className={`${styles.actionButton} ${styles.viewBtn}`}>View</button>
-                                    <button className={`${styles.actionButton} ${styles.editBtn}`}>Edit</button>
-                                </td>
+                        {filtered.length > 0 ? (
+                            filtered.map(patient => (
+                                <tr key={patient.id}>
+                                    <td><strong>{patient.name}</strong></td>
+                                    <td className={styles.mono}>PAT-{patient.id.toString().padStart(3, '0')}</td>
+                                    <td>{patient.branch}</td>
+                                    <td>{patient.lastVisit}</td>
+                                    <td>
+                                        <span className={patient.status === 'active' ? styles.statusActive : styles.statusInactive}>
+                                            {patient.status}
+                                        </span>
+                                    </td>
+                                    <td style={{textAlign: 'center'}}>
+                                        <button 
+                                            className={styles.viewBtn} 
+                                            onClick={() => navigate(`/owner/patient-records/${patient.id}`)}
+                                        >
+                                            View Patient
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="6" style={{textAlign: 'center', padding: '30px', color: '#888'}}>No records found.</td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
                 </table>
             </div>

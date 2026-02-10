@@ -1,0 +1,59 @@
+.container {
+    font-family: 'Lexend Deca', sans-serif;
+    padding: 0 20px 40px 20px;
+    background-color: #f7f7f7;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.title {
+    font-size: 1.8rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.patientList {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+}
+
+.patientTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.patientTable th, .patientTable td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.patientTable th {
+    font-weight: 600;
+    color: #555;
+}
+
+.patientTable tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.viewButton {
+    background-color: #8b5cf6;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.viewButton:hover {
+    background-color: #7c3aed;
+}

@@ -49,7 +49,6 @@ import Schedule from './components/dentist/Schedule';
 //owner
 import OwnerDashboard from './components/owner/OwnerDashboard';
 import PatientRecordsOwner from './components/owner/PatientRecords';
-import ClinicRecords from './components/owner/ClinicRecords';
 
 //sec
 import SecretaryDashboard from './components/secretary/SecretaryDashboard';
@@ -61,9 +60,8 @@ import PatientDashboard from './components/patient/PatientDashboard';
 import AIPostOp from './components/patient/AIPostOp';
 import MyFinances from './components/patient/MyFinances';
 import TreatmentJourney from './components/patient/TreatmentJourney';
-import PatientListPage from './components/patient-management/PatientListPage';
 
-
+import PatientProfilePage from './components/patient/PatientProfilePage';
 
 // --- LAYOUT ---
 function MainLayout() {
@@ -104,6 +102,7 @@ function App() {
             {/* OWNER ROUTES */}
             <Route path="/owner/dashboard" element={<OwnerDashboard />} />
             <Route path="/owner/patient-records" element={<PatientRecordsOwner />} />
+            <Route path="/owner/patient-records/:id" element={<PatientProfilePage />} />
             
             <Route path="/owner/manage-dentists" element={<ManageDentists />} />
             <Route path="/owner/add-dentist" element={<AddDentistPage />} />
@@ -127,14 +126,14 @@ function App() {
             <Route path="/owner/edit-patient/:id" element={<EditPatientPage />} />
             <Route path="/owner/view-patient/:id" element={<ViewPatientPage />} />
 
-            <Route path="/patient-management" element={<PatientListPage />} />
+            <Route path="/patient-management" element={<ManagePatientsPage />} />
             <Route path="/patient-management/add" element={<AddPatientPage />} />
             <Route path="/patient-management/edit/:id" element={<EditPatientPage />} />
             <Route path="/patient-management/view/:id" element={<ViewPatientPage />} />
 
             <Route path="/owner/audit-logs" element={<AuditLogsPage />} />
 
-            <Route path="/owner/clinic-records" element={<ClinicRecords />} />
+            <Route path="/owner/clinic-records" element={<PatientRecordsOwner />} />
 
             {/* OWNER SETTINGS (Refactored for Outlet) */}
             <Route path="/owner/settings" element={<SettingsPage />}>
