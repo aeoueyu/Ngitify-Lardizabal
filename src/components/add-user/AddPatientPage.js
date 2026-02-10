@@ -197,33 +197,12 @@ export default function AddPatientPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // 1. Get Client-Side Errors
-        const currentErrors = getFormErrors();
+        const formErrors = getFormErrors();
+        setErrors(formErrors);
 
-        // 2. Check Duplicate Email (Only if email has valid format)
-        if (formData.email && !currentErrors.email) {
-            try {
-                const res = await fetch('http://localhost:5000/api/check-email', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: formData.email })
-                });
-                if (res.status === 409) {
-                    currentErrors.email = "Email already exists";
-                }
-            } catch (error) {
-                console.error("Error checking email:", error);
-            }
-        }
-
-        // 3. Set Errors State
-        setErrors(currentErrors);
-
-        // 4. If Errors Exist -> Stop & Scroll
-        if (Object.keys(currentErrors).length > 0) {
-            const firstKey = Object.keys(currentErrors)[0];
+        if (Object.keys(formErrors).length > 0) {
+            const firstKey = Object.keys(formErrors)[0];
             let el = document.getElementsByName(firstKey)[0];
-            // Mapping for special fields
             if (firstKey === 'guardianName') el = document.getElementsByName('name')[0];
             if (firstKey === 'guardianRel') el = document.getElementsByName('relationship')[0];
             if (firstKey === 'guardianPhone') el = document.getElementsByName('contactNumber')[0];
@@ -232,7 +211,6 @@ export default function AddPatientPage() {
             return;
         }
 
-        // 5. Proceed to Save (No Errors)
         const finalData = {
             name: { first: formData.firstName, middle: formData.middleName, last: formData.lastName },
             email: formData.email,
@@ -251,19 +229,27 @@ export default function AddPatientPage() {
         };
 
         try {
-            const response = await fetch('http://localhost:5000/api/add-patient', {
+            const response = await fetch('http://localhost:5000/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(finalData),
             });
             const data = await response.json();
-            if (response.ok) setShowSuccessModal(true);
-            else {
-                // Fallback catch (should be caught by pre-check mostly)
-                if (response.status === 409) setErrors(prev => ({ ...prev, [data.field]: data.message }));
-                else alert(data.message || "Failed to add patient");
+            if (response.ok) {
+                setShowSuccessModal(true);
+            } else {
+                if (response.status === 409) {
+                    setErrors(prev => ({ ...prev, email: data.message }));
+                    const el = document.getElementsByName('email')[0];
+                    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+                } else {
+                    alert(data.message || "Failed to add patient");
+                }
             }
-        } catch (error) { console.error(error); alert("Cannot connect to server."); }
+        } catch (error) { 
+            console.error("Registration failed:", error); 
+            alert("Cannot connect to server."); 
+        }
     };
 
     const renderAddressFields = (type, title, isDisabled = false) => {
@@ -411,7 +397,7 @@ export default function AddPatientPage() {
                     {isSameAddress ? <div className={styles.disabledOverlay}>{renderAddressFields('permanentAddress', '', true)}</div> : renderAddressFields('permanentAddress', '')}
 
                     <div className={styles.buttonGroup}>
-                        <button type="button" className={styles.cancelBtn} onClick={() => navigate('/owner/manage-patients')}>CANCEL</button>
+                        <button type="button" className={styles.cancelBtn} onClick={() => navigate(-1)}>CANCEL</button>
                         <button type="submit" className={styles.submitBtn}>ADD PATIENT</button>
                     </div>
                 </form>

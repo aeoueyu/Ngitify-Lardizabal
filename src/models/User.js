@@ -61,6 +61,14 @@ const userSchema = new mongoose.Schema({
         contactNumber: { type: String }
     }, 
 
+    // 9. LEAVE REQUESTS (for staff)
+    leaveRequests: [{
+        startDate: { type: Date },
+        endDate: { type: Date },
+        reason: { type: String },
+        status: { type: String, enum: ['pending', 'approved', 'denied'], default: 'pending' }
+    }],
+
     // FIX: Default status is now 'inactive' until email verified
     status: { type: String, enum: ['active', 'inactive'], default: 'inactive' }
 

@@ -19,7 +19,6 @@ export default function Schedule() {
 
     // MOCK SURGERIES (Appointment Basis Only)
     const todaysSurgeries = [
-        { time: "10:00 AM", patient: "John Doe", procedure: "Odontectomy (Impacted #38)", status: "Confirmed" },
         { time: "02:00 PM", patient: "Maria Clara", procedure: "Multiple Extraction", status: "Pending Confirmation" },
     ];
 

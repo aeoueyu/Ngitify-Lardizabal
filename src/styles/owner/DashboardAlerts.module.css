@@ -1,0 +1,79 @@
+.alertsContainer {
+    background: white; 
+    padding: 25px; 
+    border-radius: 15px; 
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08); 
+    margin-top: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.alertsContainer:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
+.alertsContainer h2 {
+    margin-top: 0;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.alertSection {
+    margin-bottom: 20px;
+}
+
+.alertSection h3 {
+    color: #333;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alertSection ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.alertSection li {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    font-size: 14px;
+}
+
+.approveButton, .denyButton {
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-left: 5px;
+    transition: background-color 0.2s;
+}
+
+.approveButton {
+    background-color: #28a745; /* Green */
+}
+
+.denyButton {
+    background-color: #dc3545; /* Red */
+}
+
+.approveButton:hover {
+    background-color: #218838;
+}
+
+.denyButton:hover {
+    background-color: #c82333;
+}

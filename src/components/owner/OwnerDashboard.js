@@ -1,22 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../../styles/owner/OwnerDashboard.module.css';
+import DashboardCharts from './DashboardCharts';
+import DashboardAlerts from './DashboardAlerts';
+import { FaMoneyBillWave, FaUserFriends, FaToolbox, FaBoxOpen } from 'react-icons/fa';
 
 export default function OwnerDashboard() {
-    // MOCK DATA: Executive Summary
-    const financialData = {
-        totalRevenue: "₱850,000",
-        growth: "+15%",
-        branches: [
-            { name: "Parañaque Branch", revenue: 500000, color: '#005466' },
-            { name: "Las Piñas Branch", revenue: 350000, color: '#ea8b89' }
-        ]
-    };
-
-    const topServices = [
-        { name: "Veneers", earnings: "₱320,000", count: 12 },
-        { name: "Implants", earnings: "₱210,000", count: 5 },
-        { name: "Orthodontics", earnings: "₱150,000", count: 30 },
-    ];
+    const [summary, setSummary] = useState({
+        patientCount: 125,
+        surgeryCount: 30,
+        totalRevenue: 250000,
+        lowStockCount: 8
+    });
 
     return (
         <div className={styles.container}>
@@ -31,81 +25,38 @@ export default function OwnerDashboard() {
             {/* KEY METRICS ROW */}
             <div className={styles.statsRow}>
                 <div className={styles.statCard}>
-                    <span className={styles.statLabel}>Total Clinic Revenue</span>
-                    <h2 className={styles.statValue}>{financialData.totalRevenue}</h2>
-                    <span className={styles.statTrend}>▲ {financialData.growth} vs last month</span>
+                    <div>
+                        <span className={styles.statLabel}>Total Clinic Revenue</span>
+                        <h2 className={styles.statValue}>₱{summary.totalRevenue.toLocaleString()}</h2>
+                    </div>
+                    <FaMoneyBillWave className={styles.statIcon} />
                 </div>
                 <div className={styles.statCard}>
-                    <span className={styles.statLabel}>Active Patients</span>
-                    <h2 className={styles.statValue}>1,240</h2>
-                    <span className={styles.statSub}>Across all branches</span>
+                    <div>
+                        <span className={styles.statLabel}>Active Patients</span>
+                        <h2 className={styles.statValue}>{summary.patientCount}</h2>
+                    </div>
+                    <FaUserFriends className={styles.statIcon} />
                 </div>
                 <div className={styles.statCard}>
-                    <span className={styles.statLabel}>Total Procedures</span>
-                    <h2 className={styles.statValue}>342</h2>
-                    <span className={styles.statSub}>Completed this month</span>
+                    <div>
+                        <span className={styles.statLabel}>Total Procedures</span>
+                        <h2 className={styles.statValue}>{summary.surgeryCount}</h2>
+                    </div>
+                    <FaToolbox className={styles.statIcon} />
+                </div>
+                 <div className={styles.statCard}>
+                    <div>
+                        <span className={styles.statLabel}>Items with Low Stock</span>
+                        <h2 className={styles.statValue}>{summary.lowStockCount}</h2>
+                    </div>
+                    <FaBoxOpen className={styles.statIcon} />
                 </div>
             </div>
 
-            <div className={styles.mainGrid}>
-                {/* BRANCH PERFORMANCE CHART */}
-                <div className={styles.chartCard}>
-                    <div className={styles.cardHeader}>
-                        <h3>Branch Performance (Revenue)</h3>
-                    </div>
-                    <div className={styles.barChart}>
-                        {financialData.branches.map((branch, index) => (
-                            <div key={index} className={styles.chartRow}>
-                                <div className={styles.labelCol}>
-                                    <span className={styles.branchName}>{branch.name}</span>
-                                    <span className={styles.branchRev}>₱{branch.revenue.toLocaleString()}</span>
-                                </div>
-                                <div className={styles.barContainer}>
-                                    <div 
-                                        className={styles.barFill} 
-                                        style={{ 
-                                            width: `${(branch.revenue / 600000) * 100}%`, // Mock scale base on max
-                                            backgroundColor: branch.color 
-                                        }}
-                                    ></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className={styles.legend}>
-                        <div className={styles.legendItem}><span style={{background: '#005466'}}></span> Parañaque</div>
-                        <div className={styles.legendItem}><span style={{background: '#ea8b89'}}></span> Las Piñas</div>
-                    </div>
-                </div>
-
-                {/* TOP SERVICES TABLE */}
-                <div className={styles.tableCard}>
-                    <div className={styles.cardHeader}>
-                        <h3>Top Earning Services</h3>
-                        <button className={styles.viewBtn}>View Full Report</button>
-                    </div>
-                    <table className={styles.serviceTable}>
-                        <thead>
-                            <tr>
-                                <th>Service Name</th>
-                                <th>Cases</th>
-                                <th style={{textAlign: 'right'}}>Total Earnings</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {topServices.map((service, i) => (
-                                <tr key={i}>
-                                    <td><strong>{service.name}</strong></td>
-                                    <td>{service.count}</td>
-                                    <td style={{textAlign: 'right', color: '#005466', fontWeight: 'bold'}}>
-                                        {service.earnings}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <DashboardCharts />
+            <DashboardAlerts />
+            
         </div>
     );
 }

@@ -8,7 +8,6 @@ export default function ClinicRecords() {
     const allPatients = [
         { id: "P-001", name: "Alice Gupta", branch: "Parañaque", lastVisit: "Feb 02, 2026", status: "Active" },
         { id: "P-002", name: "Mark Tuan", branch: "Las Piñas", lastVisit: "Jan 28, 2026", status: "Active" },
-        { id: "P-003", name: "John Doe", branch: "Parañaque", lastVisit: "Dec 15, 2025", status: "Inactive" },
         { id: "P-004", name: "Maria Clara", branch: "Manila (HQ)", lastVisit: "Feb 03, 2026", status: "Active" },
     ];
 

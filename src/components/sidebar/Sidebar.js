@@ -68,6 +68,16 @@ export default function Sidebar() {
                     {/* OWNER MENU */}
                     {userRole === 'owner' && (
                         <>
+                            <li className={`${styles.navItem} ${isActive('/patient-management') ? styles.active : ''}`} onClick={() => navigate('/patient-management')}>
+                                <img src={patientSideIcon} alt="Patients" className={styles.icon} />
+                                <span>Patient Management</span>
+                            </li>
+
+                            <li className={`${styles.navItem} ${isActive('/owner/patient-records') ? styles.active : ''}`} onClick={() => navigate('/owner/patient-records')}>
+                                <img src={recordIcon} alt="Records" className={styles.icon} />
+                                <span>Patient Records</span>
+                            </li>
+
                             {/* Management Section */}
                             <li className={`${styles.navItem} ${isUserMgmtActive ? styles.active : ''}`} onClick={() => { setIsUserMgmtOpen(!isUserMgmtOpen); setIsSettingsOpen(false); }}>
                                 <div className={styles.navHeader}>
@@ -79,7 +89,6 @@ export default function Sidebar() {
                                 <ul className={styles.subMenu}>
                                     <li onClick={() => navigate('/owner/manage-dentists')} className={isActive('/owner/manage-dentists') ? styles.subActive : ''}>Dentists</li>
                                     <li onClick={() => navigate('/owner/manage-secretaries')} className={isActive('/owner/manage-secretaries') ? styles.subActive : ''}>Secretaries</li>
-                                    <li onClick={() => navigate('/owner/manage-patients')} className={isActive('/owner/manage-patients') ? styles.subActive : ''}>Patients</li>
                                 </ul>
                             </div>
 
@@ -114,9 +123,6 @@ export default function Sidebar() {
                     {/* DENTIST MENU */}
                     {userRole === 'dentist' && (
                         <>
-                            <li className={`${styles.navItem} ${isActive('/dentist/patient-records') ? styles.active : ''}`} onClick={() => navigate('/dentist/patient-records')}>
-                                <img src={recordIcon} alt="Records" className={styles.icon} /><span>Patient Records</span>
-                            </li>
                             <li className={`${styles.navItem} ${isActive('/dentist/schedule') ? styles.active : ''}`} onClick={() => navigate('/dentist/schedule')}>
                                 <img src={scheduleIcon} alt="Schedule" className={styles.icon} /><span>Schedule</span>
                             </li>

@@ -75,8 +75,8 @@ export default function ManageSecretaries() {
         <div className={styles.container}>
             <div className={styles.headerContainer}>
                 <div className={styles.titleSection}>
-                    <h1 className={styles.pageTitle}>Manage <span className={styles.highlight}>Secretaries</span></h1>
-                    <p className={styles.subTitle}>View and manage clinic staff.</p>
+                    <h1 className={styles.pageTitle}>Manage Secretaries</h1>
+                    <p className={styles.subTitle}>Add, update, or remove secretary accounts.</p>
                 </div>
                 <button className={styles.addButton} onClick={() => navigate('/owner/add-secretary')}>
                     <img src={addIcon} className={styles.addIcon} alt="Add" />

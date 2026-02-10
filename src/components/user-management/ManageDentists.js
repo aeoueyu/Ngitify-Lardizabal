@@ -83,7 +83,7 @@ export default function ManageDentists() {
         <div className={styles.container}>
             <div className={styles.headerContainer}>
                 <div className={styles.titleSection}>
-                    <h1 className={styles.pageTitle}>Manage <span className={styles.highlight}>Dentists</span></h1>
+                    <h1 className={styles.pageTitle}>Manage Dentists</h1>
                     <p className={styles.subTitle}>View and manage clinic dentists.</p>
                 </div>
                 <button className={styles.addButton} onClick={() => navigate('/owner/add-dentist')}>

@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container {
+    font-family: 'Lexend Deca', sans-serif;
+    width: 100%;
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.titleSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.pageTitle {
+    color: #444;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.subTitle {
+    color: #888;
+    font-size: 14px;
+    margin: 5px 0 0 0;
+}
+
+.addButton {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #005466;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-family: 'Lexend Deca', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
+}
+
+.addButton:hover {
+    background-color: #337685;
+    transform: translateY(-2px);
+}
+
+/* SEARCH BAR */
+.controls {
+    margin-bottom: 20px;
+}
+
+.searchInput {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px 20px;
+    border: 1.5px solid #ddd;
+    border-radius: 50px;
+    outline: none;
+    font-family: 'Lexend Deca', sans-serif;
+    font-size: 14px;
+    transition: all 0.3s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+}
+
+.searchInput:focus {
+    border-color: #005466;
+    box-shadow: 0 0 0 4px rgba(0, 84, 102, 0.05);
+}
+
+/* TABLE STYLING */
+.tableContainer {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    overflow: hidden; 
+}
+
+.patientTable {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px; 
+}
+
+.patientTable thead {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #edf2f4;
+}
+
+.patientTable th {
+    text-align: left;
+    padding: 18px 25px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #005466;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.patientTable tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+}
+
+.patientTable tbody tr:hover {
+    background-color: #fcfcfc;
+}
+
+.patientTable td {
+    padding: 20px 25px;
+    font-size: 14px;
+    color: #555;
+    vertical-align: middle;
+}
+
+/* --- SPECIFIC CELL STYLES --- */
+.nameCell {
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatarPlaceholder {
+    width: 35px;
+    height: 35px;
+    min-width: 35px; 
+    min-height: 35px;
+    flex-shrink: 0; 
+    background-color: #e0f7fa;
+    color: #005466;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* ACTIONS */
+.actionsHeader {
+    text-align: right !important;
+}
+
+.actions {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.actionButton {
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: all 0.2s;
+}
+
+.viewBtn {
+    background-color: #f3f3f3;
+    color: #555;
+}
+.viewBtn:hover {
+    background-color: #e0e0e0;
+}
+
+.editBtn {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+.editBtn:hover {
+    background-color: #bbdefb;
+}

@@ -114,13 +114,7 @@ export default function DentistDashboard() {
                                 <span style={{fontSize:'12px', color:'#006064'}}>Root Canal (Follow-up)</span>
                             </div>
                         </div>
-                        <div className={styles.taskItem}>
-                            <div className={styles.time}>02:00 PM</div>
-                            <div>
-                                <strong>John Doe</strong> <br/>
-                                <span style={{fontSize:'12px', color:'#666'}}>Extraction #38</span>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>

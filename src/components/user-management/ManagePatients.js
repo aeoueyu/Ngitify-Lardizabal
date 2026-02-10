@@ -72,8 +72,8 @@ export default function ManagePatients() {
         <div className={styles.container}>
             <div className={styles.headerContainer}>
                 <div className={styles.titleSection}>
-                    <h1 className={styles.pageTitle}>Manage <span className={styles.highlight}>Patients</span></h1>
-                    <p className={styles.subTitle}>View and manage patient records.</p>
+                    <h1 className={styles.pageTitle}>Manage Patients</h1>
+                    <p className={styles.subTitle}>Add, update, or remove patient accounts.</p>
                 </div>
                 <button className={styles.addButton} onClick={() => navigate(`/${currentPath}/add-patient`)}>
                     <img src={addIcon} className={styles.addIcon} alt="Add" />

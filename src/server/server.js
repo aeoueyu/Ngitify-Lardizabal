@@ -11,6 +11,9 @@ const crypto = require('crypto');
 // Import Model
 const User = require('../models/User'); 
 const AuditLog = require('../models/AuditLog'); // Import the new model
+const Patient = require('../models/Patient');
+const Surgery = require('../models/Surgery');
+const Inventory = require('../models/Inventory');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -135,6 +138,13 @@ app.post('/api/add-dentist', async (req, res) => {
         
         await newUser.save();
 
+        await AuditLog.create({
+            action: "CREATE_USER",
+            user: "ADMIN", // Or pass the actual admin email from frontend if available
+            role: "owner",
+            details: `Created new user: ${email}`
+        });
+
         const activationLink = `http://localhost:3000/activate-account/${activationToken}`;
         await sendActivationEmail(email, 'Dentist', tempPassword, activationLink);
         
@@ -170,6 +180,13 @@ app.post('/api/add-secretary', async (req, res) => {
         });
         await newUser.save();
 
+        await AuditLog.create({
+            action: "CREATE_USER",
+            user: "ADMIN",
+            role: "owner",
+            details: `Created new user: ${email}`
+        });
+
         const activationLink = `http://localhost:3000/activate-account/${activationToken}`;
         await sendActivationEmail(email, 'Secretary', tempPassword, activationLink);
 
@@ -187,35 +204,71 @@ app.post('/api/add-patient', async (req, res) => {
     try {
         const { email, ...otherData } = req.body;
 
-        const existing = await User.findOne({ email });
+        const existing = await Patient.findOne({ email });
         if (existing) return res.status(409).json({ field: 'email', message: 'Email already exists.' });
 
-        const tempPassword = crypto.randomBytes(4).toString('hex');
+        const newPatient = new Patient({
+            ...otherData,
+            email
+        });
+        await newPatient.save();
+
+        console.log(`✅ Patient Added: ${email}`);
+        res.status(201).json({ message: 'Patient added successfully.' });
+
+    } catch (error) {
+        console.error("Error adding patient:", error);
+        res.status(500).json({ message: "Error adding patient." });
+    }
+});
+
+// --- ADD CO-OWNER ---
+app.post('/api/add-co-owner', async (req, res) => {
+    try {
+        const { email, licenseNumber, branch, ...otherData } = req.body;
+        
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) return res.status(409).json({ field: 'email', message: 'Email address is already registered.' });
+
+        if (licenseNumber) {
+            const existingLicense = await User.findOne({ licenseNumber });
+            if (existingLicense) return res.status(409).json({ field: 'licenseNumber', message: 'License Number is already registered.' });
+        }
+
+        const tempPassword = crypto.randomBytes(4).toString('hex'); 
         const hashedPassword = await bcrypt.hash(tempPassword, 10);
         const activationToken = crypto.randomBytes(32).toString('hex');
 
         const newUser = new User({
-            ...otherData,
-            email, 
+            ...otherData, 
+            email,
+            licenseNumber,
+            branch,
             password: hashedPassword,
-            role: 'patient',
-            isVerified: false, 
+            role: 'co-owner',
+            isVerified: false,
             status: 'inactive',
             activationToken
         });
+        
         await newUser.save();
 
-        const activationLink = `http://localhost:3000/activate-account/${activationToken}`;
-        await sendActivationEmail(email, 'Patient', tempPassword, activationLink);
-
-        console.log(`✅ Email sent to Patient: ${email}`);
-        res.status(201).json({ message: 'Patient added successfully. Email sent.' });
+        try {
+            const activationLink = `http://localhost:3000/activate-account/${activationToken}`;
+            await sendActivationEmail(email, 'Co-Owner', tempPassword, activationLink);
+        } catch (error) {
+            console.error("Error sending activation email:", error);
+        }
+        
+        console.log(`✅ Co-Owner Added: ${email}`);
+        res.status(201).json({ message: 'Co-Owner added successfully. Email sent.' });
 
     } catch (error) {
-        console.error("Error adding patient or sending email:", error);
+        console.error("Error adding co-owner or sending email:", error);
         res.status(500).json({ message: "User created, but failed to send activation email." });
     }
 });
+
 
 // --- GENERIC GET USERS ---
 app.get('/api/users', async (req, res) => {
@@ -226,6 +279,35 @@ app.get('/api/users', async (req, res) => {
         const users = await User.find(query).select('-password');
         res.json(users);
     } catch (error) { res.status(500).json({ message: "Server error." }); }
+});
+
+app.get('/api/patients', async (req, res) => {
+    try {
+        const patients = await Patient.find();
+        res.json(patients);
+    } catch (error) { 
+        res.status(500).json({ message: "Server error." }); 
+    }
+});
+
+app.get('/api/patients/:id', async (req, res) => {
+    try {
+        const patient = await Patient.findById(req.params.id);
+        if (!patient) return res.status(404).json({ message: "Patient not found" });
+        res.json(patient);
+    } catch (error) {
+        res.status(500).json({ message: "Server error." });
+    }
+});
+
+app.put('/api/patients/:id', async (req, res) => {
+    try {
+        const updatedPatient = await Patient.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updatedPatient) return res.status(404).json({ message: "Patient not found" });
+        res.json(updatedPatient);
+    } catch (error) {
+        res.status(500).json({ message: "Error updating patient." });
+    }
 });
 
 // --- GET SINGLE USER ---
@@ -305,6 +387,14 @@ app.put('/api/user/:id', async (req, res) => {
         }
 
         const updatedUser = await User.findByIdAndUpdate(userId, { ...updateData, email }, { new: true });
+
+        await AuditLog.create({
+            action: "UPDATE_USER",
+            user: "ADMIN",
+            role: "owner",
+            details: `Updated user information for: ${updatedUser.email}`
+        });
+
         res.json(updatedUser);
     } catch (error) { res.status(500).json({ message: "Error updating user." }); }
 });
@@ -459,5 +549,6 @@ app.post('/api/check-email', async (req, res) => {
         res.status(500).json({ message: "Server error checking email" });
     }
 });
+
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

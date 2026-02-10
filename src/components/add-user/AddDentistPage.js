@@ -151,6 +151,7 @@ export default function AddDentistPage() {
         if (!validateForm()) return;
 
         const finalData = {
+            role: 'dentist',
             name: { first: formData.firstName, middle: formData.middleName, last: formData.lastName },
             email: formData.email,
             contactNumber: `+63${formData.phone}`,
@@ -188,7 +189,7 @@ export default function AddDentistPage() {
         };
 
         try {
-            const response = await fetch('http://localhost:5000/api/add-dentist', {
+            const response = await fetch('http://localhost:5000/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(finalData),
@@ -396,18 +397,19 @@ export default function AddDentistPage() {
                     {isSameAddress ? <div className={styles.disabledOverlay}>{renderAddressFields('permanentAddress', '', true)}</div> : renderAddressFields('permanentAddress', '')}
 
                     <div className={styles.buttonGroup}>
-                        <button type="button" className={styles.cancelBtn} onClick={() => navigate('/owner/manage-dentists')}>CANCEL</button>
+                        <button type="button" className={styles.cancelBtn} onClick={() => navigate(-1)}>CANCEL</button>
                         <button type="submit" className={styles.submitBtn}>ADD DENTIST</button>
                     </div>
                 </form>
             </div>
+
             {showSuccessModal && (
                 <div className={styles.modalOverlay}>
-                    <div className={styles.modalCard}>
-                        <img src={successIcon} alt="Success" className={styles.modalIcon} />
-                        <h3 className={styles.modalTitle}>Dentist Added Successfully!</h3>
-                        <p className={styles.modalMessage}>An email with the temporary password and activation link has been sent.</p>
-                        <button className={styles.closeLink} onClick={() => navigate('/owner/manage-dentists')}>Back to Manage Dentists</button>
+                    <div className={styles.modal}>
+                        <img src={successIcon} alt="Success" />
+                        <h3>Success!</h3>
+                        <p>New dentist has been successfully added.</p>
+                        <button className={styles.modalButton} onClick={() => { setShowSuccessModal(false); navigate('/manage-users'); }}>DONE</button>
                     </div>
                 </div>
             )}
