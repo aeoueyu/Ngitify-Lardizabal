@@ -5,10 +5,10 @@ export default function ScheduleSettings() {
     return (
         <div>
             <h2 className={styles.subHeader}>My Duty Calendar</h2>
-            <p>This calendar is linked to the main Staff Calendar of your branch.</p>
-            {/* Placeholder for a calendar component */}
+            <p>This calendar is linked to the main Staff Calendar of your branch. Click on a date to see your schedule.</p>
+            
             <div className={styles.calendarPlaceholder}>
-                [Calendar Component Here]
+                [Static Calendar Placeholder]
             </div>
 
             <div className={styles.divider}></div>
