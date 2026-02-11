@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+/* --- BASE & HEADER --- */
+.container {
+    font-family: 'Lexend Deca', sans-serif;
+    width: 100%;
+    padding: 0 20px 40px 20px;
+}
+
+.headerContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.titleSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.pageTitle {
+    color: #444;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.subTitle {
+    color: #888;
+    font-size: 14px;
+    margin: 5px 0 0 0;
+}
+
+/* --- GRID & CARDS --- */
+.mainGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+}
+
+@media (min-width: 1200px) {
+    .mainGrid {
+        grid-template-columns: 1.2fr 1fr; /* Adjusted ratio */
+    }
+}
+
+.leftColumn, .rightColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.calendarCard, .shiftCard, .holidayCard, .surgeryCard {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    padding: 25px 30px;
+}
+
+.cardTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #005466;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
+}
+
+/* --- CALENDAR --- */
+.calHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: #005466; }
+.calNav { display: flex; gap: 15px; font-weight: 800; cursor: pointer; }
+.calendarPlaceholder { background: #f8fbfc; border-radius: 15px; padding: 20px; border: 1px solid #e6eef0; }
+.calGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
+.dayHead { font-size: 11px; font-weight: 800; color: #b3ccd1; padding-bottom: 10px; }
+.calDate { 
+    font-size: 13px; padding: 10px 0; color: #005466; border-radius: 8px; 
+    position: relative; display: flex; flex-direction: column; align-items: center;
+}
+.today { background-color: #ea8b89; color: white !important; font-weight: 800; }
+.dutyDot { width: 4px; height: 4px; background-color: #005466; border-radius: 50%; margin-top: 2px; }
+.surgeryDot { width: 6px; height: 6px; background-color: #ef5350; border-radius: 50%; position: absolute; bottom: 5px; right: 5px; }
+
+/* --- LEGEND --- */
+.legend { display: flex; gap: 20px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f0f7f8; }
+.legendItem { font-size: 11px; display: flex; align-items: center; gap: 6px; color: #666; font-weight: 600; }
+.dotDuty, .dotHoliday { width: 8px; height: 8px; border-radius: 50%; }
+.dotDuty { background: #005466; }
+.dotHoliday { background: #b3ccd1; }
+
+/* --- LISTS (ROSTER, HOLIDAYS, SURGERIES) --- */
+.shiftList, .holidayList, .apptList { margin-top: 15px; display: flex; flex-direction: column; gap: 5px; }
+
+.shiftItem, .holidayItem, .apptItem { 
+    display: flex; justify-content: space-between; align-items: center; 
+    padding: 15px 0; border-bottom: 1px solid #f9fbfc; 
+}
+.holidayItem:last-child, .shiftItem:last-child, .apptItem:last-child { border-bottom: none; }
+
+.dayInfo { display: flex; flex-direction: column; gap: 2px; }
+.dayInfo strong { color: #003b47; font-size: 15px; }
+.dayInfo span { font-size: 12px; color: #99bbc2; font-weight: 600; }
+
+.statusOn { background: #e8f5e9; color: #2e7d32; padding: 5px 12px; border-radius: 50px; font-size: 10px; font-weight: 800; }
+.statusOff { background: #fbe8e7; color: #ea8b89; padding: 5px 12px; border-radius: 50px; font-size: 10px; font-weight: 800; }
+
+.hDate { 
+    background: #fbe8e7; color: #ea8b89; padding: 8px; border-radius: 10px; 
+    font-weight: 800; font-size: 12px; min-width: 50px; text-align: center;
+}
+.hInfo { flex: 1; margin-left: 15px; }
+.hInfo strong { display: block; color: #003b47; font-size: 14px; }
+.hInfo span { font-size: 11px; color: #99bbc2; }
+
+.apptTime { font-weight: 700; color: #c62828; width: 80px; }
+.apptInfo { flex: 1; display: flex; flex-direction: column; }
+.apptInfo strong { font-size: 14px; color: #333; }
+.apptInfo span { font-size: 12px; color: #666; }
+.statusBadge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.surgeryCard .cardTitle { color: #c62828; }
+.surgeryCard { border-left: 4px solid #ef5350; }
+.noItems { padding: 20px; text-align: center; color: #888; background: #f9f9f9; border-radius: 8px; }

@@ -38,46 +38,59 @@ export default function Sidebar() {
     const [isUserMgmtOpen, setIsUserMgmtOpen] = useState(false);
     const [isSurgeryMgmtOpen, setIsSurgeryMgmtOpen] = useState(false);
     const [isFinanceMgmtOpen, setIsFinanceMgmtOpen] = useState(false);
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isDentistToolsOpen, setIsDentistToolsOpen] = useState(false);
+    const [isRevenueOpen, setIsRevenueOpen] = useState(false);
+    const [isDentistSettingsOpen, setIsDentistSettingsOpen] = useState(false);
+    const [isOwnerSettingsOpen, setIsOwnerSettingsOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+    const toggleRevenue = () => {
+        setIsRevenueOpen(!isRevenueOpen);
+        if (isDentistToolsOpen) setIsDentistToolsOpen(false);
+        if (isDentistSettingsOpen) setIsDentistSettingsOpen(false);
+    };
+
+    const toggleDentistTools = () => {
+        setIsDentistToolsOpen(!isDentistToolsOpen);
+        if (isRevenueOpen) setIsRevenueOpen(false);
+        if (isDentistSettingsOpen) setIsDentistSettingsOpen(false);
+    };
+
+    const toggleDentistSettings = () => {
+        setIsDentistSettingsOpen(!isDentistSettingsOpen);
+        if (isRevenueOpen) setIsRevenueOpen(false);
+        if (isDentistToolsOpen) setIsDentistToolsOpen(false);
+    };
+
+    const toggleOwnerSettings = () => {
+        setIsOwnerSettingsOpen(!isOwnerSettingsOpen);
+    };
 
     const isActive = (path) => location.pathname === path;
     const isUserMgmtActive = location.pathname.includes('/owner/manage') || 
                              location.pathname.includes('/owner/assign-permissions');
     const isSurgeryMgmtActive = location.pathname.includes('/owner/surgery');
     const isFinanceMgmtActive = location.pathname.includes('/owner/billing-finance');
-    const isDentistToolsActive = location.pathname.includes('/owner/dentist-tools');
-    const isSettingsActive = location.pathname.includes('/settings') || location.pathname.includes('/activity-logs');
+    const isDentistToolsActive = location.pathname.includes('/tools');
+    const isRevenueActive = location.pathname.includes('/dentist/revenue');
+    const isDentistSettingsActive = location.pathname.includes('/dentist/settings');
+    const isOwnerSettingsActive = location.pathname.includes('/owner/settings');
 
     useEffect(() => {
         if (isUserMgmtActive) {
             setIsUserMgmtOpen(true);
-            setIsSettingsOpen(false);
-            setIsSurgeryMgmtOpen(false);
-            setIsDentistToolsOpen(false);
-        } else if (isSettingsActive) {
-            setIsSettingsOpen(true);
-            setIsUserMgmtOpen(false);
-            setIsSurgeryMgmtOpen(false);
-            setIsDentistToolsOpen(false);
         } else if (isSurgeryMgmtActive) {
             setIsSurgeryMgmtOpen(true);
-            setIsUserMgmtOpen(false);
-            setIsSettingsOpen(false);
-            setIsDentistToolsOpen(false);
         } else if (isDentistToolsActive) {
             setIsDentistToolsOpen(true);
-            setIsUserMgmtOpen(false);
-            setIsSettingsOpen(false);
-            setIsSurgeryMgmtOpen(false);
-        } else {
-            setIsUserMgmtOpen(false);
-            setIsSettingsOpen(false);
-            setIsSurgeryMgmtOpen(false);
-            setIsDentistToolsOpen(false);
+        } else if (isRevenueActive) {
+            setIsRevenueOpen(true);
+        } else if (isDentistSettingsActive) {
+            setIsDentistSettingsOpen(true);
+        } else if (isOwnerSettingsActive) {
+            setIsOwnerSettingsOpen(true);
         }
-    }, [location.pathname, isUserMgmtActive, isSettingsActive, isSurgeryMgmtActive, isDentistToolsActive]);
+    }, [location.pathname]);
 
     const handleLogout = async () => {
         try {
@@ -206,6 +219,21 @@ export default function Sidebar() {
                                     <li onClick={() => navigate('/owner/dentist-tools/records')} className={isActive('/owner/dentist-tools/records') ? styles.subActive : ''}>Access Odontogram & X-Ray</li>
                                 </ul>
                             </div>
+                            <li className={`${styles.navItem} ${isOwnerSettingsActive ? styles.active : ''}`} onClick={toggleOwnerSettings}>
+                                <div className={styles.navHeader}>
+                                    <div className={styles.navLabel}><img src={settingsIcon} alt="Settings" className={styles.icon} /><span>Settings</span></div>
+                                    <span className={`${styles.arrow} ${isOwnerSettingsOpen ? styles.rotate : ''}`}>▼</span>
+                                </div>
+                            </li>
+                            <div className={`${styles.subMenuContainer} ${isOwnerSettingsOpen ? styles.show : ''}`}>
+                                <ul className={styles.subMenu}>
+                                    <li onClick={() => navigate('/owner/settings/account')} className={isActive('/owner/settings/account') ? styles.subActive : ''}>Account Settings</li>
+                                    <li onClick={() => navigate('/owner/settings/branch')} className={isActive('/owner/settings/branch') ? styles.subActive : ''}>Branch Settings</li>
+                                    <li onClick={() => navigate('/owner/settings/system')} className={isActive('/owner/settings/system') ? styles.subActive : ''}>System Preferences</li>
+                                    <li onClick={() => navigate('/owner/settings/financial')} className={isActive('/owner/settings/financial') ? styles.subActive : ''}>Financial Settings</li>
+                                    <li onClick={() => navigate('/owner/settings/audit')} className={isActive('/owner/settings/audit') ? styles.subActive : ''}>Audit Logs</li>
+                                </ul>
+                            </div>
                         </>
                     )}
 
@@ -215,12 +243,62 @@ export default function Sidebar() {
                             <li className={`${styles.navItem} ${isActive('/dentist/patient-records') ? styles.active : ''}`} onClick={() => navigate('/dentist/patient-records')}>
                                 <img src={recordIcon} alt="Records" className={styles.icon} /><span>Patient Records</span>
                             </li>
-                            <li className={`${styles.navItem} ${isActive('/dentist/schedule') ? styles.active : ''}`} onClick={() => navigate('/dentist/schedule')}>
-                                <img src={scheduleIcon} alt="Schedule" className={styles.icon} /><span>Schedule</span>
+                            <li className={`${styles.navItem} ${isActive('/dentist/surgeries') ? styles.active : ''}`} onClick={() => navigate('/dentist/surgeries')}>
+                                <img src={surgeriesIcon} alt="Surgeries" className={styles.icon} /><span>Surgeries</span>
                             </li>
-                            <li className={`${styles.navItem} ${isActive('/dentist/financials') ? styles.active : ''}`} onClick={() => navigate('/dentist/financials')}>
-                                <img src={financeIcon} alt="Finance" className={styles.icon} /><span>My Earnings</span>
+                            <li className={`${styles.navItem} ${isDentistToolsActive ? styles.active : ''}`} onClick={() => {
+                                 if (isDentistToolsActive) {
+                                     setIsDentistToolsOpen(!isDentistToolsOpen);
+                                 } else {
+                                     navigate('/dentist/tools/assigned-surgeries');
+                                 }
+                             }}>
+                                 <div className={styles.navHeader}>
+                                     <div className={styles.navLabel}><img src={dentistIcon} alt="Tools" className={styles.icon} /><span>Dentist Tools</span></div>
+                                     <span className={`${styles.arrow} ${isDentistToolsOpen ? styles.rotate : ''}`}>▼</span>
+                                 </div>
+                             </li>
+                             <div className={`${styles.subMenuContainer} ${isDentistToolsOpen ? styles.show : ''}`}>
+                                 <ul className={styles.subMenu}>
+                                     <li onClick={() => navigate('/dentist/tools/assigned-surgeries')} className={isActive('/dentist/tools/assigned-surgeries') ? styles.subActive : ''}>View Assigned Surgeries</li>
+                                     <li onClick={() => navigate('/dentist/tools/treatment-notes')} className={isActive('/dentist/tools/treatment-notes') ? styles.subActive : ''}>Add Treatment Notes</li>
+                                     <li onClick={() => navigate('/dentist/tools/records')} className={isActive('/dentist/tools/records') ? styles.subActive : ''}>Access Odontogram & X-Ray</li>
+                                     <li onClick={() => navigate('/dentist/tools/personal-calendar')} className={isActive('/dentist/tools/personal-calendar') ? styles.subActive : ''}>Personal Calendar</li>
+                                 </ul>
+                             </div>
+                            <li className={`${styles.navItem} ${isRevenueActive ? styles.active : ''}`} onClick={() => {
+                                if (isRevenueActive) {
+                                    setIsRevenueOpen(!isRevenueOpen);
+                                } else {
+                                    navigate('/dentist/revenue/commission-view');
+                                }
+                            }}>
+                                <div className={styles.navHeader}>
+                                    <div className={styles.navLabel}><img src={financeIcon} alt="Revenue" className={styles.icon} /><span>Revenue & Commission</span></div>
+                                    <span className={`${styles.arrow} ${isRevenueOpen ? styles.rotate : ''}`}>▼</span>
+                                </div>
                             </li>
+                            <div className={`${styles.subMenuContainer} ${isRevenueOpen ? styles.show : ''}`}>
+                                <ul className={styles.subMenu}>
+                                    <li onClick={() => navigate('/dentist/revenue/commission-view')} className={isActive('/dentist/revenue/commission-view') ? styles.subActive : ''}>View Commission</li>
+                                    <li onClick={() => navigate('/dentist/revenue/earnings-summary')} className={isActive('/dentist/revenue/earnings-summary') ? styles.subActive : ''}>Monthly Earnings Summary</li>
+                                </ul>
+                            </div>
+                            <li className={`${styles.navItem} ${isDentistSettingsActive ? styles.active : ''}`} onClick={toggleDentistSettings}>
+                                <div className={styles.navHeader}>
+                                    <div className={styles.navLabel}><img src={settingsIcon} alt="Settings" className={styles.icon} /><span>Settings</span></div>
+                                    <span className={`${styles.arrow} ${isDentistSettingsOpen ? styles.rotate : ''}`}>▼</span>
+                                </div>
+                            </li>
+                            <div className={`${styles.subMenuContainer} ${isDentistSettingsOpen ? styles.show : ''}`}>
+                                <ul className={styles.subMenu}>
+                                    <li onClick={() => navigate('/dentist/settings/account')} className={isActive('/dentist/settings/account') ? styles.subActive : ''}>Account Settings</li>
+                                    <li onClick={() => navigate('/dentist/settings/schedule')} className={isActive('/dentist/settings/schedule') ? styles.subActive : ''}>Schedule Settings</li>
+                                    <li onClick={() => navigate('/dentist/settings/clinical')} className={isActive('/dentist/settings/clinical') ? styles.subActive : ''}>Clinical Preferences</li>
+                                    <li onClick={() => navigate('/dentist/settings/notifications')} className={isActive('/dentist/settings/notifications') ? styles.subActive : ''}>Notification Settings</li>
+                                    <li onClick={() => navigate('/dentist/settings/revenue')} className={isActive('/dentist/settings/revenue') ? styles.subActive : ''}>Revenue Settings</li>
+                                </ul>
+                            </div>
                         </>
                     )}
 
@@ -241,6 +319,10 @@ export default function Sidebar() {
                                 <img src={folderIcon || usersIcon} alt="Docs" className={styles.icon} />
                                 <span>Documents</span>
                             </li>
+                            <li className={`${styles.navItem} ${location.pathname.includes('/secretary/settings') ? styles.active : ''}`} onClick={() => navigate('/secretary/settings')}>
+                                <img src={settingsIcon} alt="Settings" className={styles.icon} />
+                                <span>Settings</span>
+                            </li>
                         </>
                     )}
 
@@ -257,37 +339,6 @@ export default function Sidebar() {
                             </li>
                         </>
                     )}
-
-                    {/* SETTINGS (All Roles) */}
-                    <li className={`${styles.navItem} ${isSettingsActive ? styles.active : ''}`} onClick={() => {
-                        if (isSettingsActive) {
-                            setIsSettingsOpen(!isSettingsOpen);
-                        } else {
-                            navigate(`/${userRole}/settings`);
-                        }
-                    }}>
-                        <div className={styles.navHeader}>
-                            <div className={styles.navLabel}><img src={settingsIcon} alt="Settings" className={styles.icon} /><span>Settings</span></div>
-                            <span className={`${styles.arrow} ${isSettingsOpen ? styles.rotate : ''}`}>▼</span>
-                        </div>
-                    </li>
-                    <div className={`${styles.subMenuContainer} ${isSettingsOpen ? styles.show : ''}`}>
-                        <ul className={styles.subMenu}>
-                            <li onClick={() => navigate(`/${userRole}/settings/account`)} className={location.pathname.includes('/settings/account') ? styles.subActive : ''}>Account Settings</li>
-                            {userRole === 'owner' && (
-                                <>
-                                    <li onClick={() => navigate('/owner/settings/branch')} className={location.pathname.includes('/settings/branch') ? styles.subActive : ''}>Branch Settings</li>
-                                </>
-                            )}
-                            <li onClick={() => navigate(`/${userRole}/settings/system`)} className={location.pathname.includes('/settings/system') ? styles.subActive : ''}>System Preferences</li>
-                            {userRole === 'owner' && (
-                                <>
-                                    <li onClick={() => navigate('/owner/settings/financial')} className={location.pathname.includes('/settings/financial') ? styles.subActive : ''}>Financial Settings</li>
-                                    <li onClick={() => navigate('/owner/activity-logs')} className={location.pathname.includes('/activity-logs') ? styles.subActive : ''}>Activity Logs</li>
-                                </>
-                            )}
-                        </ul>
-                    </div>
 
                 </ul>
 

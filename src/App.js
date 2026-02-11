@@ -16,9 +16,10 @@ import ActivateAccountPage from './components/email-activation/ActivateAccountPa
 import Sidebar from './components/sidebar/Sidebar';
 import SettingsPage from './components/settings/SettingsPage';
 import AccountSettingsPage from './components/settings/AccountSettingsPage';
-import BranchSettingsPage from './components/settings/BranchSettingsPage';
-import SystemPreferencesPage from './components/settings/SystemPreferencesPage';
-import FinancialSettingsPage from './components/settings/FinancialSettingsPage';
+import BranchSettings from './components/owner/settings/BranchSettings';
+import SystemPreferences from './components/owner/settings/SystemPreferences';
+import FinancialSettings from './components/owner/settings/FinancialSettings';
+import AuditLogs from './components/owner/settings/AuditLogs';
 
 // --- DASHBOARDS ---
 import AuditLogsPage from './components/audit-logs/AuditLogsPage';
@@ -48,6 +49,25 @@ import DentistDashboard from './components/dentist/DentistDashboard';
 import PatientRecords from './components/dentist/PatientRecords';
 import Financials from './components/dentist/Financials';
 import Schedule from './components/dentist/Schedule';
+import Surgeries from './components/dentist/Surgeries';
+
+//dentist-tools
+import AssignedSurgeriesDentist from './components/dentist/dentist-tools/AssignedSurgeries';
+import TreatmentNotesDentist from './components/dentist/dentist-tools/TreatmentNotes';
+import OdontogramDentist from './components/dentist/dentist-tools/Odontogram';
+import PersonalCalendar from './components/dentist/dentist-tools/PersonalCalendar';
+
+//dentist-revenue
+import CommissionView from './components/dentist/revenue/CommissionView';
+import EarningsSummary from './components/dentist/revenue/EarningsSummary';
+
+//dentist-settings
+import Settings from './components/dentist/settings/Settings';
+import ScheduleSettings from './components/dentist/settings/ScheduleSettings';
+import ClinicalPreferences from './components/dentist/settings/ClinicalPreferences';
+import NotificationSettings from './components/dentist/settings/NotificationSettings';
+import RevenueSettings from './components/dentist/settings/RevenueSettings';
+
 
 
 import ViewPatientPageDentist from './components/dentist/ViewPatientPage';
@@ -178,10 +198,10 @@ function App() {
             <Route path="/owner/settings" element={<SettingsPage />}>
                 <Route index element={<Navigate to="account" replace />} />
                 <Route path="account" element={<AccountSettingsPage />} />
-                <Route path="branch" element={<BranchSettingsPage />} />
-                <Route path="system" element={<SystemPreferencesPage />} />
-                <Route path="financial" element={<FinancialSettingsPage />} />
-                <Route path="audit-logs" element={<AuditLogsPage />} />
+                <Route path="branch" element={<BranchSettings />} />
+                <Route path="system" element={<SystemPreferences />} />
+                <Route path="financial" element={<FinancialSettings />} />
+                <Route path="audit" element={<AuditLogs />} />
             </Route>
 
             {/* SECRETARY ROUTES */}
@@ -204,12 +224,22 @@ function App() {
             <Route path="/dentist/patient-records" element={<PatientRecords />} />
             <Route path="/dentist/patient-records/:id" element={<ViewPatientPageDentist />} />
             <Route path="/dentist/financials" element={<Financials />} />
-            <Route path="/dentist/schedule" element={<Schedule />} />
+            <Route path="/dentist/surgeries" element={<Surgeries />} />
+            <Route path="/dentist/tools/assigned-surgeries" element={<AssignedSurgeriesDentist />} />
+            <Route path="/dentist/tools/treatment-notes" element={<TreatmentNotesDentist />} />
+            <Route path="/dentist/tools/records" element={<OdontogramDentist />} />
+            <Route path="/dentist/tools/personal-calendar" element={<PersonalCalendar />} />
+            <Route path="/dentist/revenue/commission-view" element={<CommissionView />} />
+            <Route path="/dentist/revenue/earnings-summary" element={<EarningsSummary />} />
             
             {/* DENTIST SETTINGS */}
-            <Route path="/dentist/settings" element={<SettingsPage />}>
+            <Route path="/dentist/settings" element={<Settings />}>
                 <Route index element={<Navigate to="account" replace />} />
                 <Route path="account" element={<AccountSettingsPage />} />
+                <Route path="schedule" element={<ScheduleSettings />} />
+                <Route path="clinical" element={<ClinicalPreferences />} />
+                <Route path="notifications" element={<NotificationSettings />} />
+                <Route path="revenue" element={<RevenueSettings />} />
             </Route>
 
             {/* PATIENT ROUTES */}

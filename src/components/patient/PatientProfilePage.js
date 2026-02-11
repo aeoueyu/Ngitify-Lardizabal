@@ -9,8 +9,8 @@ import XrayViewer from './XrayViewer';
 
 // Mock data - will be replaced by API calls
 const samplePatients = {
-    1: { id: 1, name: 'John Doe', age: 34, gender: 'Male', lastVisit: '2023-10-15', status: 'Active', email: 'john.doe@email.com', phone: '09123456789', address: '123 Dental St, Toothville', medicalHistory: 'Hypertension, Allergic to Penicillin', treatmentNotes: [{date: '2023-10-15', note: 'Initial check-up, cleaning.'}, {date: '2023-11-01', note: 'Filling on tooth #14.'}], odontogramData: { 14: { id: 14, status: 'filling' } }, xrays: [] },
-    2: { id: 2, name: 'Jane Smith', age: 28, gender: 'Female', lastVisit: '2023-11-01', status: 'Active', email: 'jane.smith@email.com', phone: '09987654321', address: '456 Molar Ave, Gumtown', medicalHistory: 'None', treatmentNotes: [{date: '2023-11-01', note: 'Wisdom tooth extraction consultation.'}], odontogramData: null, xrays: [] },
+    1: { id: 1, name: 'John Doe', age: 34, gender: 'Male', lastVisit: '2023-10-15', status: 'Active', email: 'john.doe@email.com', phone: '09123456789', address: '123 Dental St, Toothville', medicalHistory: 'Hypertension, Allergic to Penicillin', treatmentNotes: [{date: '2023-10-15', note: 'Initial check-up, cleaning.'}, {date: '2023-11-01', note: 'Filling on tooth #14.'}], odontogramData: { 14: { id: 14, status: 'filling' } }, xrays: [], surgeryHistory: [{ id: 1, procedure: 'Wisdom Tooth Extraction', date: '2024-07-15', dentist: 'Dr. Smith' }] },
+    2: { id: 2, name: 'Jane Smith', age: 28, gender: 'Female', lastVisit: '2023-11-01', status: 'Active', email: 'jane.smith@email.com', phone: '09987654321', address: '456 Molar Ave, Gumtown', medicalHistory: 'None', treatmentNotes: [{date: '2023-11-01', note: 'Wisdom tooth extraction consultation.'}], odontogramData: null, xrays: [], surgeryHistory: [] },
 };
 
 export default function PatientProfilePage() {
@@ -79,6 +79,8 @@ export default function PatientProfilePage() {
                 return <Odontogram patientData={patient.odontogramData} onUpdate={handleOdontogramUpdate} />;
             case 'xrays':
                 return <XrayViewer initialXrays={patient.xrays} onUpdate={handleXrayUpdate} />;
+            case 'surgeries':
+                return <SurgeryHistory patient={patient} />;
             default:
                 return null;
         }
@@ -86,9 +88,9 @@ export default function PatientProfilePage() {
 
     return (
         <div className={styles.container}>
-            <button className={styles.backButton} onClick={() => navigate('/owner/patient-records')}>
+            <button className={styles.backButton} onClick={() => navigate(-1)}>
                 <img src={backIcon} alt="Back" />
-                Back to Patient List
+                Back to Previous Page
             </button>
 
             <div className={styles.profileHeader}>
@@ -104,6 +106,7 @@ export default function PatientProfilePage() {
                 <button className={activeTab === 'records' ? styles.activeTab : ''} onClick={() => setActiveTab('records')}>Medical Records</button>
                 <button className={activeTab === 'odontogram' ? styles.activeTab : ''} onClick={() => setActiveTab('odontogram')}>Odontogram</button>
                 <button className={activeTab === 'xrays' ? styles.activeTab : ''} onClick={() => setActiveTab('xrays')}>X-Rays</button>
+                <button className={activeTab === 'surgeries' ? styles.activeTab : ''} onClick={() => setActiveTab('surgeries')}>Surgery History</button>
             </div>
 
             <div className={styles.contentContainer}>
@@ -220,3 +223,33 @@ const MedicalRecords = ({ patient, onAddNote, onUpdateNote, onDeleteNote }) => {
         </div>
     );
 };
+
+const SurgeryHistory = ({ patient }) => (
+    <div className={styles.card}>
+        <div className={styles.cardHeader}>
+            <h3>Surgery History</h3>
+        </div>
+        {patient.surgeryHistory && patient.surgeryHistory.length > 0 ? (
+            <table className={styles.recordTable}>
+                <thead>
+                    <tr>
+                        <th>Procedure</th>
+                        <th>Date</th>
+                        <th>Dentist</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {patient.surgeryHistory.map(surgery => (
+                        <tr key={surgery.id}>
+                            <td>{surgery.procedure}</td>
+                            <td>{surgery.date}</td>
+                            <td>{surgery.dentist}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        ) : (
+            <p>No surgery history found for this patient.</p>
+        )}
+    </div>
+);

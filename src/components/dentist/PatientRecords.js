@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from '../../styles/owner/PatientRecords.module.css';
+import styles from '../../styles/owner/Surgery.module.css';
 import { mockPatients } from '../../data/patients';
 
 export default function PatientRecords() {
@@ -17,64 +17,58 @@ export default function PatientRecords() {
 
     return (
         <div className={styles.container}>
-            <header className={styles.header}>
-                <div>
-                    <h1 className={styles.title}>Patient Records</h1>
-                    <p className={styles.subtitle}>View and manage patient clinical records.</p>
+            <div className={styles.headerContainer}>
+                <div className={styles.titleSection}>
+                    <h1 className={styles.pageTitle}>Patient Records</h1>
+                    <p className={styles.subTitle}>View and manage patient clinical records.</p>
                 </div>
-            </header>
+            </div>
 
-            <div className={styles.contentCard}>
-                <div className={styles.controls}>
-                    <input 
-                        type="text" 
-                        placeholder="Search patient name, ID, or branch..." 
-                        className={styles.searchBar} 
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    <div className={styles.filterBadge}>Total Records: {allPatients.length}</div>
-                </div>
+            <div className={styles.controlsContainer}>
+                <input
+                    type="text"
+                    className={styles.searchBar}
+                    placeholder="Search by patient, ID, or branch..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
 
-                <table className={styles.recordTable}>
+            <div className={styles.tableContainer}>
+                <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th>Patient Name</th>
+                            <th>PATIENT</th>
                             <th>ID</th>
-                            <th>Branch</th>
-                            <th>Last Visit</th>
-                            <th>Status</th>
-                            <th style={{textAlign: 'center'}}>Action</th>
+                            <th>BRANCH</th>
+                            <th>LAST VISIT</th>
+                            <th>STATUS</th>
+                            <th className={styles.actionHeader}>ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {filtered.length > 0 ? (
-                            filtered.map(patient => (
-                                <tr key={patient.id}>
-                                    <td><strong>{patient.name}</strong></td>
-                                    <td className={styles.mono}>{patient.id}</td>
-                                    <td>{patient.branch}</td>
-                                    <td>{patient.lastVisit}</td>
-                                    <td>
-                                        <span className={patient.status === 'active' ? styles.statusActive : styles.statusInactive}>
-                                            {patient.status}
-                                        </span>
-                                    </td>
-                                    <td style={{textAlign: 'center'}}>
-                                        <button 
-                                            className={styles.viewBtn} 
-                                            onClick={() => navigate(`/dentist/patient-records/${patient.id}`)}
-                                        >
-                                            View Patient
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="6" style={{textAlign: 'center', padding: '30px', color: '#888'}}>No records found.</td>
+                        {filtered.map(patient => (
+                            <tr key={patient.id}>
+                                <td className={styles.nameCell}>
+                                    <div className={styles.avatarPlaceholder}>
+                                        {patient.name.charAt(0)}
+                                    </div>
+                                    {patient.name}
+                                </td>
+                                <td>{patient.id}</td>
+                                <td>{patient.branch}</td>
+                                <td>{patient.lastVisit}</td>
+                                <td><span className={`${styles.statusBadge} ${patient.status === 'active' ? styles.confirmed : styles.cancelled}`}>{patient.status}</span></td>
+                                <td className={styles.actionCell}>
+                                    <button 
+                                        className={styles.viewBtn}
+                                        onClick={() => navigate(`/dentist/patient-records/${patient.id}`)}
+                                    >
+                                        View
+                                    </button>
+                                </td>
                             </tr>
-                        )}
+                        ))}
                     </tbody>
                 </table>
             </div>
