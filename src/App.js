@@ -55,6 +55,7 @@ import SurgeryScheduling from './components/owner/surgery/SurgeryScheduling';
 import AssignSurgeon from './components/owner/surgery/AssignSurgeon';
 import ViewSurgeryDetails from './components/owner/surgery/ViewSurgeryDetails';
 import SurgeryStatistics from './components/owner/surgery/SurgeryStatistics';
+import BillingFinance from './components/owner/finance/BillingFinance';
 
 //sec
 import SecretaryDashboard from './components/secretary/SecretaryDashboard';
@@ -114,6 +115,7 @@ function App() {
             <Route path="/owner/surgery-assignment" element={<AssignSurgeon />} />
             <Route path="/owner/surgery-details" element={<ViewSurgeryDetails />} />
             <Route path="/owner/surgery-statistics" element={<SurgeryStatistics />} />
+            <Route path="/owner/billing-finance" element={<BillingFinance />} />
 
             <Route path="/owner/manage-dentists" element={<ManageDentists />} />
             <Route path="/owner/add-dentist" element={<AddDentistPage />} />

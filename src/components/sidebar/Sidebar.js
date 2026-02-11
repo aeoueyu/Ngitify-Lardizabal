@@ -33,20 +33,23 @@ export default function Sidebar() {
 
     const [isUserMgmtOpen, setIsUserMgmtOpen] = useState(false);
     const [isSurgeryMgmtOpen, setIsSurgeryMgmtOpen] = useState(false);
+    const [isFinanceMgmtOpen, setIsFinanceMgmtOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const isActive = (path) => location.pathname === path;
     const isUserMgmtActive = location.pathname.includes('/owner/manage');
     const isSurgeryMgmtActive = location.pathname.includes('/owner/surgery');
+    const isFinanceMgmtActive = location.pathname.includes('/owner/billing-finance');
     const isSettingsActive = location.pathname.includes('/settings');
 
     useEffect(() => {
         if (isUserMgmtActive) { setIsUserMgmtOpen(true); setIsSettingsOpen(false); setIsSurgeryMgmtOpen(false); }
         else if (isSettingsActive) { setIsSettingsOpen(true); setIsUserMgmtOpen(false); setIsSurgeryMgmtOpen(false); }
-        else if (isSurgeryMgmtActive) { setIsSurgeryMgmtOpen(true); setIsUserMgmtOpen(false); setIsSettingsOpen(false); }
+        else if (isSurgeryMgmtActive) { setIsSurgeryMgmtOpen(true); setIsUserMgmtOpen(false); setIsSettingsOpen(false); setIsFinanceMgmtOpen(false); }
+        else if (isFinanceMgmtActive) { setIsFinanceMgmtOpen(true); setIsSurgeryMgmtOpen(false); setIsUserMgmtOpen(false); setIsSettingsOpen(false); }
         else { setIsUserMgmtOpen(false); setIsSettingsOpen(false); setIsSurgeryMgmtOpen(false); }
-    }, [location.pathname, isUserMgmtActive, isSettingsActive, isSurgeryMgmtActive]);
+    }, [location.pathname, isUserMgmtActive, isSettingsActive, isSurgeryMgmtActive, isFinanceMgmtActive]);
 
     const handleLogout = () => {
         localStorage.clear();
@@ -90,6 +93,19 @@ export default function Sidebar() {
                                     <li onClick={() => navigate('/owner/surgery-assignment')} className={isActive('/owner/surgery-assignment') ? styles.subActive : ''}>Assign Surgeon</li>
                                     <li onClick={() => navigate('/owner/surgery-details')} className={isActive('/owner/surgery-details') ? styles.subActive : ''}>View Surgery Details</li>
                                     <li onClick={() => navigate('/owner/surgery-statistics')} className={isActive('/owner/surgery-statistics') ? styles.subActive : ''}>Surgery Statistics</li>
+                                </ul>
+                            </div>
+
+
+                            <li className={`${styles.navItem} ${isFinanceMgmtActive ? styles.active : ''}`} onClick={() => { setIsFinanceMgmtOpen(!isFinanceMgmtOpen); setIsUserMgmtOpen(false); setIsSettingsOpen(false); setIsSurgeryMgmtOpen(false); }}>
+                                <div className={styles.navHeader}>
+                                    <div className={styles.navLabel}><img src={financeIcon} alt="Finance" className={styles.icon} /><span>Billing & Finance</span></div>
+                                    <span className={`${styles.arrow} ${isFinanceMgmtOpen ? styles.rotate : ''}`}>▼</span>
+                                </div>
+                            </li>
+                            <div className={`${styles.subMenuContainer} ${isFinanceMgmtOpen ? styles.show : ''}`}>
+                                <ul className={styles.subMenu}>
+                                    <li onClick={() => navigate('/owner/billing-finance')} className={isActive('/owner/billing-finance') ? styles.subActive : ''}>Revenue Reports</li>
                                 </ul>
                             </div>
 

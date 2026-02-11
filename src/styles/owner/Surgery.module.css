@@ -3,6 +3,7 @@
 .container {
     font-family: 'Lexend Deca', sans-serif;
     width: 100%;
+    padding: 0 20px 40px 20px;
 }
 
 /* HEADER */
@@ -250,4 +251,199 @@
     outline: none;
     border-color: #005466;
 }
+
+/* VIEW SURGERY DETAILS STYLES */
+.detailsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.infoCard {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.cardTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #005466;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.infoGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.infoGroup .label {
+    font-size: 11px;
+    color: #888;
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.infoGroup .value {
+    font-size: 14px;
+    color: #444;
+    font-weight: 500;
+}
+
+/* NOTES SECTION */
+.notesSection {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.notesList {
+    margin-bottom: 25px;
+}
+
+.noteItem {
+    border-bottom: 1px solid #f5f5f5;
+    padding: 15px 0;
+}
+.noteItem:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.noteItem:first-child {
+    padding-top: 0;
+}
+
+.noteText {
+    margin: 0 0 8px 0;
+    color: #555;
+    font-style: italic;
+}
+
+.noteMeta {
+    font-size: 12px;
+    color: #999;
+}
+
+.addNoteForm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.noteTextarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Lexend Deca', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+.noteTextarea:focus {
+    outline: none;
+    border-color: #005466;
+}
+
+.addNoteButton {
+    align-self: flex-end;
+    background-color: #005466;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Lexend Deca', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.addNoteButton:hover {
+    background-color: #337685;
+}
+
+/* STATISTICS PAGE STYLES */
+.timeframeSelector {
+    display: flex;
+    background-color: #f0f4f5;
+    border-radius: 50px;
+    padding: 5px;
+}
+
+.timeframeSelector button {
+    background: transparent;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-family: 'Lexend Deca', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.timeframeSelector .activeTimeframe {
+    background-color: white;
+    color: #005466;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.kpiGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.kpiCard {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.kpiCard h4 {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.kpiCard p {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #005466;
+}
+
+.chartsGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+}
+
+.chartCard {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+
+
+
 

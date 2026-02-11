@@ -1,0 +1,196 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container {
+    font-family: 'Lexend Deca', sans-serif;
+    width: 100%;
+    padding: 0 20px 40px 20px;
+}
+
+/* Header */
+.headerContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.titleSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.pageTitle {
+    color: #444;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.subTitle {
+    color: #888;
+    font-size: 14px;
+    margin: 5px 0 0 0;
+}
+
+/* Timeframe Selector */
+.timeframeSelector {
+    display: flex;
+    background-color: #f0f4f5;
+    border-radius: 50px;
+    padding: 5px;
+}
+
+.timeframeSelector button {
+    background: transparent;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-family: 'Lexend Deca', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.timeframeSelector .activeTimeframe {
+    background-color: white;
+    color: #005466;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* KPI Grid */
+.kpiGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.kpiCard {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.kpiCard h4 {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.kpiCard p {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--kpi-color, #005466);
+}
+
+/* Charts Grid */
+.chartsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.chartCard {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.cardTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #005466;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+/* Table Container */
+.tableContainer {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table thead {
+    border-bottom: 2px solid #edf2f4;
+}
+
+.table th {
+    text-align: left;
+    padding: 15px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #005466;
+    letter-spacing: 0.5px;
+}
+
+.table td {
+    padding: 15px;
+    font-size: 14px;
+    color: #555;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.patientCell {
+    font-weight: 600;
+    color: #333;
+}
+
+.statusBadge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.paid {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.unpaid {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.actionCell {
+    text-align: right;
+}
+
+.viewBtn {
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    background-color: #f3f3f3;
+    color: #555;
+    transition: background-color 0.2s;
+}
+
+.viewBtn:hover {
+    background-color: #e0e0e0;
+}
