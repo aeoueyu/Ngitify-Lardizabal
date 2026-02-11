@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container {
+    font-family: 'Lexend Deca', sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+}
+
+.reportsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.reportCard {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.cardTitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 15px;
+}
+
+.cardValue {
+    font-size: 32px;
+    font-weight: 700;
+    color: #005466;
+    margin-bottom: 20px;
+}
+
+.viewButton {
+    background-color: transparent;
+    color: #005466;
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: 1px solid #005466;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.viewButton:hover {
+    background-color: #005466;
+    color: white;
+}

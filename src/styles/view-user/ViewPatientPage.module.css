@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
 
-.container { width: 100%; display: flex; justify-content: center; font-family: 'Lexend Deca', sans-serif; padding-bottom: 50px; }
+.container { width: 100%; display: block; justify-content: center; font-family: 'Lexend Deca', sans-serif; padding-bottom: 50px; }
 .formCard { width: 100%; max-width: 900px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
 
 /* --- HEADER (Flex Layout) --- */
@@ -118,6 +118,19 @@
     font-size: 14px;
     color: #444;
     font-weight: 500;
+}
+
+
+.detailsCard {
+    width: 100%;
+    max-width: 900px;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    margin-top: 30px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .addressSection { margin-bottom: 20px; }

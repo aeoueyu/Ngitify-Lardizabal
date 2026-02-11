@@ -1,91 +1,76 @@
 import React, { useState } from 'react';
 import styles from '../../styles/secretary/Billing.module.css';
 
+const recentTransactions = [
+    { id: 'TXN72384', patient: 'Carlos Reyes', amount: 15000, status: 'Paid', date: '2023-10-26' },
+    { id: 'TXN72383', patient: 'Maria Dela Cruz', amount: 8000, status: 'Paid', date: '2023-10-26' },
+    { id: 'TXN72382', patient: 'Juan Santos', amount: 25000, status: 'Unpaid', date: '2023-10-25' },
+    { id: 'TXN72381', patient: 'Ana Lim', amount: 12000, status: 'Paid', date: '2023-10-24' },
+];
+
 export default function Billing() {
-    const [transactions, setTransactions] = useState([
-        { id: "TRX-001", patient: "Alice Gupta", service: "Braces (Install)", total: 40000, paid: 10000, balance: 30000, method: "Cash", status: "Partial", date: "Feb 03, 2026" },
-        { id: "TRX-002", patient: "Mark Tuan", service: "Cleaning", total: 2000, paid: 2000, balance: 0, method: "GCash", status: "Paid", date: "Feb 03, 2026" },
-    ]);
-
-    const [showPaymentModal, setShowPaymentModal] = useState(false);
-
-    // Helper to format currency
-    const formatPhp = (num) => `₱${num.toLocaleString()}`;
-
     return (
         <div className={styles.container}>
-            <header className={styles.header}>
-                <div>
-                    <h1 className={styles.title}>Billing & Finance</h1>
-                    <p className={styles.subtitle}>Manage payments, track balances, and record multi-channel transactions.</p>
+            {/* Header */}
+            <div className={styles.header}>
+                <h1 className={styles.title}>Billing & Finance</h1>
+                <div className={styles.headerActions}>
+                    <input type="text" placeholder="Search patients..." className={styles.searchInput} />
+                    <input type="date" className={styles.dateFilter} />
                 </div>
-                <button className={styles.newBtn} onClick={() => setShowPaymentModal(true)}>+ New Transaction</button>
-            </header>
+            </div>
 
-            <div className={styles.contentCard}>
-                <table className={styles.billingTable}>
+            {/* Summary Cards */}
+            <div className={styles.summaryCards}>
+                <div className={styles.card}>
+                    <h3 className={styles.cardTitle}>Total Revenue (Today)</h3>
+                    <p className={styles.cardValue}>₱23,000</p>
+                    <p className={styles.cardTrend}>+5% from yesterday</p>
+                </div>
+                <div className={styles.card}>
+                    <h3 className={styles.cardTitle}>Outstanding Payments</h3>
+                    <p className={styles.cardValue}>₱25,000</p>
+                </div>
+                <div className={styles.card}>
+                    <h3 className={styles.cardTitle}>Transactions Today</h3>
+                    <p className={styles.cardValue}>2</p>
+                </div>
+            </div>
+
+            {/* Recent Transactions Table */}
+            <div className={styles.transactionsTable}>
+                <h2 className={styles.tableHeader}>Recent Transactions</h2>
+                <table className={styles.table}>
                     <thead>
                         <tr>
                             <th>Transaction ID</th>
-                            <th>Patient Name</th>
-                            <th>Service</th>
-                            <th>Total</th>
-                            <th>Paid</th>
-                            <th>Balance</th>
-                            <th>Method</th>
+                            <th>Patient</th>
+                            <th>Amount</th>
                             <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {transactions.map(trx => (
-                            <tr key={trx.id}>
-                                <td className={styles.mono}>{trx.id}</td>
-                                <td><strong>{trx.patient}</strong></td>
-                                <td>{trx.service}</td>
-                                <td>{formatPhp(trx.total)}</td>
-                                <td style={{color: '#2e7d32'}}>{formatPhp(trx.paid)}</td>
-                                <td style={{color: trx.balance > 0 ? '#c62828' : '#888', fontWeight: 'bold'}}>
-                                    {formatPhp(trx.balance)}
-                                </td>
-                                <td><span className={styles.methodTag}>{trx.method}</span></td>
+                        {recentTransactions.map(tx => (
+                            <tr key={tx.id}>
+                                <td>{tx.id}</td>
+                                <td>{tx.patient}</td>
+                                <td>₱{tx.amount.toLocaleString()}</td>
                                 <td>
-                                    <span className={trx.status === 'Paid' ? styles.statusPaid : styles.statusPartial}>
-                                        {trx.status}
+                                    <span className={`${styles.statusBadge} ${tx.status === 'Paid' ? styles.statusPaid : styles.statusUnpaid}`}>
+                                        {tx.status}
                                     </span>
+                                </td>
+                                <td>{tx.date}</td>
+                                <td>
+                                    <button className={styles.actionButton}>View Receipt</button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
-
-            {/* Simple Mock Modal for "New Transaction" */}
-            {showPaymentModal && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalCard}>
-                        <h3>Record Payment</h3>
-                        <p style={{fontSize: '13px', color: '#666', marginBottom: '20px'}}>This is a mock form for recording payments.</p>
-                        <div className={styles.formGroup}><label>Patient Name</label><input className={styles.input} placeholder="Search patient..." /></div>
-                        <div className={styles.formGroup}><label>Service</label><input className={styles.input} placeholder="e.g. Braces" /></div>
-                        <div className={styles.row}>
-                            <div className={styles.formGroup}><label>Amount Received</label><input className={styles.input} placeholder="0.00" /></div>
-                            <div className={styles.formGroup}>
-                                <label>Method</label>
-                                <select className={styles.input}>
-                                    <option>Cash</option>
-                                    <option>GCash</option>
-                                    <option>Credit Card</option>
-                                    <option>Bank Transfer</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className={styles.actions}>
-                            <button className={styles.cancelBtn} onClick={() => setShowPaymentModal(false)}>Cancel</button>
-                            <button className={styles.saveBtn} onClick={() => setShowPaymentModal(false)}>Record Payment</button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

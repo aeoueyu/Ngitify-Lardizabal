@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styles from '../../styles/view-user/ViewPatientPage.module.css';
 import { regions, provinces, cities, barangays } from '../../utils/addressData';
 import { mockPatients } from '../../data/patients'; // IMPORT MOCK DATA
+import StaticPatientDetails from '../secretary/StaticPatientDetails';
 
 export default function ViewPatientPage() {
     const { id } = useParams();
@@ -252,6 +253,9 @@ export default function ViewPatientPage() {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className={styles.detailsCard}>
+                <StaticPatientDetails patient={patient} />
             </div>
         </div>
     );

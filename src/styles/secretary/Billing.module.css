@@ -1,33 +1,144 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
 
-.container { font-family: 'Lexend Deca', sans-serif; padding: 0 20px 40px 20px; }
+.container {
+    font-family: 'Lexend Deca', sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
 
-/* Header */
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-.title { color: #444; font-size: 24px; font-weight: 700; margin: 0; }
-.subtitle { color: #888; font-size: 14px; margin: 5px 0 0 0; }
-.newBtn { background-color: #005466; color: white; border: none; padding: 10px 20px; border-radius: 50px; font-weight: 700; cursor: pointer; }
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
 
-/* Table */
-.contentCard { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-.billingTable { width: 100%; border-collapse: collapse; }
-.billingTable th { text-align: left; font-size: 12px; color: #888; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; text-transform: uppercase; }
-.billingTable td { padding: 20px 0; border-bottom: 1px solid #f9f9f9; font-size: 14px; color: #444; }
-.mono { font-family: monospace; color: #666; }
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+}
 
-/* Badges */
-.methodTag { background: #f0f2f5; padding: 4px 8px; border-radius: 6px; font-size: 12px; color: #555; }
-.statusPaid { background: #e8f5e9; color: #2e7d32; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-.statusPartial { background: #fff3e0; color: #ef6c00; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.headerActions {
+    display: flex;
+    gap: 10px;
+}
 
-/* Modal */
-.modalOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modalCard { background: white; padding: 30px; border-radius: 15px; width: 400px; }
-.modalCard h3 { margin: 0 0 10px 0; color: #005466; }
-.formGroup { margin-bottom: 15px; display: flex; flex-direction: column; }
-.formGroup label { font-size: 12px; color: #888; margin-bottom: 5px; font-weight: 700; }
-.input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-family: inherit; }
-.row { display: flex; gap: 15px; }
-.actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-.cancelBtn { background: #f0f0f0; color: #555; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-.saveBtn { background: #005466; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.searchInput {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.dateFilter {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.summaryCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.cardTitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.cardValue {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+}
+
+.cardTrend {
+    font-size: 12px;
+    color: #4caf50;
+    margin-top: 5px;
+}
+
+.transactionsTable {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.tableHeader {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.table th {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.table td {
+    font-size: 14px;
+    color: #444;
+}
+
+.statusPaid {
+    color: #2e7d32;
+    background-color: #e8f5e9;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.statusUnpaid {
+    color: #c62828;
+    background-color: #ffebee;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.actionButton {
+    background: none;
+    border: 1px solid #005466;
+    color: #005466;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.actionButton:hover {
+    background-color: #005466;
+    color: white;
+}

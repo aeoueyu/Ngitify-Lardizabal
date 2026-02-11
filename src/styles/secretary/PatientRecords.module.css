@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container {
+    font-family: 'Lexend Deca', sans-serif;
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+.managePatientsContainer {
+    flex: 2;
+}
+
+.detailsContainer {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.detailsTitle {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.detailsSection {
+    margin-bottom: 20px;
+}
+
+.detailsSection h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.image {
+    width: 100%;
+    border-radius: 6px;
+    background-color: #f0f0f0;
+    min-height: 150px;
+    display: block;
+}
+
+.detailsSection p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #555;
+}

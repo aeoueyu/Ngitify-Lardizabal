@@ -305,21 +305,39 @@ export default function Sidebar() {
                     {/* SECRETARY MENU */}
                     {userRole === 'secretary' && (
                         <>
-                            <li className={`${styles.navItem} ${isActive('/secretary/manage-patients') ? styles.active : ''}`} onClick={() => navigate('/secretary/manage-patients')}>
-                                <img src={patientSideIcon} alt="Patients" className={styles.icon} />
-                                <span>Patient Registration</span> {/* Renamed for clarity */}
+                            <li className={`${styles.navItem} ${location.pathname.includes('/secretary/patient-records') ? styles.active : ''}`} onClick={() => navigate('/secretary/patient-records')}>
+                                <img src={recordIcon} alt="Patient Records" className={styles.icon} />
+                                <span>Patient Records</span>
                             </li>
-
+                            <li className={`${styles.navItem} ${isActive('/secretary/surgeries') ? styles.active : ''}`} onClick={() => navigate('/secretary/surgeries')}>
+                                <img src={surgeriesIcon} alt="Surgeries" className={styles.icon} />
+                                <span>Surgeries</span>
+                            </li>
                             <li className={`${styles.navItem} ${isActive('/secretary/billing') ? styles.active : ''}`} onClick={() => navigate('/secretary/billing')}>
-                                <img src={billingIcon || financeIcon} alt="Billing" className={styles.icon} />
-                                <span>Billing & Payments</span>
+                                <img src={billingIcon} alt="Billing" className={styles.icon} />
+                                <span>Billing & Finance</span>
+                            </li>
+                            <li className={`${styles.navItem} ${isActive('/secretary/inventory') ? styles.active : ''}`} onClick={() => navigate('/secretary/inventory')}>
+                                <img src={clinicIcon} alt="Inventory" className={styles.icon} />
+                                <span>Inventory</span>
+                            </li>
+                            <li className={`${styles.navItem} ${isActive('/secretary/staff-calendar') ? styles.active : ''}`} onClick={() => navigate('/secretary/staff-calendar')}>
+                                <img src={scheduleIcon} alt="Staff Calendar" className={styles.icon} />
+                                <span>Staff Calendar</span>
+                            </li>
+                            <li className={`${styles.navItem} ${isActive('/secretary/chatbot-tickets') ? styles.active : ''}`} onClick={() => navigate('/secretary/chatbot-tickets')}>
+                                <img src={usersIcon} alt="Chatbot Tickets" className={styles.icon} />
+                                <span>Chatbot Tickets</span>
+                            </li>
+                            
+                            <div className={styles.sectionDivider}>Analytics</div>
+                            <li className={`${styles.navItem} ${isActive('/secretary/reports') ? styles.active : ''}`} onClick={() => navigate('/secretary/reports')}>
+                                <img src={analyticsIcon} alt="Reports" className={styles.icon} />
+                                <span>Reports & Logs</span>
                             </li>
 
-                            <li className={`${styles.navItem} ${isActive('/secretary/document-management') ? styles.active : ''}`} onClick={() => navigate('/secretary/document-management')}>
-                                <img src={folderIcon || usersIcon} alt="Docs" className={styles.icon} />
-                                <span>Documents</span>
-                            </li>
-                            <li className={`${styles.navItem} ${location.pathname.includes('/secretary/settings') ? styles.active : ''}`} onClick={() => navigate('/secretary/settings')}>
+                            <div className={styles.sectionDivider}>General</div>
+                            <li className={`${styles.navItem} ${location.pathname.includes('/secretary/settings') ? styles.active : ''}`} onClick={() => navigate('/secretary/settings/account')}>
                                 <img src={settingsIcon} alt="Settings" className={styles.icon} />
                                 <span>Settings</span>
                             </li>

@@ -98,6 +98,12 @@ import Odontogram from './components/owner/dentist-tools/Odontogram';
 import SecretaryDashboard from './components/secretary/SecretaryDashboard';
 import Billing from './components/secretary/Billing';
 import DocumentManagement from './components/secretary/DocumentManagement';
+import SecretaryPatientRecords from './components/secretary/PatientRecords';
+import SecretarySurgeries from './components/secretary/Surgeries';
+import SecretaryInventory from './components/secretary/Inventory';
+import SecretaryStaffCalendar from './components/secretary/StaffCalendar';
+import SecretaryChatbotTickets from './components/secretary/ChatbotTickets';
+import SecretaryReports from './components/secretary/Reports';
 
 //patient
 import PatientDashboard from './components/patient/PatientDashboard';
@@ -206,11 +212,17 @@ function App() {
 
             {/* SECRETARY ROUTES */}
             <Route path="/secretary/dashboard" element={<SecretaryDashboard />} />
+            <Route path="/secretary/patient-records" element={<SecretaryPatientRecords />} />
+            <Route path="/secretary/surgeries" element={<SecretarySurgeries />} />
+            <Route path="/secretary/billing" element={<Billing />} />
+            <Route path="/secretary/inventory" element={<SecretaryInventory />} />
+            <Route path="/secretary/staff-calendar" element={<SecretaryStaffCalendar />} />
+            <Route path="/secretary/chatbot-tickets" element={<SecretaryChatbotTickets />} />
+            <Route path="/secretary/reports" element={<SecretaryReports />} />
             <Route path="/secretary/manage-patients" element={<ManagePatients />} />
             <Route path="/secretary/add-patient" element={<AddPatientPage />} />
             <Route path="/secretary/edit-patient/:id" element={<EditPatientPage />} />
             <Route path="/secretary/view-patient/:id" element={<ViewPatientPage />} />
-            <Route path="/secretary/billing/" element={<Billing />} />
             <Route path="/secretary/document-management" element={<DocumentManagement />} />
             
             {/* SECRETARY SETTINGS */}
