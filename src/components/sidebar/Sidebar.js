@@ -3,6 +3,9 @@ import styles from '../../styles/sidebar/Sidebar.module.css';
 import logo from '../../assets/logo-white.svg'; 
 import { useNavigate, useLocation } from 'react-router-dom';
 
+// Import Modal
+import Modal from '../modal/Modal'; 
+
 // Icons
 import dashboardIcon from '../../assets/sidebar-icons/dashboard.svg';
 import usersIcon from '../../assets/sidebar-icons/users.svg';
@@ -41,12 +44,11 @@ export default function Sidebar() {
 
     const isActive = (path) => location.pathname === path;
     const isUserMgmtActive = location.pathname.includes('/owner/manage') || 
-                             location.pathname.includes('/owner/activity-logs') ||
                              location.pathname.includes('/owner/assign-permissions');
     const isSurgeryMgmtActive = location.pathname.includes('/owner/surgery');
     const isFinanceMgmtActive = location.pathname.includes('/owner/billing-finance');
     const isDentistToolsActive = location.pathname.includes('/owner/dentist-tools');
-    const isSettingsActive = location.pathname.includes('/settings');
+    const isSettingsActive = location.pathname.includes('/settings') || location.pathname.includes('/activity-logs');
 
     useEffect(() => {
         if (isUserMgmtActive) {
@@ -90,6 +92,7 @@ export default function Sidebar() {
             console.error('Error logging out:', error);
         } finally {
             localStorage.clear();
+            setShowLogoutModal(false); // Close modal
             navigate('/login', { replace: true });
         }
     };
@@ -165,7 +168,6 @@ export default function Sidebar() {
                                     <li onClick={() => navigate('/owner/manage-secretaries')} className={isActive('/owner/manage-secretaries') ? styles.subActive : ''}>Secretaries</li>
                                     <li onClick={() => navigate('/owner/manage-branch-owners')} className={isActive('/owner/manage-branch-owners') ? styles.subActive : ''}>Branch Owners</li>
                                     <li onClick={() => navigate('/owner/assign-permissions')} className={isActive('/owner/assign-permissions') ? styles.subActive : ''}>Assign Permissions</li>
-                                    <li onClick={() => navigate('/owner/activity-logs')} className={isActive('/owner/activity-logs') ? styles.subActive : ''}>Activity Logs</li>
                                 </ul>
                             </div>
 
@@ -271,15 +273,14 @@ export default function Sidebar() {
                             <li onClick={() => navigate(`/${userRole}/settings/account`)} className={location.pathname.includes('/settings/account') ? styles.subActive : ''}>Account Settings</li>
                             {userRole === 'owner' && (
                                 <>
-                                    <li style={{ cursor: 'default', opacity: 0.6 }}>Branch Settings</li>
-                                    <li style={{ cursor: 'default', opacity: 0.6 }}>Staff Settings</li>
+                                    <li onClick={() => navigate('/owner/settings/branch')} className={location.pathname.includes('/settings/branch') ? styles.subActive : ''}>Branch Settings</li>
                                 </>
                             )}
-                            <li style={{ cursor: 'default', opacity: 0.6 }}>System Preferences</li>
+                            <li onClick={() => navigate(`/${userRole}/settings/system`)} className={location.pathname.includes('/settings/system') ? styles.subActive : ''}>System Preferences</li>
                             {userRole === 'owner' && (
                                 <>
-                                    <li style={{ cursor: 'default', opacity: 0.6 }}>Financial Settings</li>
-                                    <li onClick={() => navigate('/owner/settings/audit-logs')} className={location.pathname.includes('/settings/audit-logs') ? styles.subActive : ''}>Audit Logs</li>
+                                    <li onClick={() => navigate('/owner/settings/financial')} className={location.pathname.includes('/settings/financial') ? styles.subActive : ''}>Financial Settings</li>
+                                    <li onClick={() => navigate('/owner/activity-logs')} className={location.pathname.includes('/activity-logs') ? styles.subActive : ''}>Activity Logs</li>
                                 </>
                             )}
                         </ul>
@@ -291,6 +292,20 @@ export default function Sidebar() {
                     <button className={styles.logoutBtn} onClick={() => setShowLogoutModal(true)}>LOGOUT</button>
                 </div>
             </div>
+
+            {/* Logout Modal Rendered Here */}
+            {showLogoutModal && (
+                <Modal
+                    icon={warningIcon}
+                    title="Logout"
+                    body="Are you sure you want to logout?"
+                    primaryButtonText="Yes, Logout"
+                    secondaryButtonText="Cancel"
+                    onPrimaryClick={handleLogout}
+                    onSecondaryClick={() => setShowLogoutModal(false)}
+                    onClose={() => setShowLogoutModal(false)}
+                />
+            )}
         </>
     );
 }

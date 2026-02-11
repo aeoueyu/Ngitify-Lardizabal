@@ -16,7 +16,9 @@ import ActivateAccountPage from './components/email-activation/ActivateAccountPa
 import Sidebar from './components/sidebar/Sidebar';
 import SettingsPage from './components/settings/SettingsPage';
 import AccountSettingsPage from './components/settings/AccountSettingsPage';
-import StaffSettingsPage from './components/settings/StaffSettingsPage';
+import BranchSettingsPage from './components/settings/BranchSettingsPage';
+import SystemPreferencesPage from './components/settings/SystemPreferencesPage';
+import FinancialSettingsPage from './components/settings/FinancialSettingsPage';
 
 // --- DASHBOARDS ---
 import AuditLogsPage from './components/audit-logs/AuditLogsPage';
@@ -174,6 +176,9 @@ function App() {
             <Route path="/owner/settings" element={<SettingsPage />}>
                 <Route index element={<Navigate to="account" replace />} />
                 <Route path="account" element={<AccountSettingsPage />} />
+                <Route path="branch" element={<BranchSettingsPage />} />
+                <Route path="system" element={<SystemPreferencesPage />} />
+                <Route path="financial" element={<FinancialSettingsPage />} />
                 <Route path="audit-logs" element={<AuditLogsPage />} />
             </Route>
 

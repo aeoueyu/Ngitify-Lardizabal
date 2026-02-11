@@ -1,38 +1,77 @@
-import React from 'react';
-import styles from '../../styles/settings/BranchSettingsPage.module.css';
+import React, { useState } from 'react';
+import styles from '../../styles/user-management/ManageDentists.module.css'; // Re-use the same style
+import addIcon from '../../assets/sidebar-icons/add-icon.svg';
 
 export default function BranchSettingsPage() {
+    const [searchTerm, setSearchTerm] = useState('');
+
     // Sample data
     const branches = [
         { id: 1, name: 'Main Clinic (Manila)', address: '123 Rizal Ave, Manila', contact: '0917-123-4567', operatingHours: '9:00 AM - 6:00 PM' },
         { id: 2, name: 'Cebu Branch', address: '456 Mango Ave, Cebu City', contact: '0918-765-4321', operatingHours: '10:00 AM - 7:00 PM' },
     ];
 
+    const filteredBranches = branches.filter(branch =>
+        branch.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        branch.address.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className={styles.container}>
-            <div className={styles.header}>
-                <h1 className={styles.title}>Branch Settings</h1>
-                <button className={styles.addButton}>Add New Branch</button>
+            <div className={styles.headerContainer}>
+                <div className={styles.titleSection}>
+                    <h1 className={styles.pageTitle}>Branch Settings</h1>
+                    <p className={styles.subTitle}>Manage your clinic branches and their details.</p>
+                </div>
+                <button className={styles.addButton}>
+                    <img src={addIcon} alt="Add" className={styles.addIcon} />
+                    Add New Branch
+                </button>
             </div>
-            <p className={styles.subtitle}>Manage your clinic branches and their details.</p>
 
-            <div className={styles.cardContainer}>
-                {branches.map(branch => (
-                    <div key={branch.id} className={styles.branchCard}>
-                        <div className={styles.cardHeader}>
-                            <h2 className={styles.branchName}>{branch.name}</h2>
-                            <div className={styles.actions}>
-                                <button className={styles.editButton}>Edit</button>
-                                <button className={styles.deleteButton}>Delete</button>
-                            </div>
-                        </div>
-                        <div className={styles.cardBody}>
-                            <p><strong>Address:</strong> {branch.address}</p>
-                            <p><strong>Contact:</strong> {branch.contact}</p>
-                            <p><strong>Operating Hours:</strong> {branch.operatingHours}</p>
-                        </div>
-                    </div>
-                ))}
+            <div className={styles.controlsContainer}>
+                <input
+                    type="text"
+                    placeholder="Search by branch name or address..."
+                    className={styles.searchBar}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
+            <div className={styles.tableContainer}>
+                <table className={styles.table}>
+                    <thead>
+                        <tr>
+                            <th>Branch Name</th>
+                            <th>Address</th>
+                            <th>Contact</th>
+                            <th>Operating Hours</th>
+                            <th className={styles.actionHeader}>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredBranches.length > 0 ? (
+                            filteredBranches.map(branch => (
+                                <tr key={branch.id}>
+                                    <td className={styles.nameCell}>{branch.name}</td>
+                                    <td>{branch.address}</td>
+                                    <td>{branch.contact}</td>
+                                    <td>{branch.operatingHours}</td>
+                                    <td className={styles.actionCell}>
+                                        <button className={styles.viewBtn}>View</button>
+                                        <button className={styles.editBtn}>Edit</button>
+                                        <button className={styles.deleteBtn}>Delete</button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="5" className={styles.noData}>No branches found.</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
         </div>
     );

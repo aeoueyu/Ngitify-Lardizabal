@@ -1,5 +1,6 @@
 import React from 'react';
-import styles from '../../styles/settings/SystemPreferencesPage.module.css';
+import styles from '../../styles/user-management/ManageDentists.module.css'; // Re-use the same style
+import customStyles from '../../styles/settings/SystemPreferencesPage.module.css'; // Custom styles for form elements
 
 export default function SystemPreferencesPage() {
     // Sample data
@@ -11,31 +12,33 @@ export default function SystemPreferencesPage() {
 
     return (
         <div className={styles.container}>
-            <div className={styles.header}>
-                <h1 className={styles.title}>System Preferences</h1>
+            <div className={styles.headerContainer}>
+                <div className={styles.titleSection}>
+                    <h1 className={styles.pageTitle}>System Preferences</h1>
+                    <p className={styles.subTitle}>Adjust your system-wide settings.</p>
+                </div>
             </div>
-            <p className={styles.subtitle}>Adjust your system-wide settings.</p>
 
-            <div className={styles.formContainer}>
+            <div className={customStyles.formContainer}>
                 {preferences.map(pref => (
-                    <div key={pref.id} className={styles.formGroup}>
-                        <label htmlFor={pref.id} className={styles.label}>{pref.label}</label>
+                    <div key={pref.id} className={customStyles.formGroup}>
+                        <label htmlFor={pref.id} className={customStyles.label}>{pref.label}</label>
                         {Array.isArray(pref.options) ? (
-                            <select id={pref.id} className={styles.select} defaultValue={pref.value}>
+                            <select id={pref.id} className={customStyles.select} defaultValue={pref.value}>
                                 {pref.options.map(option => (
                                     <option key={option} value={option}>{option}</option>
                                 ))}
                             </select>
                         ) : (
-                            <label className={styles.switch}>
+                            <label className={customStyles.switch}>
                                 <input type="checkbox" defaultChecked={pref.value} />
-                                <span className={styles.slider}></span>
+                                <span className={customStyles.slider}></span>
                             </label>
                         )}
                     </div>
                 ))}
-                <div className={styles.actions}>
-                    <button className={styles.saveButton}>Save Changes</button>
+                <div className={customStyles.actions}>
+                    <button className={customStyles.saveButton}>Save Changes</button>
                 </div>
             </div>
         </div>
