@@ -155,106 +155,50 @@ select.inputField {
     cursor: pointer;
 }
 
-/* Phone Input */
-.phoneInputGroup {
-    display: flex;
-    align-items: center;
-    border: 1.5px solid #e0e0e0;
-    border-radius: 50px;
-    overflow: hidden;
-    transition: all 0.3s;
-    background-color: white; 
-}
-
-.phoneInputGroup:focus-within {
-    border-color: #005466;
-    box-shadow: 0 0 0 3px rgba(0, 84, 102, 0.1);
-}
-
-/* Phone Group Error State (Container ang mag-iiba ng kulay) */
-.phoneInputGroup.errorBorder {
-    border-color: #dc3545 !important;
-    background-color: #ffe6e6 !important;
-}
-
-/* Prefix (+63) - Transparent background para lumitaw ang pula ng container */
-.phonePrefix {
-    color: #555;
-    padding: 12px 15px;
-    font-size: 14px;
-    font-weight: 600;
-    border-right: 1px solid #e0e0e0;
-    user-select: none;
-    background-color: rgba(248, 249, 250, 0.5); /* Semi-transparent */
-}
-
-/* Phone Field - Transparent background para lumitaw ang pula ng container */
-.phoneField {
-    flex: 1;
-    border: none;
-    padding: 12px 15px;
-    font-size: 14px;
-    outline: none;
-    font-family: 'Lexend Deca', sans-serif;
-    color: #333;
-    background-color: transparent !important; /* IMPORTANT para makita ang background color */
-}
-
-.phoneField::placeholder {
-    color: #ccc;
-}
-
-/* Password Rules Container */
-.passwordRulesContainer {
-    background-color: #f8f9fa;
-    padding: 10px 15px;
-    border-radius: 8px;
-    margin-top: -10px;
-    margin-bottom: 15px;
-    border: 1px solid #eee;
+/* --- Password Checklist Styles --- */
+.checklistBox {
+    background-color: #f8fcfd;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    text-align: left;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     animation: fadeIn 0.2s ease-in-out;
 }
 
-.rulesLabel {
+.checklistTitle {
     font-size: 11px;
     font-weight: 700;
     color: #666;
-    margin: 0 0 5px 0;
-}
-
-.rulesList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    grid-template-columns: 1fr 1fr; 
-    column-gap: 15px;
-    row-gap: 2px;
+    margin: 0 0 8px 0;
+    text-transform: uppercase;
 }
 
 .ruleItem {
-    font-size: 10px;
     display: flex;
     align-items: center;
-    gap: 5px;
-    transition: color 0.3s;
-    line-height: 1.5;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 12px;
 }
 
-.ruleIcon {
-    font-weight: bold;
-    font-size: 11px;
-}
+.iconValid { color: #2e7d32; font-size: 12px; font-weight: bold; } /* Check Icon */
+.iconInvalid { color: #ccc; font-size: 12px; font-weight: bold; } /* Bullet Icon */
 
-.validRule {
-    color: #2e7d32;
+.textValid { color: #2e7d32; font-weight: 600; }
+.textInvalid { color: #888; }
+/* ---------------------------------- */
+
+.passwordMismatch {
+    color: #c62828;
+    font-size: 12px;
+    margin-top: 5px;
+    margin-left: 10px;
     font-weight: 600;
 }
 
-.invalidRule {
-    color: #999;
-}
-
+/* Messages */
 .warningMessage {
     background-color: #fff3cd;
     color: #856404;
@@ -265,42 +209,10 @@ select.inputField {
     font-size: 14px;
 }
 
-.passwordCriteria {
-    font-size: 12px;
-    color: #666;
-    margin-top: 5px;
-}
-
-.passwordCriteria div {
-    color: #c62828;
-}
-
-.passwordCriteria div.valid {
-    color: #2e7d32;
-}
-
-.passwordMismatch {
-    color: #c62828;
-    font-size: 12px;
-    margin-top: 5px;
-}
-
 .errorBorder {
-    border: 1.5px solid #dc3545 !important; /* Red Border */
-    background-color: #ffe6e6 !important;   /* Light Red Background */
+    border: 1.5px solid #dc3545 !important;
+    background-color: #ffe6e6 !important;
     transition: all 0.2s ease;
-}
-
-/* Error Text Message */
-.errorText {
-    color: #dc3545;
-    font-size: 11px;
-    font-weight: 600;
-    margin-top: 4px;
-    margin-left: 2px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
 }
 
 /* Address & Checkbox */
@@ -312,13 +224,6 @@ select.inputField {
     margin-bottom: 20px;
 }
 
-.permanentHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
 .checkboxContainer {
     display: flex;
     align-items: center;
@@ -326,6 +231,7 @@ select.inputField {
     font-size: 14px;
     color: #555;
     cursor: pointer;
+    margin-bottom: 20px;
 }
 
 .checkboxContainer input {
@@ -333,11 +239,6 @@ select.inputField {
     height: 16px;
     accent-color: #005466;
     cursor: pointer;
-}
-
-.disabledOverlay {
-    pointer-events: none;
-    opacity: 0.7;
 }
 
 /* Buttons */
@@ -350,13 +251,12 @@ select.inputField {
     border-top: 1px solid #eee;
 }
 
-/* SAVE CHANGES BUTTON */
 .submitBtn {
     background-color: #005466;
     color: white;
     border: none;
     padding: 12px 30px;
-    border-radius: 50px; /* Eto ang nagpapabilog */
+    border-radius: 50px;
     font-weight: 700;
     font-size: 14px;
     cursor: pointer;
@@ -365,32 +265,36 @@ select.inputField {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2); /* Default shadow */
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
 }
 
 .submitBtn:hover {
     background-color: #337685;
-    transform: scale(1.05); /* LUMALAKI */
-    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2); /* DARKER SHADOW */
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
 }
 
-/* DISABLED SAVE BUTTON (Fixed Shape) */
+/* Disabled State for Submit Button */
+.submitBtn:disabled {
+    background-color: #ccc;
+    color: white;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
 .disabledBtn {
-    /* Kopyahin ang layout styles ng submitBtn */
     background-color: #ccc !important;
     color: white !important;
     border: none;
     padding: 12px 30px;
-    border-radius: 50px; /* FIXED: Para bilog pa rin */
+    border-radius: 50px;
     font-weight: 700;
-    
-    /* Disabled logic */
     cursor: not-allowed !important;
     transform: none !important;
     box-shadow: none !important;
 }
 
-/* CANCEL BUTTON */
 .cancelBtn {
     background-color: white;
     color: #888;
@@ -405,7 +309,7 @@ select.inputField {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2); /* Default Shadow */
+    box-shadow: 0 4px 10px rgba(90, 90, 90, 0.2);
 }
 
 .cancelBtn:hover {
@@ -418,10 +322,7 @@ select.inputField {
 
 /* Animations */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-@keyframes bounceIn { 0% { transform: scale(0); } 60% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
 @media (max-width: 768px) {
-    .row { flex-direction: column; gap: 15px; }
-    .rulesList { grid-template-columns: 1fr; }
+    .row, .formRow { flex-direction: column; gap: 15px; }
 }

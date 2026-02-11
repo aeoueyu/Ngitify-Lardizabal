@@ -6,10 +6,15 @@ export default function AuditLogsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
 
+    // Hanapin ang part na ito sa iyong src/components/audit-logs/AuditLogsPage.js
+// at palitan ang useEffect ng code na nasa ibaba:
+
     useEffect(() => {
         const fetchLogs = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/audit-logs');
+                // 👇 DITO MO ILALAGAY (Palitan ang lumang fetch line nito)
+                const response = await fetch(`http://localhost:5000/api/audit-logs?t=${new Date().getTime()}`);
+                
                 const data = await response.json();
                 if (response.ok) {
                     setLogs(data);
@@ -20,7 +25,15 @@ export default function AuditLogsPage() {
                 setLoading(false);
             }
         };
-        fetchLogs();
+
+        fetchLogs(); 
+
+        // Optional: Kung gusto mo ng automatic refresh (Polling)
+        const intervalId = setInterval(() => {
+            fetchLogs();
+        }, 2000);
+
+        return () => clearInterval(intervalId);
     }, []);
 
     const filteredLogs = logs.filter(log =>
@@ -38,7 +51,7 @@ export default function AuditLogsPage() {
         <div className={styles.container}>
             <div className={styles.headerContainer}>
                 <div className={styles.titleSection}>
-                    <h1 className={styles.pageTitle}>Audit Logs</h1>
+                    <h1 className={styles.pageTitle}>Activity Logs</h1>
                     <p className={styles.subTitle}>Track all system activities.</p>
                 </div>
             </div>

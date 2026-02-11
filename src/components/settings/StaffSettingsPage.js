@@ -1,61 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styles from '../../styles/settings/StaffSettingsPage.module.css';
 
 export default function StaffSettingsPage() {
-    const [staff, setStaff] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchStaff = async () => {
-            try {
-                const res = await fetch('http://localhost:5000/api/users');
-                const data = await res.json();
-                if (res.ok) {
-                    // Filter for dentists and secretaries
-                    const filteredStaff = data.filter(user => user.role === 'dentist' || user.role === 'secretary');
-                    setStaff(filteredStaff);
-                }
-            } catch (error) {
-                console.error("Error fetching staff:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchStaff();
-    }, []);
+    // Sample data
+    const staff = [
+        { id: 1, name: 'Dr. Jose Rizal', role: 'Dentist', email: 'jose.rizal@ngitify.com', status: 'Active' },
+        { id: 2, name: 'Maria Clara', role: 'Receptionist', email: 'maria.clara@ngitify.com', status: 'Active' },
+        { id: 3, name: 'Andres Bonifacio', role: 'Dental Assistant', email: 'andres.bonifacio@ngitify.com', status: 'Inactive' },
+    ];
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.title}>Staff Management</h1>
+            <div className={styles.header}>
+                <h1 className={styles.title}>Staff Settings</h1>
+                <button className={styles.addButton}>Add New Staff</button>
+            </div>
+            <p className={styles.subtitle}>Manage your clinic staff and their roles.</p>
+
             <div className={styles.tableContainer}>
-                <table className={styles.table}>
+                <table className={styles.staffTable}>
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Email</th>
                             <th>Role</th>
+                            <th>Email</th>
                             <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
-                            <tr><td colSpan="4" style={{textAlign:'center', padding:'20px'}}>Loading staff...</td></tr>
-                        ) : staff.length > 0 ? (
-                            staff.map(member => (
-                                <tr key={member._id}>
-                                    <td>{`${member.name.first} ${member.name.last}`}</td>
-                                    <td>{member.email}</td>
-                                    <td style={{textTransform: 'capitalize'}}>{member.role}</td>
-                                    <td>
-                                        <span className={`${styles.status} ${styles[member.status]}`}>
-                                            {member.status}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr><td colSpan="4" className={styles.noData}>No staff found.</td></tr>
-                        )}
+                        {staff.map(member => (
+                            <tr key={member.id}>
+                                <td>{member.name}</td>
+                                <td>{member.role}</td>
+                                <td>{member.email}</td>
+                                <td>
+                                    <span className={`${styles.status} ${member.status === 'Active' ? styles.active : styles.inactive}`}>
+                                        {member.status}
+                                    </span>
+                                </td>
+                                <td className={styles.actions}>
+                                    <button className={styles.editButton}>Edit</button>
+                                    <button className={styles.deleteButton}>Deactivate</button>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>

@@ -41,9 +41,13 @@ const AccountSettingsPage = () => {
     const [profileImage, setProfileImage] = useState(null);
     const [initialImage, setInitialImage] = useState(null);
     const [passwordChangeRequired, setPasswordChangeRequired] = useState(false);
+    
+    // Password States
     const [isCurrentPasswordVerified, setIsCurrentPasswordVerified] = useState(false);
+    const [currentPasswordError, setCurrentPasswordError] = useState(''); // New state for error message
     const [passwordMatch, setPasswordMatch] = useState(true);
-    const [isNewPasswordFocused, setIsNewPasswordFocused] = useState(false);
+    const [showChecklist, setShowChecklist] = useState(false);
+    
     const [passwordCriteria, setPasswordCriteria] = useState({
         length: false,
         uppercase: false,
@@ -91,12 +95,18 @@ const AccountSettingsPage = () => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
 
+        // Reset verification when user types in current password again
+        if (name === 'currentPassword') {
+            setIsCurrentPasswordVerified(false);
+            setCurrentPasswordError('');
+        }
+
         if (name === 'newPassword') {
             const length = value.length >= 8;
             const uppercase = /[A-Z]/.test(value);
             const lowercase = /[a-z]/.test(value);
             const number = /[0-9]/.test(value);
-            const specialChar = /[!@#$%^&*]/.test(value);
+            const specialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
             setPasswordCriteria({ length, uppercase, lowercase, number, specialChar });
         }
 
@@ -108,6 +118,12 @@ const AccountSettingsPage = () => {
     const verifyCurrentPassword = async () => {
         const userId = localStorage.getItem('userId');
         const { currentPassword } = formData;
+        
+        if (!currentPassword) {
+            setIsCurrentPasswordVerified(false);
+            setCurrentPasswordError('');
+            return;
+        }
 
         try {
             const response = await fetch(`http://localhost:5000/api/verify-password`, {
@@ -118,15 +134,17 @@ const AccountSettingsPage = () => {
 
             if (response.ok) {
                 setIsCurrentPasswordVerified(true);
+                setCurrentPasswordError('');
             } else {
                 setIsCurrentPasswordVerified(false);
+                setCurrentPasswordError('Incorrect password'); // Set error message
             }
         } catch (error) {
             console.error('Error verifying password:', error);
             setIsCurrentPasswordVerified(false);
+            setCurrentPasswordError('Server error. Please try again.');
         }
     };
-
 
     const handleAddressChange = (type, field, value) => {
         setFormData(prev => {
@@ -221,11 +239,18 @@ const AccountSettingsPage = () => {
                 setIsEditing(false);
             } else {
                 console.error('Failed to save changes');
+                alert('Failed to save changes.');
             }
         } catch (error) {
             console.error('Error saving changes:', error);
+            alert('An error occurred while saving.');
         }
         setShowSaveModal(false);
+    };
+
+    const handleLogout = () => {
+        localStorage.clear();
+        window.location.href = '/';
     };
 
     const handleChangePassword = async () => {
@@ -238,26 +263,33 @@ const AccountSettingsPage = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:5000/api/user/change-password/${userId}`, {
-                method: 'PUT',
+            // FIX: Binago ang URL, Method, at Body para tumugma sa server.js
+            const response = await fetch(`http://localhost:5000/api/change-password`, { 
+                method: 'POST', // Dapat POST, hindi PUT
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ currentPassword, newPassword })
+                body: JSON.stringify({ 
+                    userId, // Kailangan isama ang userId sa body
+                    currentPassword, 
+                    newPassword 
+                })
             });
 
             if (response.ok) {
                 setShowLogoutModal(true);
+                
+                // Logout automatically after 2 seconds
+                setTimeout(() => {
+                    handleLogout();
+                }, 2000);
+
             } else {
                 const error = await response.json();
                 alert(error.message);
             }
         } catch (error) {
             console.error('Error changing password:', error);
+            alert("Server connection failed. Please try again later.");
         }
-    };
-
-    const handleLogout = () => {
-        localStorage.clear();
-        window.location.href = '/';
     };
 
     const hasChanges = () => {
@@ -398,31 +430,101 @@ const AccountSettingsPage = () => {
                 <div className={styles.formRow}>
                     <div className={styles.formGroup}>
                         <label htmlFor="currentPassword">Current Password</label>
-                        <input className={styles.inputField} type="password" id="currentPassword" name="currentPassword" value={formData.currentPassword} onChange={handleInputChange} onBlur={verifyCurrentPassword} />
+                        <input 
+                            className={`${styles.inputField} ${currentPasswordError ? styles.errorBorder : ''}`} 
+                            type="password" 
+                            id="currentPassword" 
+                            name="currentPassword" 
+                            value={formData.currentPassword} 
+                            onChange={handleInputChange} 
+                            onBlur={verifyCurrentPassword} 
+                        />
+                        {/* Error Message for Current Password */}
+                        {currentPasswordError && (
+                            <div className={styles.errorText} style={{ color: '#dc3545', fontSize: '12px', marginTop: '5px' }}>
+                                {currentPasswordError}
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className={styles.formRow}>
                     <div className={styles.formGroup}>
                         <label htmlFor="newPassword">New Password</label>
-                        <input className={styles.inputField} type="password" id="newPassword" name="newPassword" value={formData.newPassword} onChange={handleInputChange} onFocus={() => setIsNewPasswordFocused(true)} onBlur={() => setIsNewPasswordFocused(formData.newPassword !== '')} disabled={!isCurrentPasswordVerified} />
-                        {isNewPasswordFocused && (
-                            <div className={styles.passwordCriteria}>
-                                <div className={passwordCriteria.length ? styles.valid : ''}>At least 8 characters</div>
-                                <div className={passwordCriteria.uppercase ? styles.valid : ''}>One uppercase letter</div>
-                                <div className={passwordCriteria.lowercase ? styles.valid : ''}>One lowercase letter</div>
-                                <div className={passwordCriteria.number ? styles.valid : ''}>One number</div>
-                                <div className={passwordCriteria.specialChar ? styles.valid : ''}>One special character</div>
+                        <input 
+                            className={styles.inputField} 
+                            type="password" 
+                            id="newPassword" 
+                            name="newPassword" 
+                            value={formData.newPassword} 
+                            onChange={handleInputChange} 
+                            onFocus={() => setShowChecklist(true)} 
+                            onBlur={() => setShowChecklist(false)}
+                            disabled={!isCurrentPasswordVerified} 
+                        />
+                        {showChecklist && (
+                            <div className={styles.checklistBox}>
+                                <p className={styles.checklistTitle}>Password must contain:</p>
+                                <div className={styles.ruleItem}>
+                                    <span className={passwordCriteria.length ? styles.iconValid : styles.iconInvalid}>
+                                        {passwordCriteria.length ? '✔' : '●'}
+                                    </span>
+                                    <span className={passwordCriteria.length ? styles.textValid : styles.textInvalid}>At least 8 characters</span>
+                                </div>
+                                <div className={styles.ruleItem}>
+                                    <span className={passwordCriteria.uppercase ? styles.iconValid : styles.iconInvalid}>
+                                        {passwordCriteria.uppercase ? '✔' : '●'}
+                                    </span>
+                                    <span className={passwordCriteria.uppercase ? styles.textValid : styles.textInvalid}>Uppercase letter</span>
+                                </div>
+                                <div className={styles.ruleItem}>
+                                    <span className={passwordCriteria.lowercase ? styles.iconValid : styles.iconInvalid}>
+                                        {passwordCriteria.lowercase ? '✔' : '●'}
+                                    </span>
+                                    <span className={passwordCriteria.lowercase ? styles.textValid : styles.textInvalid}>Lowercase letter</span>
+                                </div>
+                                <div className={styles.ruleItem}>
+                                    <span className={passwordCriteria.number ? styles.iconValid : styles.iconInvalid}>
+                                        {passwordCriteria.number ? '✔' : '●'}
+                                    </span>
+                                    <span className={passwordCriteria.number ? styles.textValid : styles.textInvalid}>Number</span>
+                                </div>
+                                <div className={styles.ruleItem}>
+                                    <span className={passwordCriteria.specialChar ? styles.iconValid : styles.iconInvalid}>
+                                        {passwordCriteria.specialChar ? '✔' : '●'}
+                                    </span>
+                                    <span className={passwordCriteria.specialChar ? styles.textValid : styles.textInvalid}>Special character</span>
+                                </div>
                             </div>
                         )}
                     </div>
                     <div className={styles.formGroup}>
                         <label htmlFor="confirmPassword">Confirm New Password</label>
-                        <input className={styles.inputField} type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} disabled={!isCurrentPasswordVerified} />
+                        <input 
+                            className={styles.inputField} 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            value={formData.confirmPassword} 
+                            onChange={handleInputChange} 
+                            disabled={!isCurrentPasswordVerified} 
+                        />
                         {formData.confirmPassword && !passwordMatch && <div className={styles.passwordMismatch}>Passwords do not match</div>}
                     </div>
                 </div>
                 <div className={styles.buttonGroup}>
-                    <button onClick={handleChangePassword} className={styles.submitBtn} disabled={!isCurrentPasswordVerified || !passwordMatch || Object.values(passwordCriteria).some(v => !v) || !formData.newPassword || !formData.confirmPassword}>Change Password</button>
+                    <button 
+                        onClick={handleChangePassword} 
+                        className={styles.submitBtn} 
+                        disabled={
+                            !isCurrentPasswordVerified || 
+                            !passwordMatch || 
+                            Object.values(passwordCriteria).some(v => !v) || 
+                            !formData.newPassword || 
+                            !formData.confirmPassword
+                        }
+                    >
+                        Change Password
+                    </button>
                 </div>
             </div>
 
@@ -443,11 +545,11 @@ const AccountSettingsPage = () => {
             {showLogoutModal && (
                 <Modal
                     icon={successIcon}
-                    title="Password Changed"
-                    body="Your password has been changed successfully. You will be logged out."
-                    primaryButtonText="Logout"
+                    title="Logging out..."
+                    body="Your password has been changed successfully. You will be logged out automatically in a few seconds."
+                    primaryButtonText="Logout Now"
                     onPrimaryClick={handleLogout}
-                    onClose={handleLogout}
+                    onClose={() => {}} // Disabled close to force logout
                     modalType="logout"
                 />
             )}

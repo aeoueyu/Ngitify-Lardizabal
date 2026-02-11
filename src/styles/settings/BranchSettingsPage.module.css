@@ -37,45 +37,31 @@
     background-color: #0056b3;
 }
 
-.tableContainer {
+.cardContainer {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.branchCard {
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    overflow-x: auto;
+    padding: 1.5rem;
 }
 
-.staffTable {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.staffTable th, .staffTable td {
-    padding: 1rem;
-    text-align: left;
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
     border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
 }
 
-.staffTable th {
-    background-color: #f8f9fa;
+.branchName {
+    font-size: 1.3rem;
     font-weight: bold;
-    color: #333;
-}
-
-.status {
-    padding: 0.3rem 0.8rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
-.active {
-    background-color: #28a745;
-    color: white;
-}
-
-.inactive {
-    background-color: #dc3545;
-    color: white;
+    color: #007bff;
 }
 
 .actions button {
@@ -84,7 +70,7 @@
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.9rem;
-    margin-right: 0.5rem;
+    margin-left: 0.5rem;
 }
 
 .editButton {
@@ -93,6 +79,15 @@
 }
 
 .deleteButton {
-    background-color: #6c757d;
+    background-color: #dc3545;
     color: white;
+}
+
+.cardBody p {
+    margin: 0.5rem 0;
+    color: #555;
+}
+
+.cardBody p strong {
+    color: #333;
 }
