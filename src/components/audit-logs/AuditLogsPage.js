@@ -7,49 +7,47 @@ export default function AuditLogsPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const fetchLogs = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/audit-logs');
+                const data = await response.json();
+                if (response.ok) {
+                    setLogs(data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch audit logs:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchLogs();
     }, []);
 
-    const fetchLogs = async () => {
-        try {
-            const res = await fetch('http://localhost:5000/api/audit-logs');
-            const data = await res.json();
-            if (res.ok) setLogs(data);
-        } catch (error) {
-            console.error("Error fetching logs:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Search Filter
-    const filteredLogs = logs.filter(log => 
+    const filteredLogs = logs.filter(log =>
         log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
         log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
         log.details.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Format Date Helper
-    const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        return new Date(dateString).toLocaleDateString('en-US', options);
+    const getBadgeClass = (action) => {
+        const actionClass = action.toLowerCase().replace(/ /g, '_');
+        return styles[actionClass] || '';
     };
 
     return (
         <div className={styles.container}>
             <div className={styles.headerContainer}>
                 <div className={styles.titleSection}>
-                    <h1 className={styles.pageTitle}>System <span className={styles.highlight}>Audit Logs</span></h1>
-                    <p className={styles.subTitle}>Track system activities and user actions.</p>
+                    <h1 className={styles.pageTitle}>Audit Logs</h1>
+                    <p className={styles.subTitle}>Track all system activities.</p>
                 </div>
-                {/* Optional: Export Button here if needed */}
             </div>
 
             <div className={styles.controlsContainer}>
-                <input 
-                    type="text" 
-                    className={styles.searchBar} 
-                    placeholder="Search logs by user, action, or details..." 
+                <input
+                    type="text"
+                    className={styles.searchBar}
+                    placeholder="Search by user, action, or details..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -59,32 +57,32 @@ export default function AuditLogsPage() {
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th>TIMESTAMP</th>
-                            <th>ACTION</th>
                             <th>USER</th>
                             <th>ROLE</th>
+                            <th>ACTION</th>
                             <th>DETAILS</th>
+                            <th>TIMESTAMP</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan="5" style={{textAlign:'center', padding:'20px'}}>Loading logs...</td></tr>
+                            <tr><td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>Loading...</td></tr>
                         ) : filteredLogs.length > 0 ? (
                             filteredLogs.map((log) => (
                                 <tr key={log._id}>
-                                    <td className={styles.dateCell}>{formatDate(log.timestamp)}</td>
+                                    <td>{log.user}</td>
+                                    <td>{log.role}</td>
                                     <td>
-                                        <span className={`${styles.badge} ${styles[log.action] || styles.DEFAULT}`}>
-                                            {log.action}
+                                        <span className={`${styles.badge} ${getBadgeClass(log.action)}`}>
+                                            {log.action.replace(/_/g, ' ')}
                                         </span>
                                     </td>
-                                    <td className={styles.userCell}>{log.user}</td>
-                                    <td style={{textTransform:'capitalize'}}>{log.role || 'System'}</td>
-                                    <td className={styles.detailsCell}>{log.details}</td>
+                                    <td>{log.details}</td>
+                                    <td>{new Date(log.timestamp).toLocaleString()}</td>
                                 </tr>
                             ))
                         ) : (
-                            <tr><td colSpan="5" className={styles.noData}>No logs found.</td></tr>
+                            <tr><td colSpan="5" className={styles.noData}>No audit logs found.</td></tr>
                         )}
                     </tbody>
                 </table>

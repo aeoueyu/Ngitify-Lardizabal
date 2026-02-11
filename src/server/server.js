@@ -47,6 +47,12 @@ app.post('/api/login', async (req, res) => {
         const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ message: "Invalid email or password" });
 
+        if (!user.isPasswordChanged && user.temporaryPasswordExpires && new Date() > user.temporaryPasswordExpires) {
+            user.status = 'inactive';
+            await user.save();
+            return res.status(403).json({ message: "Your temporary password has expired and your account has been deactivated. Please contact an administrator." });
+        }
+
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
@@ -55,6 +61,13 @@ app.post('/api/login', async (req, res) => {
         }
 
         const token = jwt.sign({ id: user._id, role: user.role }, 'your_jwt_secret', { expiresIn: '1h' });
+
+        await AuditLog.create({
+            action: "LOGIN",
+            user: user.email,
+            role: user.role,
+            details: `User logged in successfully.`
+        });
 
         res.json({ token, role: user.role, userId: user._id });
 
@@ -123,6 +136,7 @@ app.post('/api/add-dentist', async (req, res) => {
         const tempPassword = crypto.randomBytes(4).toString('hex'); 
         const hashedPassword = await bcrypt.hash(tempPassword, 10);
         const activationToken = crypto.randomBytes(32).toString('hex');
+        const temporaryPasswordExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
 
         // FIX: ...otherData is now FIRST to prevent overwriting security fields
         const newUser = new User({
@@ -133,7 +147,8 @@ app.post('/api/add-dentist', async (req, res) => {
             role: 'dentist',
             isVerified: false, // Ensures unverified
             status: 'inactive', // Ensures inactive until verified
-            activationToken
+            activationToken,
+            temporaryPasswordExpires
         });
         
         await newUser.save();
@@ -168,6 +183,7 @@ app.post('/api/add-secretary', async (req, res) => {
         const tempPassword = crypto.randomBytes(4).toString('hex');
         const hashedPassword = await bcrypt.hash(tempPassword, 10);
         const activationToken = crypto.randomBytes(32).toString('hex');
+        const temporaryPasswordExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
 
         const newUser = new User({
             ...otherData,
@@ -176,7 +192,8 @@ app.post('/api/add-secretary', async (req, res) => {
             role: 'secretary',
             isVerified: false, 
             status: 'inactive',
-            activationToken
+            activationToken,
+            temporaryPasswordExpires
         });
         await newUser.save();
 
@@ -213,6 +230,13 @@ app.post('/api/add-patient', async (req, res) => {
         });
         await newPatient.save();
 
+        await AuditLog.create({
+            action: "CREATE_PATIENT",
+            user: "SYSTEM", // Or pass the actual user email from frontend if available
+            role: "SYSTEM",
+            details: `Created new patient: ${email}`
+        });
+
         console.log(`✅ Patient Added: ${email}`);
         res.status(201).json({ message: 'Patient added successfully.' });
 
@@ -238,6 +262,7 @@ app.post('/api/add-co-owner', async (req, res) => {
         const tempPassword = crypto.randomBytes(4).toString('hex'); 
         const hashedPassword = await bcrypt.hash(tempPassword, 10);
         const activationToken = crypto.randomBytes(32).toString('hex');
+        const temporaryPasswordExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
 
         const newUser = new User({
             ...otherData, 
@@ -248,7 +273,8 @@ app.post('/api/add-co-owner', async (req, res) => {
             role: 'co-owner',
             isVerified: false,
             status: 'inactive',
-            activationToken
+            activationToken,
+            temporaryPasswordExpires
         });
         
         await newUser.save();
@@ -304,6 +330,14 @@ app.put('/api/patients/:id', async (req, res) => {
     try {
         const updatedPatient = await Patient.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedPatient) return res.status(404).json({ message: "Patient not found" });
+
+        await AuditLog.create({
+            action: "UPDATE_PATIENT",
+            user: "SYSTEM", // Or pass the actual user email from frontend if available
+            role: "SYSTEM",
+            details: `Updated patient information for: ${updatedPatient.email}`
+        });
+
         res.json(updatedPatient);
     } catch (error) {
         res.status(500).json({ message: "Error updating patient." });
@@ -467,6 +501,13 @@ app.post('/api/reset-password', async (req, res) => {
         user.isPasswordChanged = true;
         await user.save();
 
+        await AuditLog.create({
+            action: "PASSWORD_RESET",
+            user: user.email,
+            role: user.role,
+            details: `User reset their password.`
+        });
+
         res.json({ message: "Password reset successful." });
     } catch (error) {
         res.status(500).json({ message: "Server error." });
@@ -488,6 +529,13 @@ app.post('/api/change-password', async (req, res) => {
         user.password = hashedPassword;
         user.isPasswordChanged = true;
         await user.save();
+
+        await AuditLog.create({
+            action: "PASSWORD_CHANGE",
+            user: user.email,
+            role: user.role,
+            details: `User changed their password.`
+        });
 
         res.json({ message: "Password updated successfully." });
     } catch (error) {
@@ -521,6 +569,21 @@ app.get('/api/audit-logs', async (req, res) => {
         res.json(logs);
     } catch (error) {
         res.status(500).json({ message: "Error fetching logs." });
+    }
+});
+
+app.post('/api/logout', async (req, res) => {
+    try {
+        const { email, role } = req.body;
+        await AuditLog.create({
+            action: "LOGOUT",
+            user: email,
+            role: role,
+            details: `User logged out successfully.`
+        });
+        res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error during logout." });
     }
 });
 

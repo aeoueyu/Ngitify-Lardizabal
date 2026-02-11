@@ -3,6 +3,7 @@
 .container {
     font-family: 'Lexend Deca', sans-serif;
     width: 100%;
+    padding: 0 20px 40px 20px;
 }
 
 /* HEADER */
@@ -23,10 +24,6 @@
     font-size: 24px;
     font-weight: 700;
     margin: 0;
-}
-
-.highlight {
-    color: #ea8b89;
 }
 
 .subTitle {
@@ -104,13 +101,33 @@
     vertical-align: middle;
 }
 
-.noData {
-    text-align: center;
-    padding: 40px;
-    color: #999;
+/* SPECIFIC CELLS */
+.nameCell {
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.badge {
+.avatarPlaceholder {
+    width: 35px;
+    height: 35px;
+    min-width: 35px; 
+    min-height: 35px;
+    flex-shrink: 0; 
+    background-color: #e0f7fa;
+    color: #005466;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* STATUS BADGES */
+.statusBadge {
     padding: 5px 12px;
     border-radius: 20px;
     font-size: 11px;
@@ -118,12 +135,42 @@
     text-transform: uppercase;
 }
 
-.login { background-color: #e8f5e9; color: #2e7d32; }
-.logout { background-color: #f3e5f5; color: #6a1b9a; }
-.create_user { background-color: #e3f2fd; color: #1565c0; }
-.update_user { background-color: #e0f7fa; color: #006064; }
-.status_change { background-color: #fffde7; color: #f57f17; }
-.password_change { background-color: #fbe9e7; color: #d84315; }
-.password_reset { background-color: #fce4ec; color: #c2185b; }
-.create_patient { background-color: #e8eaf6; color: #303f9f; }
-.update_patient { background-color: #e1f5fe; color: #0277bd; }
+.scheduled {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.completed {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.cancelled {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+
+/* ACTIONS */
+.actionHeader {
+    text-align: right !important; 
+}
+
+.actionCell {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.viewBtn {
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    background-color: #f3f3f3;
+    color: #555;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.viewBtn:hover {
+    background-color: #e0e0e0;
+}

@@ -30,6 +30,7 @@ export default function LoginPage() {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('role', data.role); // Save role for future checks
                 localStorage.setItem('userId', data.userId);
+                localStorage.setItem('userEmail', email);
 
                 // Redirect based on role returned by backend
                 if (data.role === 'owner') navigate('/owner/dashboard');

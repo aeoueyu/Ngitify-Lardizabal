@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container {
+    font-family: 'Lexend Deca', sans-serif;
+    width: 100%;
+    padding: 0 20px 40px 20px;
+}
+
+/* Header */
+.headerContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.titleSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.pageTitle {
+    color: #444;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.subTitle {
+    color: #888;
+    font-size: 14px;
+    margin: 5px 0 0 0;
+}
+
+.actionsContainer {
+    display: flex;
+    gap: 10px;
+}
+
+.actionButton {
+    background-color: #005466;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.actionButton:hover {
+    background-color: #003d4d;
+}
+
+.reportsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+}
+
+.reportCard {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.reportTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #005466;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.statsContainer {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+}
+
+.statValue {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+}
+
+.statLabel {
+    font-size: 14px;
+    color: #888;
+    margin-top: 5px;
+}

@@ -51,6 +51,7 @@ const userSchema = new mongoose.Schema({
     isVerified: { type: Boolean, default: false },
     activationToken: { type: String },
     isPasswordChanged: { type: Boolean, default: false },
+    temporaryPasswordExpires: { type: Date },
     resetPasswordOtp: { type: String },
     resetPasswordExpires: { type: Date },
 

@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container {
+    font-family: 'Lexend Deca', sans-serif;
+    width: 100%;
+    padding: 0 20px 40px 20px;
+}
+
+.headerContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.titleSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.pageTitle {
+    color: #444;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.subTitle {
+    color: #888;
+    font-size: 14px;
+    margin: 5px 0 0 0;
+}
+
+.mainGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+}
+
+@media (min-width: 1200px) {
+    .mainGrid {
+        grid-template-columns: 1.5fr 1fr;
+    }
+}
+
+.odontogramContainer, .xrayContainer {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    padding: 25px 30px;
+}
+
+.cardTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #005466;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
+}
+
+.odontogramPlaceholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    border: 2px dashed #e0e0e0;
+    color: #888;
+    font-style: italic;
+}
+
+.xrayGallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 20px;
+}
+
+.xrayItem {
+    text-align: center;
+}
+
+.xrayImage {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.xrayImage:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.xrayCaption {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #555;
+    font-weight: 500;
+}

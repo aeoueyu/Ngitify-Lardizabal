@@ -16,7 +16,6 @@ import ActivateAccountPage from './components/email-activation/ActivateAccountPa
 import Sidebar from './components/sidebar/Sidebar';
 import SettingsPage from './components/settings/SettingsPage';
 import AccountSettingsPage from './components/settings/AccountSettingsPage';
-import SecuritySettingsPage from './components/settings/SecuritySettingsPage';
 import StaffSettingsPage from './components/settings/StaffSettingsPage';
 
 // --- DASHBOARDS ---
@@ -32,6 +31,9 @@ import ManageSecretaries from './components/user-management/ManageSecretaries';
 import AddSecretaryPage from './components/add-user/AddSecretaryPage';
 import EditSecretaryPage from './components/edit-user/EditSecretaryPage';
 import ViewSecretaryPage from './components/view-user/ViewSecretaryPage';
+
+import BranchOwners from './components/user-management/ManageBranchOwners';
+import AssignPermissions from './components/user-management/AssignPermissions';
 
 import ManagePatientsPage from './pages/management/ManagePatientsPage';
 import ManagePatients from './components/user-management/ManagePatients';
@@ -56,6 +58,17 @@ import AssignSurgeon from './components/owner/surgery/AssignSurgeon';
 import ViewSurgeryDetails from './components/owner/surgery/ViewSurgeryDetails';
 import SurgeryStatistics from './components/owner/surgery/SurgeryStatistics';
 import BillingFinance from './components/owner/finance/BillingFinance';
+
+//owner-calendar
+import StaffCalendar from './components/owner/calendar/StaffCalendar';
+
+//owner-reports
+import ReportsAnalytics from './components/owner/reports/ReportsAnalytics';
+
+//owner-dentist-tools
+import AssignedSurgeries from './components/owner/dentist-tools/AssignedSurgeries';
+import TreatmentNotes from './components/owner/dentist-tools/TreatmentNotes';
+import Odontogram from './components/owner/dentist-tools/Odontogram';
 
 //sec
 import SecretaryDashboard from './components/secretary/SecretaryDashboard';
@@ -116,11 +129,20 @@ function App() {
             <Route path="/owner/surgery-details" element={<ViewSurgeryDetails />} />
             <Route path="/owner/surgery-statistics" element={<SurgeryStatistics />} />
             <Route path="/owner/billing-finance" element={<BillingFinance />} />
+            <Route path="/owner/staff-calendar" element={<StaffCalendar />} />
+            <Route path="/owner/reports-analytics" element={<ReportsAnalytics />} />
+
+            <Route path="/owner/dentist-tools/assigned-surgeries" element={<AssignedSurgeries />} />
+            <Route path="/owner/dentist-tools/treatment-notes" element={<TreatmentNotes />} />
+            <Route path="/owner/dentist-tools/records" element={<Odontogram />} />
 
             <Route path="/owner/manage-dentists" element={<ManageDentists />} />
             <Route path="/owner/add-dentist" element={<AddDentistPage />} />
             <Route path="/owner/edit-dentist/:id" element={<EditDentistPage />} />
             <Route path="/owner/view-dentist/:id" element={<ViewDentistPage />} />
+
+            <Route path="/owner/manage-branch-owners" element={<BranchOwners />} />
+            <Route path="/owner/assign-permissions" element={<AssignPermissions />} />
 
             {/* <Route path="/owner/manage-co-owners" element={<ManageCoOwners />} />
             <Route path="/owner/add-co-owner" element={<AddCoOwnerPage />} />
@@ -144,16 +166,15 @@ function App() {
             <Route path="/patient-management/edit/:id" element={<EditPatientPage />} />
             <Route path="/patient-management/view/:id" element={<ViewPatientPage />} />
 
-            <Route path="/owner/audit-logs" element={<AuditLogsPage />} />
+            <Route path="/owner/activity-logs" element={<AuditLogsPage />} />
 
             <Route path="/owner/clinic-records" element={<PatientRecordsOwner />} />
 
             {/* OWNER SETTINGS (Refactored for Outlet) */}
             <Route path="/owner/settings" element={<SettingsPage />}>
-                <Route index element={<Navigate to="personal" replace />} />
-                <Route path="personal" element={<AccountSettingsPage />} />
-                <Route path="security" element={<SecuritySettingsPage />} />
-                <Route path="staff" element={<StaffSettingsPage />} />
+                <Route index element={<Navigate to="account" replace />} />
+                <Route path="account" element={<AccountSettingsPage />} />
+                <Route path="audit-logs" element={<AuditLogsPage />} />
             </Route>
 
             {/* SECRETARY ROUTES */}
@@ -166,9 +187,10 @@ function App() {
             <Route path="/secretary/document-management" element={<DocumentManagement />} />
             
             {/* SECRETARY SETTINGS */}
-            <Route path="/secretary/settings" element={<Navigate to="/secretary/settings/personal" replace />} />
-            <Route path="/secretary/settings/personal" element={<SettingsPage section="personal" />} />
-            <Route path="/secretary/settings/security" element={<SettingsPage section="security" />} />
+            <Route path="/secretary/settings" element={<SettingsPage />}>
+                <Route index element={<Navigate to="account" replace />} />
+                <Route path="account" element={<AccountSettingsPage />} />
+            </Route>
 
             {/* DENTIST ROUTES */}
             <Route path="/dentist/dashboard" element={<DentistDashboard />} />
@@ -177,9 +199,10 @@ function App() {
             <Route path="/dentist/schedule" element={<Schedule />} />
             
             {/* DENTIST SETTINGS */}
-            <Route path="/dentist/settings" element={<Navigate to="/dentist/settings/personal" replace />} />
-            <Route path="/dentist/settings/personal" element={<SettingsPage section="personal" />} />
-            <Route path="/dentist/settings/security" element={<SettingsPage section="security" />} />
+            <Route path="/dentist/settings" element={<SettingsPage />}>
+                <Route index element={<Navigate to="account" replace />} />
+                <Route path="account" element={<AccountSettingsPage />} />
+            </Route>
 
             {/* PATIENT ROUTES */}
             <Route path="/patient/dashboard" element={<PatientDashboard />} />
@@ -188,9 +211,10 @@ function App() {
             <Route path="/patient/treatment-journey" element={<TreatmentJourney />} />
             
             {/* PATIENT SETTINGS */}
-            <Route path="/patient/settings" element={<Navigate to="/patient/settings/personal" replace />} />
-            <Route path="/patient/settings/personal" element={<SettingsPage section="personal" />} />
-            <Route path="/patient/settings/security" element={<SettingsPage section="security" />} />
+            <Route path="/patient/settings" element={<SettingsPage />}>
+                <Route index element={<Navigate to="account" replace />} />
+                <Route path="account" element={<AccountSettingsPage />} />
+            </Route>
 
         </Route>
 
