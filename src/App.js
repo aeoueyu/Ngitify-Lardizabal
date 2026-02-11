@@ -50,6 +50,12 @@ import Schedule from './components/dentist/Schedule';
 import OwnerDashboard from './components/owner/OwnerDashboard';
 import PatientRecordsOwner from './components/owner/PatientRecords';
 
+//owner-surgery
+import SurgeryScheduling from './components/owner/surgery/SurgeryScheduling';
+import AssignSurgeon from './components/owner/surgery/AssignSurgeon';
+import ViewSurgeryDetails from './components/owner/surgery/ViewSurgeryDetails';
+import SurgeryStatistics from './components/owner/surgery/SurgeryStatistics';
+
 //sec
 import SecretaryDashboard from './components/secretary/SecretaryDashboard';
 import Billing from './components/secretary/Billing';
@@ -104,6 +110,11 @@ function App() {
             <Route path="/owner/patient-records" element={<PatientRecordsOwner />} />
             <Route path="/owner/patient-records/:id" element={<PatientProfilePage />} />
             
+            <Route path="/owner/surgery-scheduling" element={<SurgeryScheduling />} />
+            <Route path="/owner/surgery-assignment" element={<AssignSurgeon />} />
+            <Route path="/owner/surgery-details" element={<ViewSurgeryDetails />} />
+            <Route path="/owner/surgery-statistics" element={<SurgeryStatistics />} />
+
             <Route path="/owner/manage-dentists" element={<ManageDentists />} />
             <Route path="/owner/add-dentist" element={<AddDentistPage />} />
             <Route path="/owner/edit-dentist/:id" element={<EditDentistPage />} />

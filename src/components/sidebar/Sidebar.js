@@ -20,7 +20,7 @@ import billingIcon from '../../assets/sidebar-icons/finance.svg'; // Or finance.
 import folderIcon from '../../assets/sidebar-icons/folder.svg';
 
 import cameraIcon from '../../assets/sidebar-icons/camera.svg'; // Placeholder if none
-import roadmapIcon from '../../assets/sidebar-icons/roadmap.svg'; // Placeholder if none
+import surgeriesIcon from '../../assets/sidebar-icons/surgeries.svg'; // Placeholder if none
 
 // NEW ICON (Ensure you have this!)
 import clinicIcon from '../../assets/sidebar-icons/clinic.svg'; // If wala pa, use users.svg temporarily
@@ -32,18 +32,21 @@ export default function Sidebar() {
     const userRole = localStorage.getItem('role') || 'patient'; 
 
     const [isUserMgmtOpen, setIsUserMgmtOpen] = useState(false);
+    const [isSurgeryMgmtOpen, setIsSurgeryMgmtOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const isActive = (path) => location.pathname === path;
     const isUserMgmtActive = location.pathname.includes('/owner/manage');
+    const isSurgeryMgmtActive = location.pathname.includes('/owner/surgery');
     const isSettingsActive = location.pathname.includes('/settings');
 
     useEffect(() => {
-        if (isUserMgmtActive) { setIsUserMgmtOpen(true); setIsSettingsOpen(false); }
-        else if (isSettingsActive) { setIsSettingsOpen(true); setIsUserMgmtOpen(false); }
-        else { setIsUserMgmtOpen(false); setIsSettingsOpen(false); }
-    }, [location.pathname, isUserMgmtActive, isSettingsActive]);
+        if (isUserMgmtActive) { setIsUserMgmtOpen(true); setIsSettingsOpen(false); setIsSurgeryMgmtOpen(false); }
+        else if (isSettingsActive) { setIsSettingsOpen(true); setIsUserMgmtOpen(false); setIsSurgeryMgmtOpen(false); }
+        else if (isSurgeryMgmtActive) { setIsSurgeryMgmtOpen(true); setIsUserMgmtOpen(false); setIsSettingsOpen(false); }
+        else { setIsUserMgmtOpen(false); setIsSettingsOpen(false); setIsSurgeryMgmtOpen(false); }
+    }, [location.pathname, isUserMgmtActive, isSettingsActive, isSurgeryMgmtActive]);
 
     const handleLogout = () => {
         localStorage.clear();
@@ -73,6 +76,23 @@ export default function Sidebar() {
                                 <img src={recordIcon} alt="Records" className={styles.icon} />
                                 <span>Patient Records</span>
                             </li>
+
+                            {/* Surgeries Section */}
+                            <li className={`${styles.navItem} ${isSurgeryMgmtActive ? styles.active : ''}`} onClick={() => { setIsSurgeryMgmtOpen(!isSurgeryMgmtOpen); setIsUserMgmtOpen(false); setIsSettingsOpen(false); }}>
+                                <div className={styles.navHeader}>
+                                    <div className={styles.navLabel}><img src={surgeriesIcon} alt="Surgeries" className={styles.icon} /><span>Surgeries</span></div>
+                                    <span className={`${styles.arrow} ${isSurgeryMgmtOpen ? styles.rotate : ''}`}>▼</span>
+                                </div>
+                            </li>
+                            <div className={`${styles.subMenuContainer} ${isSurgeryMgmtOpen ? styles.show : ''}`}>
+                                <ul className={styles.subMenu}>
+                                    <li onClick={() => navigate('/owner/surgery-scheduling')} className={isActive('/owner/surgery-scheduling') ? styles.subActive : ''}>Surgery Scheduling</li>
+                                    <li onClick={() => navigate('/owner/surgery-assignment')} className={isActive('/owner/surgery-assignment') ? styles.subActive : ''}>Assign Surgeon</li>
+                                    <li onClick={() => navigate('/owner/surgery-details')} className={isActive('/owner/surgery-details') ? styles.subActive : ''}>View Surgery Details</li>
+                                    <li onClick={() => navigate('/owner/surgery-statistics')} className={isActive('/owner/surgery-statistics') ? styles.subActive : ''}>Surgery Statistics</li>
+                                </ul>
+                            </div>
+
 
                             {/* Management Section */}
                             <li className={`${styles.navItem} ${isUserMgmtActive ? styles.active : ''}`} onClick={() => { setIsUserMgmtOpen(!isUserMgmtOpen); setIsSettingsOpen(false); }}>
@@ -146,10 +166,6 @@ export default function Sidebar() {
                             <li className={`${styles.navItem} ${isActive('/patient/aipost-op') ? styles.active : ''}`} onClick={() => navigate('/patient/aipost-op')}>
                                 <img src={cameraIcon || dashboardIcon} alt="AI Check" className={styles.icon} />
                                 <span>AI Post-Op</span>
-                            </li>
-                            <li className={`${styles.navItem} ${isActive('/patient/treatment-journey') ? styles.active : ''}`} onClick={() => navigate('/patient/treatment-journey')}>
-                                <img src={roadmapIcon || dashboardIcon} alt="Roadmap" className={styles.icon} />
-                                <span>My Journey</span>
                             </li>
                             <li className={`${styles.navItem} ${isActive('/patient/my-finances') ? styles.active : ''}`} onClick={() => navigate('/patient/my-finances')}>
                                 <img src={billingIcon} alt="Finance" className={styles.icon} />
