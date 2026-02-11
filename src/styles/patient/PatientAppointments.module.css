@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container {
+    padding: 40px;
+    font-family: 'Lexend Deca', sans-serif;
+    background-color: #f9f9f9;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.section {
+    margin-bottom: 40px;
+}
+
+.section h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #005466;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.appointmentList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+.appointmentCard {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-left: 5px solid #007bff;
+}
+
+.pastCard {
+    border-left-color: #6c757d;
+}
+
+.appointmentCard p {
+    font-size: 16px;
+    color: #555;
+    margin: 8px 0;
+}
+
+.appointmentCard p strong {
+    font-weight: 600;
+    color: #333;
+}
+
+.status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.confirmed {
+    background-color: #28a745;
+}
+
+.completed {
+    background-color: #6c757d;
+}
+
+.actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    background-color: #005466;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Lexend Deca', sans-serif;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #003d4d;
+}
+
+.btnCancel {
+    background-color: #dc3545;
+}
+
+.btnCancel:hover {
+    background-color: #c82333;
+}

@@ -42,6 +42,7 @@ export default function Sidebar() {
     const [isRevenueOpen, setIsRevenueOpen] = useState(false);
     const [isDentistSettingsOpen, setIsDentistSettingsOpen] = useState(false);
     const [isOwnerSettingsOpen, setIsOwnerSettingsOpen] = useState(false);
+    const [isPatientRecordsOpen, setIsPatientRecordsOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const toggleRevenue = () => {
@@ -66,6 +67,10 @@ export default function Sidebar() {
         setIsOwnerSettingsOpen(!isOwnerSettingsOpen);
     };
 
+    const togglePatientRecords = () => {
+        setIsPatientRecordsOpen(!isPatientRecordsOpen);
+    };
+
     const isActive = (path) => location.pathname === path;
     const isUserMgmtActive = location.pathname.includes('/owner/manage') || 
                              location.pathname.includes('/owner/assign-permissions');
@@ -75,6 +80,7 @@ export default function Sidebar() {
     const isRevenueActive = location.pathname.includes('/dentist/revenue');
     const isDentistSettingsActive = location.pathname.includes('/dentist/settings');
     const isOwnerSettingsActive = location.pathname.includes('/owner/settings');
+    const isPatientRecordsActive = location.pathname.includes('/patient/records');
 
     useEffect(() => {
         if (isUserMgmtActive) {
@@ -89,6 +95,8 @@ export default function Sidebar() {
             setIsDentistSettingsOpen(true);
         } else if (isOwnerSettingsActive) {
             setIsOwnerSettingsOpen(true);
+        } else if (isPatientRecordsActive) {
+            setIsPatientRecordsOpen(true);
         }
     }, [location.pathname]);
 
@@ -347,13 +355,56 @@ export default function Sidebar() {
                     {/* PATIENT MENU */}
                     {userRole === 'patient' && (
                         <>
-                            <li className={`${styles.navItem} ${isActive('/patient/aipost-op') ? styles.active : ''}`} onClick={() => navigate('/patient/aipost-op')}>
-                                <img src={cameraIcon || dashboardIcon} alt="AI Check" className={styles.icon} />
-                                <span>AI Post-Op</span>
+                            {/* My Records */}
+                            <li className={`${styles.navItem} ${isPatientRecordsActive ? styles.active : ''}`} onClick={togglePatientRecords}>
+                                <div className={styles.navHeader}>
+                                    <div className={styles.navLabel}><img src={recordIcon} alt="My Records" className={styles.icon} /><span>My Records</span></div>
+                                    <span className={`${styles.arrow} ${isPatientRecordsOpen ? styles.rotate : ''}`}>▼</span>
+                                </div>
                             </li>
-                            <li className={`${styles.navItem} ${isActive('/patient/my-finances') ? styles.active : ''}`} onClick={() => navigate('/patient/my-finances')}>
-                                <img src={billingIcon} alt="Finance" className={styles.icon} />
-                                <span>My Finances</span>
+                            <div className={`${styles.subMenuContainer} ${isPatientRecordsOpen ? styles.show : ''}`}>
+                                <ul className={styles.subMenu}>
+                                    <li onClick={() => navigate('/patient/records/emr')} className={isActive('/patient/records/emr') ? styles.subActive : ''}>EMR</li>
+                                    <li onClick={() => navigate('/patient/records/odontogram')} className={isActive('/patient/records/odontogram') ? styles.subActive : ''}>Odontogram</li>
+                                    <li onClick={() => navigate('/patient/records/xray')} className={isActive('/patient/records/xray') ? styles.subActive : ''}>X-ray Viewer</li>
+                                    <li onClick={() => navigate('/patient/records/simulation-results')} className={isActive('/patient/records/simulation-results') ? styles.subActive : ''}>Predictive Simulation Results</li>
+                                </ul>
+                            </div>
+
+                            {/* Appointments & Surgeries */}
+                            <li className={`${styles.navItem} ${isActive('/patient/appointments') ? styles.active : ''}`} onClick={() => navigate('/patient/appointments')}>
+                                <img src={scheduleIcon} alt="Appointments" className={styles.icon} />
+                                <span>Appointments & Surgeries</span>
+                            </li>
+
+                            {/* Billing & Payments */}
+                            <li className={`${styles.navItem} ${isActive('/patient/billing') ? styles.active : ''}`} onClick={() => navigate('/patient/billing')}>
+                                <img src={billingIcon} alt="Billing" className={styles.icon} />
+                                <span>Billing & Payments</span>
+                            </li>
+
+                            {/* Chatbot Assistant */}
+                            <li className={`${styles.navItem} ${isActive('/patient/chatbot') ? styles.active : ''}`} onClick={() => navigate('/patient/chatbot')}>
+                                <img src={patientSideIcon} alt="Chatbot" className={styles.icon} />
+                                <span>Chatbot Assistant</span>
+                            </li>
+
+                            {/* Notifications */}
+                            <li className={`${styles.navItem} ${isActive('/patient/notifications') ? styles.active : ''}`} onClick={() => navigate('/patient/notifications')}>
+                                <img src={warningIcon} alt="Notifications" className={styles.icon} />
+                                <span>Notifications</span>
+                            </li>
+
+                            {/* AI Predictive Outcome Simulator */}
+                            <li className={`${styles.navItem} ${isActive('/patient/ai-simulator') ? styles.active : ''}`} onClick={() => navigate('/patient/ai-simulator')}>
+                                <img src={cameraIcon} alt="AI Simulator" className={styles.icon} />
+                                <span>AI Predictive Simulator</span>
+                            </li>
+
+                            {/* Settings */}
+                            <li className={`${styles.navItem} ${isActive('/patient/settings') ? styles.active : ''}`} onClick={() => navigate('/patient/settings')}>
+                                <img src={settingsIcon} alt="Settings" className={styles.icon} />
+                                <span>Settings</span>
                             </li>
                         </>
                     )}

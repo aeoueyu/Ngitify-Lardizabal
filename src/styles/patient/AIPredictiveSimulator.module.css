@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container {
+    padding: 40px;
+    font-family: 'Lexend Deca', sans-serif;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 16px;
+    color: #666;
+    max-width: 700px;
+    margin: 0 auto 40px auto;
+}
+
+.uploadArea {
+    background-color: #fff;
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 2px dashed #ddd;
+}
+
+.uploadArea h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #005466;
+    margin-bottom: 20px;
+}
+
+.uploadArea input[type="file"] {
+    display: none;
+}
+
+.uploadLabel {
+    background-color: #005466;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.uploadLabel:hover {
+    background-color: #003d4d;
+}
+
+.comparisonArea {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.imagePanel {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.imagePanel h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #005466;
+    margin-bottom: 15px;
+}
+
+.imagePanel img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 200px;
+}
+
+.loading p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: #005466;
+    animation: spin 1s ease infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Lexend Deca', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #218838;
+}
+
+.btnDiscard {
+    background-color: #dc3545;
+}
+
+.btnDiscard:hover {
+    background-color: #c82333;
+}

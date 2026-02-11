@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container {
+    padding: 40px;
+    font-family: 'Lexend Deca', sans-serif;
+    background-color: #f9f9f9;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.summaryCard {
+    background: linear-gradient(135deg, #005466, #006980);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 40px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 84, 102, 0.2);
+}
+
+.summaryCard h2 {
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.balanceAmount {
+    font-size: 42px;
+    font-weight: 700;
+    margin: 10px 0;
+}
+
+.dueDate {
+    font-size: 16px;
+    opacity: 0.9;
+    margin-bottom: 25px;
+}
+
+.payNowBtn {
+    background-color: #fff;
+    color: #005466;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: 'Lexend Deca', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.payNowBtn:hover {
+    background-color: #f0f4f5;
+    transform: translateY(-2px);
+}
+
+.historySection {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.historySection h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #005466;
+    margin-bottom: 20px;
+}
+
+.billingTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.billingTable th, .billingTable td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.billingTable th {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    background-color: #f8f9fa;
+}
+
+.billingTable td {
+    font-size: 15px;
+    color: #555;
+}
+
+.status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.paid {
+    background-color: #28a745;
+}
+
+.downloadBtn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.3s ease;
+}
+
+.downloadBtn:hover {
+    background-color: #0056b3;
+}

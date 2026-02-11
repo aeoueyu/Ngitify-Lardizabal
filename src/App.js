@@ -107,6 +107,12 @@ import SecretaryReports from './components/secretary/Reports';
 
 //patient
 import PatientDashboard from './components/patient/PatientDashboard';
+import MyRecords from './components/patient/MyRecords';
+import PatientAppointments from './components/patient/PatientAppointments';
+import PatientBilling from './components/patient/PatientBilling';
+import ChatbotAssistant from './components/patient/ChatbotAssistant';
+import PatientNotifications from './components/patient/PatientNotifications';
+import AIPredictiveSimulator from './components/patient/AIPredictiveSimulator';
 import AIPostOp from './components/patient/AIPostOp';
 import MyFinances from './components/patient/MyFinances';
 import TreatmentJourney from './components/patient/TreatmentJourney';
@@ -256,6 +262,15 @@ function App() {
 
             {/* PATIENT ROUTES */}
             <Route path="/patient/dashboard" element={<PatientDashboard />} />
+            <Route path="/patient/records/emr" element={<MyRecords />} />
+            <Route path="/patient/records/odontogram" element={<MyRecords />} />
+            <Route path="/patient/records/xray" element={<MyRecords />} />
+            <Route path="/patient/records/simulation-results" element={<MyRecords />} />
+            <Route path="/patient/appointments" element={<PatientAppointments />} />
+            <Route path="/patient/billing" element={<PatientBilling />} />
+            <Route path="/patient/chatbot" element={<ChatbotAssistant />} />
+            <Route path="/patient/notifications" element={<PatientNotifications />} />
+            <Route path="/patient/ai-simulator" element={<AIPredictiveSimulator />} />
             <Route path="/patient/aipost-op" element={<AIPostOp />} />
             <Route path="/patient/my-finances" element={<MyFinances />} />
             <Route path="/patient/treatment-journey" element={<TreatmentJourney />} />

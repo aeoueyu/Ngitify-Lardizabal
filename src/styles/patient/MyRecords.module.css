@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container {
+    padding: 40px;
+    font-family: 'Lexend Deca', sans-serif;
+    background-color: #f9f9f9;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.recordSection {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.recordSection h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #005466;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.recordContent p {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 10px;
+}
+
+.recordContent p strong {
+    font-weight: 600;
+    color: #333;
+}
+
+.imageContainer {
+    text-align: center;
+    padding: 20px;
+    background-color: #f0f4f5;
+    border-radius: 10px;
+}
+
+.image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}

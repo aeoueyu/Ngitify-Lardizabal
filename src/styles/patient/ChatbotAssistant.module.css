@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+
+.container {
+    padding: 40px;
+    font-family: 'Lexend Deca', sans-serif;
+    background-color: #f9f9f9;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+}
+
+.title {
+    grid-column: 1 / -1;
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0;
+}
+
+.chatWindow {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+}
+
+.messageList {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message {
+    padding: 12px 18px;
+    border-radius: 20px;
+    max-width: 80%;
+    line-height: 1.5;
+}
+
+.bot {
+    background-color: #e9ecef;
+    color: #333;
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+}
+
+.user {
+    background-color: #005466;
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+}
+
+.chatInput {
+    display: flex;
+    padding: 20px;
+    border-top: 1px solid #eee;
+}
+
+.chatInput input {
+    flex-grow: 1;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    padding: 12px 20px;
+    font-family: 'Lexend Deca', sans-serif;
+    font-size: 15px;
+}
+
+.chatInput input:focus {
+    outline: none;
+    border-color: #005466;
+}
+
+.chatInput button {
+    background-color: #005466;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    margin-left: 10px;
+    font-family: 'Lexend Deca', sans-serif;
+    font-size: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.chatInput button:hover {
+    background-color: #003d4d;
+}
+
+.infoPanel {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+}
+
+.infoPanel h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #005466;
+    margin-bottom: 15px;
+}
+
+.infoPanel p {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.infoBtn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    font-family: 'Lexend Deca', sans-serif;
+    font-size: 15px;
+    margin-bottom: 25px;
+    transition: background-color 0.3s ease;
+}
+
+.infoBtn:hover {
+    background-color: #0056b3;
+}
