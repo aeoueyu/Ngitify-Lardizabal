@@ -46,8 +46,7 @@ export default function Sidebar() {
     useEffect(() => {
         if (isUserMgmtActive) { setIsUserMgmtOpen(true); setIsSettingsOpen(false); setIsSurgeryMgmtOpen(false); }
         else if (isSettingsActive) { setIsSettingsOpen(true); setIsUserMgmtOpen(false); setIsSurgeryMgmtOpen(false); }
-        else if (isSurgeryMgmtActive) { setIsSurgeryMgmtOpen(true); setIsUserMgmtOpen(false); setIsSettingsOpen(false); setIsFinanceMgmtOpen(false); }
-        else if (isFinanceMgmtActive) { setIsFinanceMgmtOpen(true); setIsSurgeryMgmtOpen(false); setIsUserMgmtOpen(false); setIsSettingsOpen(false); }
+        else if (isSurgeryMgmtActive) { setIsSurgeryMgmtOpen(true); setIsUserMgmtOpen(false); setIsSettingsOpen(false); }
         else { setIsUserMgmtOpen(false); setIsSettingsOpen(false); setIsSurgeryMgmtOpen(false); }
     }, [location.pathname, isUserMgmtActive, isSettingsActive, isSurgeryMgmtActive, isFinanceMgmtActive]);
 
@@ -97,17 +96,10 @@ export default function Sidebar() {
                             </div>
 
 
-                            <li className={`${styles.navItem} ${isFinanceMgmtActive ? styles.active : ''}`} onClick={() => { setIsFinanceMgmtOpen(!isFinanceMgmtOpen); setIsUserMgmtOpen(false); setIsSettingsOpen(false); setIsSurgeryMgmtOpen(false); }}>
-                                <div className={styles.navHeader}>
-                                    <div className={styles.navLabel}><img src={financeIcon} alt="Finance" className={styles.icon} /><span>Billing & Finance</span></div>
-                                    <span className={`${styles.arrow} ${isFinanceMgmtOpen ? styles.rotate : ''}`}>▼</span>
-                                </div>
+                            <li className={`${styles.navItem} ${isFinanceMgmtActive ? styles.active : ''}`} onClick={() => navigate('/owner/billing-finance')}>
+                                <img src={financeIcon} alt="Finance" className={styles.icon} />
+                                <span>Billing & Finance</span>
                             </li>
-                            <div className={`${styles.subMenuContainer} ${isFinanceMgmtOpen ? styles.show : ''}`}>
-                                <ul className={styles.subMenu}>
-                                    <li onClick={() => navigate('/owner/billing-finance')} className={isActive('/owner/billing-finance') ? styles.subActive : ''}>Revenue Reports</li>
-                                </ul>
-                            </div>
 
 
                             {/* Management Section */}

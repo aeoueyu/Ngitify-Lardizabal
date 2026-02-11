@@ -18,6 +18,15 @@ const monthlyRevenue = [
     { name: 'Jun', revenue: 170000 },
 ];
 
+const monthlyPaymentStatus = [
+    { name: 'Jan', paid: 150000, unpaid: 30000 },
+    { name: 'Feb', paid: 200000, unpaid: 20000 },
+    { name: 'Mar', paid: 210000, unpaid: 40000 },
+    { name: 'Apr', paid: 180000, unpaid: 10000 },
+    { name: 'May', paid: 220000, unpaid: 20000 },
+    { name: 'Jun', paid: 150000, unpaid: 20000 },
+];
+
 const paymentStatus = [
     { name: 'Paid', value: revenueData.paid },
     { name: 'Unpaid', value: revenueData.unpaid },
@@ -87,18 +96,19 @@ export default function BillingFinance() {
                     </ResponsiveContainer>
                 </div>
                 <div className={styles.chartCard}>
-                    <h3 className={styles.cardTitle}>Payment Status (Paid vs. Unpaid)</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={paymentStatus} layout="vertical">
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis type="number" />
-                            <YAxis type="category" dataKey="name" />
-                            <Tooltip formatter={(value) => `₱${value.toLocaleString()}`} />
-                            <Legend />
-                            <Bar dataKey="value" stackId="a" fill="#007a8c" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
+                            <h3 className={styles.cardTitle}>Payment Status by Month (Paid vs. Unpaid)</h3>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={monthlyPaymentStatus}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip formatter={(value) => `₱${value.toLocaleString()}`} />
+                                    <Legend />
+                                    <Bar dataKey="paid" stackId="a" fill="#2e7d32" name="Paid" />
+                                    <Bar dataKey="unpaid" stackId="a" fill="#c62828" name="Unpaid" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
             </div>
 
             {/* Recent Transactions Table */}
