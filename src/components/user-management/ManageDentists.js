@@ -79,6 +79,23 @@ export default function ManageDentists() {
         }
     };
 
+    const handleResendActivation = async (userId) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/user/resend-activation/${userId}`, {
+                method: 'POST',
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setAlertModal({ show: true, message: data.message });
+            } else {
+                setAlertModal({ show: true, message: data.message || "Failed to resend activation email." });
+            }
+        } catch (error) {
+            console.error("Error resending activation:", error);
+            setAlertModal({ show: true, message: "Server error. Please try again later." });
+        }
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.headerContainer}>
@@ -154,17 +171,26 @@ export default function ManageDentists() {
                                             >
                                                 Edit
                                             </button>
-                                            <button 
-                                                className={styles.deleteBtn} 
-                                                onClick={() => handleToggleStatusClick(dentist._id, dentist.status || 'inactive', dentist.isVerified)}
-                                                style={{ 
-                                                    backgroundColor: dentist.status === 'inactive' ? '#e8f5e9' : '#ffebee',
-                                                    color: dentist.status === 'inactive' ? '#2e7d32' : '#c62828',
-                                                    cursor: 'pointer'
-                                                }}
-                                            >
-                                                {dentist.status === 'inactive' ? 'Activate' : 'Deactivate'}
-                                            </button>
+                                            {isInactive && isUnverified ? (
+                                                <button 
+                                                    className={styles.resendBtn}
+                                                    onClick={() => handleResendActivation(dentist._id)}
+                                                >
+                                                    Resend Activation
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    className={styles.deleteBtn} 
+                                                    onClick={() => handleToggleStatusClick(dentist._id, dentist.status || 'inactive', dentist.isVerified)}
+                                                    style={{ 
+                                                        backgroundColor: dentist.status === 'inactive' ? '#e8f5e9' : '#ffebee',
+                                                        color: dentist.status === 'inactive' ? '#2e7d32' : '#c62828',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    {dentist.status === 'inactive' ? 'Activate' : 'Deactivate'}
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 );

@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../../styles/owner/PatientRecords.module.css';
+import { mockPatients } from '../../data/patients';
 
 export default function PatientRecords() {
     const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
 
-    // MOCK DATA matching PatientProfilePage for layout testing
-    const allPatients = [
-        { id: 1, name: 'John Doe', branch: 'Parañaque', lastVisit: '2023-10-15', status: 'active' },
-        { id: 2, name: 'Jane Smith', branch: 'Las Piñas', lastVisit: '2023-11-01', status: 'active' },
-    ];
+    const allPatients = mockPatients;
 
     const filtered = allPatients.filter(p => 
         (p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -55,7 +52,7 @@ export default function PatientRecords() {
                             filtered.map(patient => (
                                 <tr key={patient.id}>
                                     <td><strong>{patient.name}</strong></td>
-                                    <td className={styles.mono}>PAT-{patient.id.toString().padStart(3, '0')}</td>
+                                    <td className={styles.mono}>{patient.id}</td>
                                     <td>{patient.branch}</td>
                                     <td>{patient.lastVisit}</td>
                                     <td>

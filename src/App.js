@@ -50,6 +50,8 @@ import Financials from './components/dentist/Financials';
 import Schedule from './components/dentist/Schedule';
 
 
+import ViewPatientPageDentist from './components/dentist/ViewPatientPage';
+
 //owner
 import OwnerDashboard from './components/owner/OwnerDashboard';
 import PatientRecordsOwner from './components/owner/PatientRecords';
@@ -200,6 +202,7 @@ function App() {
             {/* DENTIST ROUTES */}
             <Route path="/dentist/dashboard" element={<DentistDashboard />} />
             <Route path="/dentist/patient-records" element={<PatientRecords />} />
+            <Route path="/dentist/patient-records/:id" element={<ViewPatientPageDentist />} />
             <Route path="/dentist/financials" element={<Financials />} />
             <Route path="/dentist/schedule" element={<Schedule />} />
             

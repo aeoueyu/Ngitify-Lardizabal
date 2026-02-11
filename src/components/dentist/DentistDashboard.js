@@ -1,121 +1,116 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styles from '../../styles/dentist/DentistDashboard.module.css';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
+import { FaUserMd, FaSyringe, FaDollarSign } from 'react-icons/fa';
 
 export default function DentistDashboard() {
-    const [currentDateTime, setCurrentDateTime] = useState(new Date());
+    // Sample Static Data
+    const summary = {
+        upcomingSurgeries: 5,
+        patientsHandled: 23,
+        commissionThisMonth: 45000,
+    };
 
-    useEffect(() => {
-        const timer = setInterval(() => setCurrentDateTime(new Date()), 60000);
-        return () => clearInterval(timer);
-    }, []);
+    const surgeriesPerWeek = [
+        { week: 'Week 1', surgeries: 4 },
+        { week: 'Week 2', surgeries: 6 },
+        { week: 'Week 3', surgeries: 3 },
+        { week: 'Week 4', surgeries: 8 },
+    ];
 
-    const dayName = currentDateTime.toLocaleDateString('en-US', { weekday: 'long' });
-    const formattedDate = currentDateTime.toLocaleDateString('en-GB', {
-        day: 'numeric', month: 'short', year: 'numeric'
-    });
+    const procedureTypes = [
+        { name: 'Extractions', value: 40 },
+        { name: 'Fillings', value: 30 },
+        { name: 'Surgeries', value: 30 },
+    ];
+
+    const commissionPerProcedure = [
+        { name: 'Cleaning', commission: 5000 },
+        { name: 'Extraction', commission: 12000 },
+        { name: 'Filling', commission: 8000 },
+        { name: 'Surgery', commission: 20000 },
+    ];
+
+    const PIE_COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
     return (
-        <div className={styles.dashboardContainer}>
+        <div className={styles.container}>
             <header className={styles.header}>
-                <div className={styles.welcomeSection}>
+                <div>
                     <h1 className={styles.title}>Dentist Dashboard</h1>
-                    <p className={styles.subtitle}>Welcome back, Doc! Here's your performance overview.</p>
+                    <p className={styles.subtitle}>Your personal performance and schedule overview.</p>
                 </div>
-                
-                <div className={styles.topRightActions}>
-                    <div className={styles.dateTime}>
-                        <span className={styles.dayLabel}>{dayName}</span>
-                        <span className={styles.dateLabel}>{formattedDate}</span>
-                    </div>
-                </div>
+                <div className={styles.dateBadge}>February 2026</div>
             </header>
 
+            {/* QUICK OVERVIEW */}
             <div className={styles.statsRow}>
                 <div className={styles.statCard}>
-                    <span className={styles.statTitle}>Total Procedures (Feb)</span>
-                    <h2 className={styles.statNumber}>128</h2>
-                    <span className={styles.statTrend}>+12% from Jan</span>
-                </div>
-                <div className={styles.statCard} style={{ borderLeft: '4px solid #ea8b89' }}>
-                    <span className={styles.statTitle}>My Revenue Contribution</span>
-                    <h2 className={styles.statNumber} style={{ color: '#ea8b89' }}>₱80,400</h2>
-                    <span className={styles.statTrend}>40 Extractions, 12 Root Canals</span>
+                    <div>
+                        <span className={styles.statLabel}>Upcoming Surgeries</span>
+                        <h2 className={styles.statValue}>{summary.upcomingSurgeries}</h2>
+                    </div>
+                    <FaUserMd className={styles.statIcon} />
                 </div>
                 <div className={styles.statCard}>
-                    <span className={styles.statTitle}>Personal Commission</span>
-                    <h2 className={styles.statNumber} style={{ color: '#005466' }}>₱48,200</h2>
-                    <span className={styles.statTrend}>Paid Out</span>
+                    <div>
+                        <span className={styles.statLabel}>Patients Handled (This Week)</span>
+                        <h2 className={styles.statValue}>{summary.patientsHandled}</h2>
+                    </div>
+                    <FaSyringe className={styles.statIcon} />
+                </div>
+                <div className={styles.statCard}>
+                    <div>
+                        <span className={styles.statLabel}>Commission Summary (This Month)</span>
+                        <h2 className={styles.statValue}>₱{summary.commissionThisMonth.toLocaleString()}</h2>
+                    </div>
+                    <FaDollarSign className={styles.statIcon} />
                 </div>
             </div>
 
-            <div className={styles.mainGrid}>
-                
-                {/* PERFORMANCE BREAKDOWN */}
-                <div className={styles.tableSection}>
-                    <div className={styles.sectionHeader}>
-                        <h3>Performance Breakdown (Top Services)</h3>
-                        <span style={{fontSize: '12px', color: '#888'}}>Month: February</span>
-                    </div>
-                    <table className={styles.procedureTable}>
-                        <thead>
-                            <tr>
-                                <th>Procedure Type</th>
-                                <th>Count</th>
-                                <th>Revenue</th>
-                                <th>Contribution</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Tooth Extraction</strong></td>
-                                <td>40</td>
-                                <td>₱80,000</td>
-                                <td><div className={styles.bar} style={{width:'80%', background:'#ea8b89'}}></div></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Root Canal Treatment</strong></td>
-                                <td>12</td>
-                                <td>₱60,000</td>
-                                <td><div className={styles.bar} style={{width:'60%', background:'#4d8794'}}></div></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Teeth Whitening</strong></td>
-                                <td>8</td>
-                                <td>₱48,000</td>
-                                <td><div className={styles.bar} style={{width:'48%', background:'#95a5a6'}}></div></td>
-                            </tr>
-                            <tr>
-                                <td><strong>General Cleaning</strong></td>
-                                <td>68</td>
-                                <td>₱81,600</td>
-                                <td><div className={styles.bar} style={{width:'82%', background:'#005466'}}></div></td>
-                            </tr>
-                        </tbody>
-                    </table>
+            {/* CHARTS */}
+            <div className={styles.chartsGrid}>
+                <div className={styles.chartCard}>
+                    <h3 className={styles.chartTitle}>Surgeries Per Week</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={surgeriesPerWeek}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="week" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Line type="monotone" dataKey="surgeries" stroke="#8884d8" activeDot={{ r: 8 }} />
+                        </LineChart>
+                    </ResponsiveContainer>
                 </div>
 
-                {/* TODAY'S DUTY MINI-VIEW */}
-                <div className={styles.calendarMini}>
-                    <div className={styles.sectionHeader}>
-                        <h3>Today's Schedule</h3>
-                    </div>
-                    <div className={styles.taskList}>
-                        <div className={styles.taskItem}>
-                            <div className={styles.time}>09:00 AM</div>
-                            <div>
-                                <strong>Mark Tuan</strong> <br/>
-                                <span style={{fontSize:'12px', color:'#666'}}>General Cleaning</span>
-                            </div>
-                        </div>
-                        <div className={styles.taskItem} style={{background:'#e0f7fa'}}>
-                            <div className={styles.time}>11:30 AM</div>
-                            <div>
-                                <strong>Alice Gupta</strong> <br/>
-                                <span style={{fontSize:'12px', color:'#006064'}}>Root Canal (Follow-up)</span>
-                            </div>
-                        </div>
+                <div className={styles.chartCard}>
+                    <h3 className={styles.chartTitle}>Procedure Types</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                            <Pie data={procedureTypes} cx="50%" cy="50%" labelLine={false} outerRadius={100} fill="#8884d8" dataKey="value" nameKey="name" label>
+                                {procedureTypes.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
 
-                    </div>
+                <div className={`${styles.chartCard} ${styles.fullWidthCard}`}>
+                    <h3 className={styles.chartTitle}>Commission Earned Per Procedure</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={commissionPerProcedure}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="commission" fill="#82ca9d" />
+                        </BarChart>
+                    </ResponsiveContainer>
                 </div>
             </div>
         </div>

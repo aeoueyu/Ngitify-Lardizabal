@@ -1,0 +1,17 @@
+.container {
+    margin-top: 2rem;
+}
+
+.chart {
+    /* Basic styling for the chart area */
+    border: 1px solid #ddd;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #fff;
+    min-height: 300px; /* Example height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-style: italic;
+    color: #888;
+}

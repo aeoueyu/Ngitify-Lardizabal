@@ -389,6 +389,46 @@ app.put('/api/user/toggle-status/:id', async (req, res) => {
     }
 });
 
+app.post('/api/user/resend-activation/:id', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        // Generate new credentials
+        const tempPassword = crypto.randomBytes(4).toString('hex');
+        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+        const activationToken = crypto.randomBytes(32).toString('hex');
+        const temporaryPasswordExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+
+        // Update user document
+        user.password = hashedPassword;
+        user.activationToken = activationToken;
+        user.temporaryPasswordExpires = temporaryPasswordExpires;
+        user.isVerified = false;
+        user.status = 'inactive';
+        await user.save();
+
+        // Resend activation email
+        const activationLink = `http://localhost:3000/activate-account/${activationToken}`;
+        await sendActivationEmail(user.email, user.role, tempPassword, activationLink);
+
+        await AuditLog.create({
+            action: "RESEND_ACTIVATION",
+            user: "ADMIN",
+            role: "owner",
+            details: `Resent activation email to ${user.email}`
+        });
+
+        res.json({ message: "Activation email has been resent successfully." });
+
+    } catch (error) {
+        console.error("Error resending activation email:", error);
+        res.status(500).json({ message: "Server error while resending activation email." });
+    }
+});
+
 
 // --- UPDATE USER (Re-activation logic) ---
 app.put('/api/user/:id', async (req, res) => {

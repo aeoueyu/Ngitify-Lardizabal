@@ -12,64 +12,84 @@ export default function ManageBranchOwners() {
 
     // Modal States
     const [statusModal, setStatusModal] = useState({ show: false, id: null, status: null });
+    const [alertModal, setAlertModal] = useState({ show: false, message: '' });
 
-    // Sample Data
-    const sampleData = [
-        {
-            _id: '1',
-            name: 'John Doe',
-            email: 'john.doe@example.com',
-            branch: 'Main Branch',
-            status: 'active',
-            isVerified: true,
-            profileImage: ''
-        },
-        {
-            _id: '2',
-            name: 'Jane Smith',
-            email: 'jane.smith@example.com',
-            branch: 'Second Branch',
-            status: 'inactive',
-            isVerified: true,
-            profileImage: ''
-        },
-        {
-            _id: '3',
-            name: 'Peter Jones',
-            email: 'peter.jones@example.com',
-            branch: 'Main Branch',
-            status: 'active',
-            isVerified: false,
-            profileImage: ''
+    const fetchBranchOwners = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/users?role=co-owner');
+            const data = await response.json();
+            if (response.ok) {
+                const formattedData = data.map(user => ({
+                    ...user,
+                    name: user.name ? `${user.name.first} ${user.name.last}` : 'Unknown'
+                }));
+                setBranchOwners(formattedData);
+            }
+        } catch (error) {
+            console.error("Error fetching branch owners:", error);
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
 
     useEffect(() => {
-        // Simulate fetching data
-        setBranchOwners(sampleData);
-        setLoading(false);
+        fetchBranchOwners();
     }, []);
 
     const filteredBranchOwners = branchOwners.filter(owner => 
         owner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         owner.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        owner.branch.toLowerCase().includes(searchTerm.toLowerCase())
+        (owner.branch && owner.branch.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
-    const handleToggleStatusClick = (id, currentStatus) => {
+    const handleToggleStatusClick = (id, currentStatus, isVerified) => {
+        if (currentStatus === 'inactive' && !isVerified) {
+            setAlertModal({ 
+                show: true, 
+                message: "Cannot activate this account. The user has not verified their email yet." 
+            });
+            return;
+        }
         setStatusModal({ show: true, id, status: currentStatus });
     };
 
-    const confirmStatusChange = () => {
+    const confirmStatusChange = async () => {
         const { id, status } = statusModal;
         const newStatus = status === 'active' ? 'inactive' : 'active';
         
-        setBranchOwners(prevOwners => 
-            prevOwners.map(owner => 
-                owner._id === id ? { ...owner, status: newStatus } : owner
-            )
-        );
-        setStatusModal({ show: false, id: null, status: null });
+        try {
+            const res = await fetch(`http://localhost:5000/api/user/toggle-status/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if(res.ok) {
+                fetchBranchOwners();
+                setStatusModal({ show: false, id: null, status: null });
+            } else {
+                alert("Action failed.");
+            }
+        } catch(error) {
+            console.error(error);
+        }
+    };
+
+    const handleResendActivation = async (userId) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/user/resend-activation/${userId}`, {
+                method: 'POST',
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setAlertModal({ show: true, message: data.message });
+            } else {
+                setAlertModal({ show: true, message: data.message || "Failed to resend activation email." });
+            }
+        } catch (error) {
+            console.error("Error resending activation:", error);
+            setAlertModal({ show: true, message: "Server error. Please try again later." });
+        }
     };
 
     return (
@@ -141,16 +161,25 @@ export default function ManageBranchOwners() {
                                             >
                                                 Edit
                                             </button>
-                                            <button 
-                                                className={styles.deleteBtn} 
-                                                onClick={() => handleToggleStatusClick(owner._id, owner.status)}
-                                                style={{ 
-                                                    backgroundColor: owner.status === 'inactive' ? '#e8f5e9' : '#ffebee',
-                                                    color: owner.status === 'inactive' ? '#2e7d32' : '#c62828',
-                                                }}
-                                            >
-                                                {owner.status === 'inactive' ? 'Activate' : 'Deactivate'}
-                                            </button>
+                                            {isInactive && !owner.isVerified ? (
+                                                <button 
+                                                    className={styles.resendBtn}
+                                                    onClick={() => handleResendActivation(owner._id)}
+                                                >
+                                                    Resend Activation
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    className={styles.deleteBtn} 
+                                                    onClick={() => handleToggleStatusClick(owner._id, owner.status)}
+                                                    style={{ 
+                                                        backgroundColor: owner.status === 'inactive' ? '#e8f5e9' : '#ffebee',
+                                                        color: owner.status === 'inactive' ? '#2e7d32' : '#c62828',
+                                                    }}
+                                                >
+                                                    {owner.status === 'inactive' ? 'Activate' : 'Deactivate'}
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 );
@@ -181,6 +210,31 @@ export default function ManageBranchOwners() {
                                 Yes, {statusModal.status === 'active' ? 'Deactivate' : 'Activate'}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {alertModal.show && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalCard}>
+                        <img src={warningIcon} alt="Warning" className={styles.modalIcon} />
+                        <h3 className={styles.modalTitle}>Alert</h3>
+                        <p className={styles.modalMessage}>{alertModal.message}</p>
+                        <button 
+                            onClick={() => setAlertModal({ show: false, message: '' })}
+                            style={{ 
+                                marginTop: '20px', 
+                                background: 'none', 
+                                border: 'none', 
+                                color: '#555', 
+                                fontWeight: 'bold', 
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                textDecoration: 'underline'
+                            }}
+                        >
+                            Close
+                        </button>
                     </div>
                 </div>
             )}

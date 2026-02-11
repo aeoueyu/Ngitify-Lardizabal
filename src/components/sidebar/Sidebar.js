@@ -212,6 +212,9 @@ export default function Sidebar() {
                     {/* DENTIST MENU */}
                     {userRole === 'dentist' && (
                         <>
+                            <li className={`${styles.navItem} ${isActive('/dentist/patient-records') ? styles.active : ''}`} onClick={() => navigate('/dentist/patient-records')}>
+                                <img src={recordIcon} alt="Records" className={styles.icon} /><span>Patient Records</span>
+                            </li>
                             <li className={`${styles.navItem} ${isActive('/dentist/schedule') ? styles.active : ''}`} onClick={() => navigate('/dentist/schedule')}>
                                 <img src={scheduleIcon} alt="Schedule" className={styles.icon} /><span>Schedule</span>
                             </li>

@@ -71,6 +71,23 @@ export default function ManageSecretaries() {
         } catch(error) { console.error(error); }
     };
 
+    const handleResendActivation = async (userId) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/user/resend-activation/${userId}`, {
+                method: 'POST',
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setAlertModal({ show: true, message: data.message });
+            } else {
+                setAlertModal({ show: true, message: data.message || "Failed to resend activation email." });
+            }
+        } catch (error) {
+            console.error("Error resending activation:", error);
+            setAlertModal({ show: true, message: "Server error. Please try again later." });
+        }
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.headerContainer}>
@@ -144,17 +161,26 @@ export default function ManageSecretaries() {
                                             >
                                                 Edit
                                             </button>
-                                            <button 
-                                                className={styles.deleteBtn} 
-                                                onClick={() => handleToggleStatusClick(sec._id, sec.status || 'active', sec.isVerified)}
-                                                style={{ 
-                                                    backgroundColor: sec.status === 'inactive' ? '#e8f5e9' : '#ffebee',
-                                                    color: sec.status === 'inactive' ? '#2e7d32' : '#c62828',
-                                                    cursor: 'pointer'
-                                                }}
-                                            >
-                                                {sec.status === 'inactive' ? 'Activate' : 'Deactivate'}
-                                            </button>
+                                            {isInactive && isUnverified ? (
+                                                <button 
+                                                    className={styles.resendBtn}
+                                                    onClick={() => handleResendActivation(sec._id)}
+                                                >
+                                                    Resend Activation
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    className={styles.deleteBtn} 
+                                                    onClick={() => handleToggleStatusClick(sec._id, sec.status || 'inactive', sec.isVerified)}
+                                                    style={{ 
+                                                        backgroundColor: sec.status === 'inactive' ? '#e8f5e9' : '#ffebee',
+                                                        color: sec.status === 'inactive' ? '#2e7d32' : '#c62828',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    {sec.status === 'inactive' ? 'Activate' : 'Deactivate'}
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 );
